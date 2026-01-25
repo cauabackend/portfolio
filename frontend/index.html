@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="meta.title">My Portfolio</title>
+    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="./i18n-styles.css">
+</head>
+
+<body>
+
+    <header class="header">
+        <nav class="nav">
+            <a href="#home" class="logo">My Portfolio</a>
+
+            <ul class="nav-links">
+                <li><a href="#home" data-i18n="nav.home">Home</a></li>
+                <li><a href="#sobre" data-i18n="nav.about">About</a></li>
+                <li><a href="#skills" data-i18n="nav.skills">Skills</a></li>
+                <li><a href="#projetos" data-i18n="nav.projects">Projects</a></li>
+                <li><a href="#contato" data-i18n="nav.contact">Contact</a></li>
+            </ul>
+
+            <div class="header-buttons">
+                <!-- Language Switcher - Será preenchido pelo JavaScript -->
+                <div class="lang-switcher"></div>
+
+                <button class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Alternar tema">
+                    🌙
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <section id="home" class="hero">
+        <div class="hero-grid">
+            <div class="hero-content">
+                <span class="hero-eyebrow" data-i18n="hero.eyebrow">Welcome To My Portfolio</span>
+                <h1 data-i18n="hero.title">Hi, I am Cauã<br>Back-End developer</h1>
+                <p data-i18n="hero.description">I turn ideas into robust digital systems, designing and developing scalable, secure, and high-performance web applications.</p>
+
+                <div class="hero-actions">
+                    <a href="https://github.com/cauabackend" target="_blank" rel="noopener noreferrer" class="btn-primary" data-i18n="hero.cta">
+                        View My Work
+                    </a>
+                </div>
+            </div>
+
+            <div class="hero-visual">
+                <div class="visual-box"></div>
+                <div class="visual-outline"></div>
+            </div>
+        </div>
+
+        <div class="scroll-indicator">
+            <span class="scroll-text" data-i18n="hero.scroll">Scroll Down</span>
+            <div class="scroll-icon">
+                <div class="scroll-wheel"></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="sobre" class="page">
+        <div class="page-header">
+            <h1 data-i18n="about.title">About Me</h1>
+            <p data-i18n="about.subtitle">Learn more about my journey</p>
+        </div>
+
+        <div class="page-content">
+            <p data-i18n="about.p1">
+                Programming student, exploring my path in software development. I'm currently studying Software Engineering at FIAP and actively seeking an internship opportunity. My main focus is backend development, with a strong interest in building robust, well-structured
+                systems using Java.
+            </p>
+            <p data-i18n="about.p2">
+                I enjoy learning through practice, developing projects that help me understand how real applications work behind the scenes. I'm motivated by problem solving, clean code, and understanding system architecture, and I'm constantly improving my technical
+                skills to grow as a backend developer.
+            </p>
+
+            <div class="info-cards-grid">
+                <div class="info-card">
+                    <div class="info-icon">🎓</div>
+                    <h3 data-i18n="about.card1.title">Education</h3>
+                    <p data-i18n="about.card1.text">Software Engineering</p>
+                    <span data-i18n="about.card1.detail">FIAP - Currently pursuing</span>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-icon">💼</div>
+                    <h3 data-i18n="about.card2.title">Objective</h3>
+                    <p data-i18n="about.card2.text">Development Internship</p>
+                    <span data-i18n="about.card2.detail">Backend with Java</span>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-icon">🚀</div>
+                    <h3 data-i18n="about.card3.title">Focus</h3>
+                    <p data-i18n="about.card3.text">Continuous Learning</p>
+                    <span data-i18n="about.card3.detail">Projects & Practice</span>
+                </div>
+            </div>
+
+            <div class="download-cv-container">
+                <a href="curriculo.pdf" download="Curriculo-SeuNome.pdf" class="btn-download-cv" data-i18n="about.downloadCV">
+                    Download My Resume
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section id="skills" class="page">
+        <div class="page-header">
+            <h1 data-i18n="skills.title">Skills</h1>
+            <p data-i18n="skills.subtitle">Technologies and Tools I Master</p>
+        </div>
+
+        <div class="skills-tabs">
+            <div class="tabs-header">
+                <button class="tab-btn active" onclick="switchTab('backend')">Backend</button>
+                <button class="tab-btn" onclick="switchTab('frontend')">Frontend</button>
+                <button class="tab-btn" onclick="switchTab('ferramentas')" data-i18n="skills.tabs.tools">Tools</button>
+            </div>
+
+            <div id="backend" class="tab-panel active">
+                <ul class="skills-list">
+                    <li>
+                        <div class="skill-icon">☕</div>
+                        <span><strong>Java</strong> - <span data-i18n="skills.backend.java">Object-Oriented Programming, Collections, Streams, Exception Handling</span></span>
+                    </li>
+                    <li>
+                        <div class="skill-icon">🍃</div>
+                        <span><strong>Spring Boot</strong> - <span data-i18n="skills.backend.spring">REST APIs, Dependency Injection, Spring Data JPA</span></span>
+                    </li>
+                    <li>
+                        <div class="skill-icon">🗄️</div>
+                        <span><strong data-i18n="skills.backend.dbTitle">Database</strong> - <span data-i18n="skills.backend.db">SQL, MySQL, PostgreSQL, database relationship concepts</span></span>
+                    </li>
+                    <li>
+                        <div class="skill-icon">🔌</div>
+                        <span><strong>APIs REST</strong> - <span data-i18n="skills.backend.api">Endpoint design, HTTP methods, JSON</span></span>
+                    </li>
+                    <li>
+                        <div class="skill-icon">🧪</div>
+                        <span><strong data-i18n="skills.backend.testsTitle">Tests</strong> - <span data-i18n="skills.backend.tests">JUnit, unit testing concepts</span></span>
+                    </li>
+                    <li>
+                        <div class="skill-icon">🐍</div>
+                        <span><strong>Python</strong> - <span data-i18n="skills.backend.python">Object-Oriented Programming, Data Structures, Modules, Exception Handling</span></span>
+                    </li>
+                </ul>
+            </div>
+
+            <div id="frontend" class="tab-panel">
+                <div class="skills-rect-grid">
+                    <div class="skill-rect">HTML5</div>
+                    <div class="skill-rect">CSS3</div>
+                    <div class="skill-rect">JavaScript</div>
+                    <div class="skill-rect" data-i18n="skills.frontend.responsive">Responsive Design</div>
+                    <div class="skill-rect">Bootstrap</div>
+                    <div class="skill-rect" data-i18n="skills.frontend.dom">DOM Manipulation</div>
+                </div>
+            </div>
+
+            <div id="ferramentas" class="tab-panel">
+                <div class="skills-grid">
+                    <div class="skill-card">
+                        <h3>Git & GitHub</h3>
+                        <span data-i18n="skills.tools.git">Code Versioning and Collaboration</span>
+                    </div>
+                    <div class="skill-card">
+                        <h3>Maven</h3>
+                        <span data-i18n="skills.tools.maven">Dependency Management</span>
+                    </div>
+                    <div class="skill-card">
+                        <h3>IntelliJ IDEA</h3>
+                        <span data-i18n="skills.tools.intellij">Primary IDE for Java</span>
+                    </div>
+                    <div class="skill-card">
+                        <h3>Postman</h3>
+                        <span data-i18n="skills.tools.postman">API Testing</span>
+                    </div>
+                    <div class="skill-card">
+                        <h3>VS Code</h3>
+                        <span data-i18n="skills.tools.vscode">Code Editor</span>
+                    </div>
+                    <div class="skill-card">
+                        <h3>MySQL Workbench</h3>
+                        <span data-i18n="skills.tools.mysql">Database Management</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="projetos" class="page">
+        <div class="page-header">
+            <div class="section-icon">🚀</div>
+            <h1 data-i18n="projects.title">Projects</h1>
+            <p data-i18n="projects.subtitle">Academic and Personal Projects Developed</p>
+        </div>
+
+        <div class="projects-grid">
+            <div class="project-card">
+                <div class="project-image">
+                    <div class="project-placeholder">☕</div>
+                </div>
+                <div class="project-content">
+                    <div class="project-tags">
+                        <span class="tag">Java</span>
+                        <span class="tag">Spring Boot</span>
+                        <span class="tag">MySQL</span>
+                    </div>
+                    <h3 data-i18n="projects.project1.title">Management System</h3>
+                    <p data-i18n="projects.project1.desc">REST API for data management with full CRUD, validations, and relationships between entities.</p>
+                    <div class="project-links">
+                        <a href="https://github.com/seuusuario/projeto1" target="_blank" rel="noopener noreferrer">
+                            <span>🐙</span> GitHub
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-image">
+                    <div class="project-placeholder">🗄️</div>
+                </div>
+                <div class="project-content">
+                    <div class="project-tags">
+                        <span class="tag">Java</span>
+                        <span class="tag">JDBC</span>
+                        <span class="tag">PostgreSQL</span>
+                    </div>
+                    <h3 data-i18n="projects.project2.title">Java Console Application</h3>
+                    <p data-i18n="projects.project2.desc">Terminal-based registration system using JDBC for database connection and data manipulation.</p>
+                    <div class="project-links">
+                        <a href="https://github.com/seuusuario/projeto2" target="_blank" rel="noopener noreferrer">
+                            <span>🐙</span> GitHub
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-image">
+                    <div class="project-placeholder">🌐</div>
+                </div>
+                <div class="project-content">
+                    <div class="project-tags">
+                        <span class="tag">Java</span>
+                        <span class="tag">Spring Boot</span>
+                        <span class="tag">REST API</span>
+                    </div>
+                    <h3 data-i18n="projects.project3.title">Study API</h3>
+                    <p data-i18n="projects.project3.desc">RESTful API for registering notes and study resources, with documented endpoints and testing.</p>
+                    <div class="project-links">
+                        <a href="https://github.com/seuusuario/projeto3" target="_blank" rel="noopener noreferrer">
+                            <span>🐙</span> GitHub
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-image">
+                    <div class="project-placeholder">📱</div>
+                </div>
+                <div class="project-content">
+                    <div class="project-tags">
+                        <span class="tag">HTML</span>
+                        <span class="tag">CSS</span>
+                        <span class="tag">JavaScript</span>
+                    </div>
+                    <h3 data-i18n="projects.project4.title">Personal Portfolio</h3>
+                    <p data-i18n="projects.project4.desc">Responsive portfolio website with light/dark theme, smooth animations, and modern design.</p>
+                    <div class="project-links">
+                        <a href="https://github.com/seuusuario/portfolio" target="_blank" rel="noopener noreferrer">
+                            <span>🐙</span> GitHub
+                        </a>
+                        <a href="#home" class="demo-link">
+                            <span>🌐</span> Demo
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contato" class="page">
+        <div class="page-header">
+            <div class="section-icon">📧</div>
+            <h1 data-i18n="contact.title">Get in Touch</h1>
+            <p data-i18n="contact.subtitle">Interested in Working Together?</p>
+        </div>
+
+        <div class="contact-container">
+            <div class="contact-info-column">
+                <div class="contact-card">
+                    <div class="contact-icon">📧</div>
+                    <div class="contact-info">
+                        <span>Email</span>
+                        <a href="mailto:cauabackend@gmail.com">cauabackend@gmail.com</a>
+                    </div>
+                </div>
+
+                <div class="contact-card">
+                    <div class="contact-icon">📱</div>
+                    <div class="contact-info">
+                        <span data-i18n="contact.phone">Phone</span>
+                        <a href="tel:+5511911090137">+55 11 91109-0137</a>
+                    </div>
+                </div>
+
+                <div class="contact-card">
+                    <div class="contact-icon">💼</div>
+                    <div class="contact-info">
+                        <span>LinkedIn</span>
+                        <a href="https://www.linkedin.com/in/cauajava/" target="_blank">linkedin.com/in/cauajava/</a>
+                    </div>
+                </div>
+
+                <div class="contact-card">
+                    <div class="contact-icon">🐙</div>
+                    <div class="contact-info">
+                        <span>GitHub</span>
+                        <a href="https://github.com/cauabackend" target="_blank">github.com/cauabackend</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="contact-form-column">
+                <form class="contact-form" onsubmit="handleSubmit(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nome" data-i18n="contact.form.name">Name</label>
+                            <input type="text" id="nome" name="nome" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="assunto" data-i18n="contact.form.subject">Subject</label>
+                        <input type="text" id="assunto" name="assunto" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mensagem" data-i18n="contact.form.message">Message</label>
+                        <textarea id="mensagem" name="mensagem" rows="5" required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-primary" data-i18n="contact.form.send">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>© 2025 Cauã Pereira da Silva.</p>
+    </footer>
+
+    <script src="./i18n.js"></script>
+    <script src="./script.js"></script>
+
+</body>
+
+</html>
