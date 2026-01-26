@@ -158,7 +158,6 @@ function setupScrollAnimations() {
 async function handleFormSubmit(e) {
     e.preventDefault();
 
-    // Pega os dados do formulário
     const formData = {
         nome: document.getElementById('nome').value,
         email: document.getElementById('email').value,
@@ -166,20 +165,17 @@ async function handleFormSubmit(e) {
         mensagem: document.getElementById('mensagem').value
     };
 
-    // Validação básica
     if (!formData.nome || !formData.email || !formData.mensagem) {
         alert('Por favor, preencha todos os campos obrigatórios.');
         return;
     }
 
-    // Botão de loading
     const submitBtn = e.target.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
     submitBtn.textContent = 'Enviando...';
     submitBtn.disabled = true;
 
     try {
-        // 🔗 ENVIA PARA O BACKEND
         const response = await fetch(`${API_URL}/contact`, {
             method: 'POST',
             headers: {
@@ -192,16 +188,15 @@ async function handleFormSubmit(e) {
 
         if (data.success) {
             alert('✅ Mensagem enviada com sucesso!\nEntrarei em contato em breve.');
-            e.target.reset(); // Limpa o formulário
+            e.target.reset();
         } else {
-            alert('❌ Erro ao enviar: ' + data.message);
+            alert('❌ Erro ao enviar: ' + (data.message || 'Erro desconhecido'));
         }
 
     } catch (error) {
         console.error('Erro:', error);
-        alert('❌ Erro de conexão com o servidor.\nVerifique se o backend está rodando.');
+        alert('❌ Erro de conexão com o servidor.');
     } finally {
-        // Restaura o botão
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
     }
