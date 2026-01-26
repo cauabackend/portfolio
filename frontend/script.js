@@ -337,3 +337,6 @@ function applySystemTheme() {
 }
 
 window.addEventListener('load', applySystemTheme);
+
+const API_URL = 'http://localhost:8000/api';
+async function handleFormSubmit(e) {}
