@@ -1,7 +1,8 @@
+const API_URL = 'http://localhost:8000/api';
+
 function toggleTheme() {
     document.body.classList.toggle('dark-theme');
     const btn = document.querySelector('.theme-toggle-btn');
-
 
     if (document.body.classList.contains('dark-theme')) {
         btn.textContent = '☀️';
@@ -9,11 +10,9 @@ function toggleTheme() {
         btn.textContent = '🌙';
     }
 
-
     const currentTheme = document.body.classList.contains('dark-theme') ? 'dark' : 'light';
     localStorage.setItem('theme', currentTheme);
 }
-
 
 function loadSavedTheme() {
     const savedTheme = localStorage.getItem('theme');
@@ -27,22 +26,14 @@ function loadSavedTheme() {
     }
 }
 
-
-
-
-
 function switchTab(tabName) {
-
     const allButtons = document.querySelectorAll('.tab-btn');
     allButtons.forEach(btn => btn.classList.remove('active'));
-
 
     const allPanels = document.querySelectorAll('.tab-panel');
     allPanels.forEach(panel => panel.classList.remove('active'));
 
-
     event.target.classList.add('active');
-
 
     const targetPanel = document.getElementById(tabName);
     if (targetPanel) {
@@ -50,12 +41,7 @@ function switchTab(tabName) {
     }
 }
 
-
-
-
-
 function setupSmoothScroll() {
-
     const links = document.querySelectorAll('a[href^="#"]');
 
     links.forEach(link => {
@@ -75,10 +61,6 @@ function setupSmoothScroll() {
     });
 }
 
-
-
-
-
 function highlightActiveSection() {
     const sections = document.querySelectorAll('section[id]');
     const navLinks = document.querySelectorAll('.nav-links a');
@@ -86,31 +68,21 @@ function highlightActiveSection() {
     window.addEventListener('scroll', () => {
         let currentSection = '';
 
-
         sections.forEach(section => {
             const sectionTop = section.offsetTop;
-            const sectionHeight = section.clientHeight;
-
-
             if (window.pageYOffset >= sectionTop - 200) {
                 currentSection = section.getAttribute('id');
             }
         });
 
-
         navLinks.forEach(link => {
             link.classList.remove('active');
-
             if (link.getAttribute('href') === `#${currentSection}`) {
                 link.classList.add('active');
             }
         });
     });
 }
-
-
-
-
 
 function setupScrollHeader() {
     const header = document.querySelector('.header');
@@ -124,15 +96,10 @@ function setupScrollHeader() {
     });
 }
 
-
-
-
-
 function setupScrollIndicator() {
     const scrollIndicator = document.querySelector('.scroll-indicator');
 
     if (!scrollIndicator) return;
-
 
     scrollIndicator.addEventListener('click', () => {
         const sobreSection = document.querySelector('#sobre');
@@ -141,8 +108,6 @@ function setupScrollIndicator() {
         }
     });
 
-
-    let lastScrollTop = 0;
     window.addEventListener('scroll', () => {
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
@@ -151,17 +116,10 @@ function setupScrollIndicator() {
         } else {
             scrollIndicator.classList.remove('hidden');
         }
-
-        lastScrollTop = scrollTop;
     });
 }
 
-
-
-
-
 function setupScrollAnimations() {
-
     const observerOptions = {
         threshold: 0.15,
         rootMargin: '0px 0px -50px 0px'
@@ -171,12 +129,9 @@ function setupScrollAnimations() {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('visible');
-
-
             }
         });
     }, observerOptions);
-
 
     const elementsToAnimate = document.querySelectorAll(`
         .info-card,
@@ -188,63 +143,68 @@ function setupScrollAnimations() {
         .hero-visual
     `);
 
-
     elementsToAnimate.forEach(el => {
         el.classList.add('fade-in-element');
         observer.observe(el);
     });
-
-    console.log(`✨ ${elementsToAnimate.length} elementos preparados para animação`);
 }
 
-
-
-
-
-function handleFormSubmit(e) {
+async function handleFormSubmit(e) {
     e.preventDefault();
 
-
-    const formData = new FormData(e.target);
-    const data = {
-        nome: formData.get('nome'),
-        email: formData.get('email'),
-        assunto: formData.get('assunto'),
-        mensagem: formData.get('mensagem')
+    // Pega os dados do formulário
+    const formData = {
+        nome: document.getElementById('nome').value,
+        email: document.getElementById('email').value,
+        assunto: document.getElementById('assunto').value,
+        mensagem: document.getElementById('mensagem').value
     };
 
-
-    if (!data.nome || !data.email || !data.mensagem) {
+    // Validação básica
+    if (!formData.nome || !formData.email || !formData.mensagem) {
         alert('Por favor, preencha todos os campos obrigatórios.');
         return;
     }
 
+    // Botão de loading
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Enviando...';
+    submitBtn.disabled = true;
 
-    console.log('Dados do formulário:', data);
+    try {
+        // 🔗 ENVIA PARA O BACKEND
+        const response = await fetch(`${API_URL}/contact`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
 
+        const data = await response.json();
 
-    alert('Mensagem enviada com sucesso! 🎉\n(Esta é uma demonstração)');
+        if (data.success) {
+            alert('✅ Mensagem enviada com sucesso!\nEntrarei em contato em breve.');
+            e.target.reset(); // Limpa o formulário
+        } else {
+            alert('❌ Erro ao enviar: ' + data.message);
+        }
 
-
-    e.target.reset();
-
-
-
-
-
-
-
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('❌ Erro de conexão com o servidor.\nVerifique se o backend está rodando.');
+    } finally {
+        // Restaura o botão
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }
 }
-
-
-
-
 
 function validateEmail(email) {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
 }
-
 
 function setupEmailValidation() {
     const emailInput = document.querySelector('input[type="email"]');
@@ -262,10 +222,9 @@ function setupEmailValidation() {
     }
 }
 
-
-
-
-
+// ============================================
+// MENU MOBILE
+// ============================================
 function toggleMobileMenu() {
     const navLinks = document.querySelector('.nav-links');
     const menuToggle = document.querySelector('.mobile-menu-toggle');
@@ -279,7 +238,6 @@ function setupMobileMenu() {
     const menuToggle = document.querySelector('.mobile-menu-toggle');
 
     if (navLinks && menuToggle) {
-
         const links = navLinks.querySelectorAll('a');
         links.forEach(link => {
             link.addEventListener('click', () => {
@@ -287,7 +245,6 @@ function setupMobileMenu() {
                 menuToggle.classList.remove('active');
             });
         });
-
 
         document.addEventListener('click', (e) => {
             if (!navLinks.contains(e.target) && !menuToggle.contains(e.target)) {
@@ -298,104 +255,67 @@ function setupMobileMenu() {
     }
 }
 
+// ============================================
+// CARREGAR PROJETOS DO BACKEND (OPCIONAL)
+// ============================================
+async function loadProjects() {
+    try {
+        const response = await fetch(`${API_URL}/projects`);
+        const data = await response.json();
 
-
-
-
-function setupScrollProgress() {
-    window.addEventListener('scroll', () => {
-        const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-        const scrolled = (winScroll / height) * 100;
-
-
-
-    });
-}
-
-
-
-
-
-function setupTypingEffect() {
-    const textElement = document.querySelector('.hero h1');
-    if (!textElement) return;
-
-    const originalText = textElement.textContent;
-    const shouldAnimate = sessionStorage.getItem('hasVisited') !== 'true';
-
-    if (shouldAnimate) {
-        textElement.textContent = '';
-        let charIndex = 0;
-
-        function typeChar() {
-            if (charIndex < originalText.length) {
-                textElement.textContent += originalText.charAt(charIndex);
-                charIndex++;
-                setTimeout(typeChar, 50);
-            }
+        if (data.success && data.data) {
+            console.log('📦 Projetos carregados:', data.data);
+            // Aqui você pode renderizar os projetos dinamicamente se quiser
         }
-
-        setTimeout(typeChar, 500);
-        sessionStorage.setItem('hasVisited', 'true');
+    } catch (error) {
+        console.log('Backend não disponível, usando dados estáticos');
     }
 }
 
+async function loadSkills() {
+    try {
+        const response = await fetch(`${API_URL}/skills`);
+        const data = await response.json();
 
-
-
-
+        if (data.success && data.data) {
+            console.log('🛠️ Skills carregadas:', data.data);
+            // Aqui você pode renderizar as skills dinamicamente se quiser
+        }
+    } catch (error) {
+        console.log('Backend não disponível, usando dados estáticos');
+    }
+}
 
 document.addEventListener('DOMContentLoaded', function() {
-
+    // Tema
     loadSavedTheme();
 
-
+    // Navegação
     setupSmoothScroll();
-
-
     highlightActiveSection();
-
-
     setupScrollHeader();
-
-
-    setupScrollAnimations();
-
-
     setupScrollIndicator();
-
-
-    setupEmailValidation();
-
-
     setupMobileMenu();
 
+    // Animações
+    setupScrollAnimations();
 
+    // Formulário
+    setupEmailValidation();
 
-
-
+    // 🔗 Conecta o formulário ao backend
     const form = document.querySelector('.contact-form');
     if (form) {
         form.addEventListener('submit', handleFormSubmit);
     }
 
+    // Carrega dados do backend (opcional)
+    loadProjects();
+    loadSkills();
 
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    tabButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const tabName = this.textContent.toLowerCase();
-            switchTab(tabName);
-        });
-    });
-
-    console.log('✅ Portfólio inicializado com sucesso!');
+    console.log('✅ Portfólio inicializado!');
+    console.log('🔗 Backend:', API_URL);
 });
-
-
-
-
-
 
 function detectSystemTheme() {
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -403,7 +323,6 @@ function detectSystemTheme() {
     }
     return 'light';
 }
-
 
 function applySystemTheme() {
     const savedTheme = localStorage.getItem('theme');
@@ -416,6 +335,5 @@ function applySystemTheme() {
         }
     }
 }
-
 
 window.addEventListener('load', applySystemTheme);
