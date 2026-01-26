@@ -1,6 +1,5 @@
 const API_URL = 'https://portfolio-backend-nkp4.onrender.com/api';
 
-
 function toggleTheme() {
     document.body.classList.toggle('dark-theme');
     const btn = document.querySelector('.theme-toggle-btn');
