@@ -161,7 +161,8 @@ var translations = {
                 api: "Design de endpoints, métodos HTTP, JSON",
                 testsTitle: "Testes",
                 tests: "JUnit, conceitos de testes unitários",
-                python: "Programação Orientada a Objetos, Estruturas de Dados, Módulos, Tratamento de Exceções"
+                python: "Programação Orientada a Objetos, Estruturas de Dados, Módulos, Tratamento de Exceções",
+                nodejs: "Programação Assíncrona, APIs REST, Express.js, Middlewares, Gerenciamento de Pacotes (npm)"
             },
             frontend: {
                 responsive: "Design Responsivo",
