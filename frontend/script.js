@@ -1,5 +1,6 @@
 const API_URL = 'http://localhost:8000/api';
 
+
 function toggleTheme() {
     document.body.classList.toggle('dark-theme');
     const btn = document.querySelector('.theme-toggle-btn');
@@ -26,6 +27,7 @@ function loadSavedTheme() {
     }
 }
 
+
 function switchTab(tabName) {
     const allButtons = document.querySelectorAll('.tab-btn');
     allButtons.forEach(btn => btn.classList.remove('active'));
@@ -40,6 +42,7 @@ function switchTab(tabName) {
         targetPanel.classList.add('active');
     }
 }
+
 
 function setupSmoothScroll() {
     const links = document.querySelectorAll('a[href^="#"]');
@@ -60,6 +63,7 @@ function setupSmoothScroll() {
         });
     });
 }
+
 
 function highlightActiveSection() {
     const sections = document.querySelectorAll('section[id]');
@@ -84,6 +88,7 @@ function highlightActiveSection() {
     });
 }
 
+
 function setupScrollHeader() {
     const header = document.querySelector('.header');
 
@@ -95,6 +100,7 @@ function setupScrollHeader() {
         }
     });
 }
+
 
 function setupScrollIndicator() {
     const scrollIndicator = document.querySelector('.scroll-indicator');
@@ -201,6 +207,7 @@ async function handleFormSubmit(e) {
     }
 }
 
+
 function validateEmail(email) {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
@@ -222,9 +229,7 @@ function setupEmailValidation() {
     }
 }
 
-// ============================================
-// MENU MOBILE
-// ============================================
+
 function toggleMobileMenu() {
     const navLinks = document.querySelector('.nav-links');
     const menuToggle = document.querySelector('.mobile-menu-toggle');
@@ -255,9 +260,6 @@ function setupMobileMenu() {
     }
 }
 
-// ============================================
-// CARREGAR PROJETOS DO BACKEND (OPCIONAL)
-// ============================================
 async function loadProjects() {
     try {
         const response = await fetch(`${API_URL}/projects`);
@@ -271,6 +273,7 @@ async function loadProjects() {
         console.log('Backend não disponível, usando dados estáticos');
     }
 }
+
 
 async function loadSkills() {
     try {
@@ -317,6 +320,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('🔗 Backend:', API_URL);
 });
 
+
 function detectSystemTheme() {
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
         return 'dark';
@@ -337,6 +341,3 @@ function applySystemTheme() {
 }
 
 window.addEventListener('load', applySystemTheme);
-
-const API_URL = 'http://localhost:8000/api';
-async function handleFormSubmit(e) {}
