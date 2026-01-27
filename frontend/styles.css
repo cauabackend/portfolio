@@ -324,6 +324,10 @@ body::before {
     border-radius: 14px;
     background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(139, 92, 246, 0.05));
     border: 1px solid var(--border-color);
+    background-image: url('../assets/img/WhatsApp Image 2026-01-27 at 12.48.26.jpeg');
+    background-size: cover;
+    background-position: center;
+    background-blend-mode: overlay;
 }
 
 .visual-outline {
