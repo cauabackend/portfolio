@@ -1,5 +1,3 @@
-const API_URL = 'https://portfolio-backend-nkp4.onrender.com/api';
-
 function toggleTheme() {
     document.body.classList.toggle('dark-theme');
     const btn = document.querySelector('.theme-toggle-btn');
@@ -26,7 +24,6 @@ function loadSavedTheme() {
     }
 }
 
-
 function switchTab(tabName) {
     const allButtons = document.querySelectorAll('.tab-btn');
     allButtons.forEach(btn => btn.classList.remove('active'));
@@ -41,7 +38,6 @@ function switchTab(tabName) {
         targetPanel.classList.add('active');
     }
 }
-
 
 function setupSmoothScroll() {
     const links = document.querySelectorAll('a[href^="#"]');
@@ -63,7 +59,6 @@ function setupSmoothScroll() {
     });
 }
 
-
 function highlightActiveSection() {
     const sections = document.querySelectorAll('section[id]');
     const navLinks = document.querySelectorAll('.nav-links a');
@@ -73,6 +68,8 @@ function highlightActiveSection() {
 
         sections.forEach(section => {
             const sectionTop = section.offsetTop;
+            const sectionHeight = section.clientHeight;
+
             if (window.pageYOffset >= sectionTop - 200) {
                 currentSection = section.getAttribute('id');
             }
@@ -80,13 +77,13 @@ function highlightActiveSection() {
 
         navLinks.forEach(link => {
             link.classList.remove('active');
+
             if (link.getAttribute('href') === `#${currentSection}`) {
                 link.classList.add('active');
             }
         });
     });
 }
-
 
 function setupScrollHeader() {
     const header = document.querySelector('.header');
@@ -100,7 +97,6 @@ function setupScrollHeader() {
     });
 }
 
-
 function setupScrollIndicator() {
     const scrollIndicator = document.querySelector('.scroll-indicator');
 
@@ -113,6 +109,7 @@ function setupScrollIndicator() {
         }
     });
 
+    let lastScrollTop = 0;
     window.addEventListener('scroll', () => {
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
@@ -121,6 +118,8 @@ function setupScrollIndicator() {
         } else {
             scrollIndicator.classList.remove('hidden');
         }
+
+        lastScrollTop = scrollTop;
     });
 }
 
@@ -152,55 +151,9 @@ function setupScrollAnimations() {
         el.classList.add('fade-in-element');
         observer.observe(el);
     });
+
+    console.log(`✨ ${elementsToAnimate.length} elementos preparados para animação`);
 }
-
-async function handleFormSubmit(e) {
-    e.preventDefault();
-
-    const formData = {
-        nome: document.getElementById('nome').value,
-        email: document.getElementById('email').value,
-        assunto: document.getElementById('assunto').value,
-        mensagem: document.getElementById('mensagem').value
-    };
-
-    if (!formData.nome || !formData.email || !formData.mensagem) {
-        alert('Por favor, preencha todos os campos obrigatórios.');
-        return;
-    }
-
-    const submitBtn = e.target.querySelector('button[type="submit"]');
-    const originalText = submitBtn.textContent;
-    submitBtn.textContent = 'Enviando...';
-    submitBtn.disabled = true;
-
-    try {
-        const response = await fetch(`${API_URL}/contact`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(formData)
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            alert('✅ Mensagem enviada com sucesso!\nEntrarei em contato em breve.');
-            e.target.reset();
-        } else {
-            alert('❌ Erro ao enviar: ' + (data.message || 'Erro desconhecido'));
-        }
-
-    } catch (error) {
-        console.error('Erro:', error);
-        alert('❌ Erro de conexão com o servidor.');
-    } finally {
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-    }
-}
-
 
 function validateEmail(email) {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -222,7 +175,6 @@ function setupEmailValidation() {
         });
     }
 }
-
 
 function toggleMobileMenu() {
     const navLinks = document.querySelector('.nav-links');
@@ -254,66 +206,58 @@ function setupMobileMenu() {
     }
 }
 
-async function loadProjects() {
-    try {
-        const response = await fetch(`${API_URL}/projects`);
-        const data = await response.json();
-
-        if (data.success && data.data) {
-            console.log('📦 Projetos carregados:', data.data);
-            // Aqui você pode renderizar os projetos dinamicamente se quiser
-        }
-    } catch (error) {
-        console.log('Backend não disponível, usando dados estáticos');
-    }
+function setupScrollProgress() {
+    window.addEventListener('scroll', () => {
+        const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = (winScroll / height) * 100;
+    });
 }
 
+function setupTypingEffect() {
+    const textElement = document.querySelector('.hero h1');
+    if (!textElement) return;
 
-async function loadSkills() {
-    try {
-        const response = await fetch(`${API_URL}/skills`);
-        const data = await response.json();
+    const originalText = textElement.textContent;
+    const shouldAnimate = sessionStorage.getItem('hasVisited') !== 'true';
 
-        if (data.success && data.data) {
-            console.log('🛠️ Skills carregadas:', data.data);
-            // Aqui você pode renderizar as skills dinamicamente se quiser
+    if (shouldAnimate) {
+        textElement.textContent = '';
+        let charIndex = 0;
+
+        function typeChar() {
+            if (charIndex < originalText.length) {
+                textElement.textContent += originalText.charAt(charIndex);
+                charIndex++;
+                setTimeout(typeChar, 50);
+            }
         }
-    } catch (error) {
-        console.log('Backend não disponível, usando dados estáticos');
+
+        setTimeout(typeChar, 500);
+        sessionStorage.setItem('hasVisited', 'true');
     }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Tema
     loadSavedTheme();
-
-    // Navegação
     setupSmoothScroll();
     highlightActiveSection();
     setupScrollHeader();
+    setupScrollAnimations();
     setupScrollIndicator();
+    setupEmailValidation();
     setupMobileMenu();
 
-    // Animações
-    setupScrollAnimations();
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    tabButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const tabName = this.textContent.toLowerCase();
+            switchTab(tabName);
+        });
+    });
 
-    // Formulário
-    setupEmailValidation();
-
-    // 🔗 Conecta o formulário ao backend
-    const form = document.querySelector('.contact-form');
-    if (form) {
-        form.addEventListener('submit', handleFormSubmit);
-    }
-
-    // Carrega dados do backend (opcional)
-    loadProjects();
-    loadSkills();
-
-    console.log('✅ Portfólio inicializado!');
-    console.log('🔗 Backend:', API_URL);
+    console.log('✅ Portfólio inicializado com sucesso!');
 });
-
 
 function detectSystemTheme() {
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
