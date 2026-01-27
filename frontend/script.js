@@ -24,14 +24,22 @@ function loadSavedTheme() {
     }
 }
 
-function switchTab(tabName) {
+function switchTab(tabName, clickedButton) {
     const allButtons = document.querySelectorAll('.tab-btn');
     allButtons.forEach(btn => btn.classList.remove('active'));
 
     const allPanels = document.querySelectorAll('.tab-panel');
     allPanels.forEach(panel => panel.classList.remove('active'));
 
-    event.target.classList.add('active');
+    // Se foi passado o botão, ativa ele
+    if (clickedButton) {
+        clickedButton.classList.add('active');
+    } else {
+        // Caso contrário, tenta pelo event (fallback)
+        if (typeof event !== 'undefined' && event.target) {
+            event.target.classList.add('active');
+        }
+    }
 
     const targetPanel = document.getElementById(tabName);
     if (targetPanel) {
@@ -250,9 +258,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const tabButtons = document.querySelectorAll('.tab-btn');
     tabButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const tabName = this.textContent.toLowerCase();
-            switchTab(tabName);
+        btn.addEventListener('click', function(e) {
+            // Remove active de todos
+            tabButtons.forEach(b => b.classList.remove('active'));
+            // Adiciona active no clicado
+            this.classList.add('active');
+
+            // Pega o onclick do botão para saber qual tab ativar
+            const onclickAttr = this.getAttribute('onclick');
+            if (onclickAttr) {
+                // Extrai o nome da tab do onclick="switchTab('nome')"
+                const match = onclickAttr.match(/switchTab\('(.+?)'\)/);
+                if (match) {
+                    const tabName = match[1];
+
+                    // Ativa o painel
+                    const allPanels = document.querySelectorAll('.tab-panel');
+                    allPanels.forEach(panel => panel.classList.remove('active'));
+
+                    const targetPanel = document.getElementById(tabName);
+                    if (targetPanel) {
+                        targetPanel.classList.add('active');
+                    }
+                }
+            }
         });
     });
 
