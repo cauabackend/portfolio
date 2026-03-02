@@ -1,0 +1,64 @@
+# Portfolio — Caua Pereira da Silva
+
+## Estrutura
+
+```
+portfolio/
+├── index.html                    # HTML principal
+├── frontend/
+│   ├── styles.css                # Estilos (dark/light mode)
+│   ├── script.js                 # Logica, i18n (PT/EN), theme toggle
+│   ├── emailconfig.js            # Envio de email via EmailJS
+│   └── emailstyles.css           # Estilos das notificacoes
+├── backend-python/
+│   ├── main.py                   # API FastAPI (contato, projetos, skills)
+│   └── requirements.txt          # Dependencias Python
+└── assets/
+    └── img/
+        ├── teste.jpeg            # Foto pessoal (hero)
+        ├── project-gerenciamento.png  # Screenshot projeto 1
+        ├── project-estudos.png        # Screenshot projeto 2
+        ├── project-console.png        # Screenshot projeto 3
+        └── project-portfolio.png      # Screenshot projeto 4
+```
+
+## Contato — Duas opcoes
+
+### Opcao 1: EmailJS (atual, sem backend)
+O formulario ja funciona com EmailJS. As mensagens vao direto pro seu email.
+Nao precisa de servidor. Basta fazer deploy do frontend.
+
+### Opcao 2: Backend Python/FastAPI
+Se quiser armazenar mensagens num banco de dados:
+
+```bash
+cd backend-python
+pip install -r requirements.txt
+python main.py
+```
+
+Depois altere o `emailconfig.js` para enviar para o backend:
+
+```javascript
+// Troque o emailjs.send() por:
+fetch('http://localhost:8000/api/contact', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        nome: templateParams.from_name,
+        email: templateParams.from_email,
+        assunto: templateParams.subject,
+        mensagem: templateParams.message
+    })
+});
+```
+
+## Imagens dos projetos
+
+Coloque screenshots na pasta `assets/img/` com estes nomes:
+- `project-gerenciamento.png`
+- `project-estudos.png`
+- `project-console.png`
+- `project-portfolio.png`
+
+Se a imagem nao existir, aparece um placeholder SVG automaticamente.
