@@ -1,5 +1,7 @@
 import Image from "next/image";
 import { about } from "@/lib/resume";
+import { GroundShadow } from "@/components/GroundShadow";
+import { Section, SectionHeader } from "@/components/Section";
 
 // Sobre aprovado — CLAUDE.md §5.2 (mockup design/sobre-v1.html).
 const RINGS = [
@@ -13,88 +15,103 @@ const RINGS = [
 
 export function Sobre() {
   return (
-    <section id="sobre" className="relative px-[6vw] pt-[min(12vw,130px)] pb-[min(10vw,110px)]">
-      <div className="mx-auto max-w-[1600px]">
-        <p className="mb-[72px] flex items-center justify-center gap-[10px] font-mono text-xs tracking-[0.14em] text-[var(--ink-muted)] uppercase">
-          <span aria-hidden className="h-px w-[60px] bg-[var(--line)]" />
-          <span className="font-medium text-[var(--accent-ink)]">02</span> Sobre
-          <span aria-hidden className="h-px w-[60px] bg-[var(--line)]" />
-        </p>
+    <Section id="sobre" index="02">
+      {/* Título derivado da própria bio aprovada ("Comecei como desenvolvedor
+          full-stack — hoje o foco é engenharia de IA"), não é copy nova. */}
+      <SectionHeader index="02" label="Sobre" title="De full-stack a engenharia de IA." />
 
-        <div className="flex items-center gap-[min(5.5vw,80px)] max-[720px]:flex-col max-[720px]:gap-9">
-          {/* overflow-hidden contém a caixa girada dos anéis (a diagonal do PNG
-              quadrado estoura a viewport no mobile); a arte é circular, nada some. */}
-          <div className="relative flex aspect-square w-[min(50vw,1000px)] flex-none items-center justify-center overflow-hidden max-[720px]:w-[min(76vw,340px)]">
-            {RINGS.map((r) => (
-              <Image
-                key={r.src}
-                src={r.src}
-                alt=""
-                aria-hidden
-                width={1100}
-                height={1100}
-                // gradiente metálico sutil: a compressão padrão (75) borra as
-                // bandas do anel e cria banding visível
-                quality={100}
-                sizes="(max-width: 720px) 76vw, 50vw"
-                priority
-                className={`pointer-events-none absolute inset-0 h-full w-full select-none ${r.anim}`}
-              />
-            ))}
+      {/* Anel e texto dividem a linha em duas metades iguais e ficam centrados no
+          que sobra da seção: antes o anel tinha 50vw e o texto flutuava longe,
+          à direita, com um vão morto entre os dois. */}
+      {/* flex-1 só no desktop: empilhado, esticar a linha abre vãos mortos
+          entre título, anel e texto */}
+      <div className="mt-[3vh] grid grid-cols-1 items-center gap-10 min-[861px]:flex-1 min-[861px]:grid-cols-2 min-[861px]:gap-[4vw]">
+        {/* alinhado à esquerda no desktop: o anel encosta na mesma margem do
+            título e a seção ganha uma espinha em vez de dois blocos flutuando.
+            O wrapper existe só pra sombra poder cair FORA do quadrado — o
+            container do anel precisa de overflow-hidden e a clipparia. */}
+        <div className="relative mx-auto w-[min(72vw,300px)] min-[861px]:mx-0 min-[861px]:w-[min(38vw,480px)]">
+          <GroundShadow className="bottom-[12%] h-[24px] w-[34%]" />
+          <div className="relative flex aspect-square w-full items-center justify-center overflow-hidden">
+            {/* O PNG tem muita margem transparente: a arte do anel ocupa só ~50%
+                do arquivo. Escalar o grupo faz a foto crescer em pixels sem
+                engolir as bandas — inflar só a foto dentro da caixa original
+                cobria o anel inteiro. A escala vive aqui, e não nas imagens,
+                porque o transform delas já é o da animação de rotação. */}
+            <div aria-hidden className="absolute inset-0 scale-[1.35]">
+              {RINGS.map((r) => (
+                <Image
+                  key={r.src}
+                  src={r.src}
+                  alt=""
+                  width={1100}
+                  height={1100}
+                  // gradiente metálico sutil: a compressão padrão (75) borra as
+                  // bandas do anel e cria banding visível
+                  quality={100}
+                  sizes="(max-width: 860px) 98vw, 52vw"
+                  priority
+                  className={`pointer-events-none absolute inset-0 h-full w-full select-none ${r.anim}`}
+                />
+              ))}
+            </div>
 
-            {/* TODO: foto real do Cauã entra aqui (asset ainda não fornecido). */}
-            <div className="relative z-[2] flex h-[32%] w-[32%] items-center justify-center rounded-full bg-[linear-gradient(155deg,#fcfcfb,#d6d7d5_60%,#adafac)] shadow-[inset_0_-16px_30px_rgba(15,17,17,.11),inset_0_12px_20px_rgba(255,255,255,.85),var(--shadow-lg)]">
+            {/* TODO: foto real do Cauã entra aqui (asset ainda não fornecido).
+                Elevação reforçada (§5.1): um contato curto e escuro na borda +
+                duas quedas longas, além do highlight interno no topo — sem as
+                três camadas o disco lê como recorte chapado sobre o anel. */}
+            <div className="relative z-[2] flex h-[44%] w-[44%] items-center justify-center rounded-full bg-[linear-gradient(155deg,#fcfcfb,#d6d7d5_60%,#adafac)] shadow-[inset_0_-20px_36px_rgba(15,17,17,.14),inset_0_14px_24px_rgba(255,255,255,.9),0_2px_5px_rgba(15,17,17,.12),0_22px_44px_rgba(15,17,17,.2),0_60px_96px_rgba(15,17,17,.18)]">
               <span
                 aria-hidden
-                className="absolute inset-[5%] rounded-full border border-[rgba(25,26,26,.14)]"
+                className="absolute inset-[4%] rounded-full border border-[rgba(25,26,26,.14)]"
               />
-              <span className="px-[20%] text-center font-mono text-[11px] tracking-[0.05em] text-[var(--ink-faint)]">
+              <span className="px-[16%] text-center font-mono text-[11px] tracking-[0.05em] text-[var(--ink-faint)]">
                 ‹ foto entra aqui ›
               </span>
             </div>
           </div>
+        </div>
 
-          <div className="min-w-0 max-w-[460px] flex-auto max-[720px]:max-w-[520px]">
-            {about.paragraphs.map((parts, i) => (
-              <p
-                key={i}
-                className="m-0 font-display text-[clamp(16.5px,1.55vw,19.5px)] leading-[1.62] font-medium tracking-[-0.005em] not-first:mt-[14px] max-[720px]:text-center"
-              >
-                {parts.map((p, j) => (
-                  <span
-                    key={j}
-                    className={
-                      "strong" in p && p.strong
-                        ? "font-semibold text-[var(--accent-ink)]"
-                        : "muted" in p && p.muted
-                          ? "text-[var(--ink-muted)]"
-                          : undefined
-                    }
-                  >
-                    {p.t}
-                  </span>
-                ))}
-              </p>
-            ))}
-
-            <dl className="mt-8 flex flex-col gap-[13px] border-t border-[var(--line)] pt-[26px] max-[720px]:items-center">
-              {about.fields.map((f) => (
-                <div key={f.k} className="flex items-baseline gap-[14px] max-[720px]:justify-center">
-                  <dt className="w-[84px] flex-none font-mono text-[10.5px] tracking-[0.1em] text-[var(--ink-faint)] uppercase">
-                    {f.k}
-                  </dt>
-                  <dd className="m-0 font-mono text-sm leading-[1.5] tracking-[-0.005em]">
-                    {f.v}
-                    {"sub" in f && f.sub && (
-                      <span className="ml-1 text-xs text-[var(--ink-muted)]">{f.sub}</span>
-                    )}
-                  </dd>
-                </div>
+        <div className="min-w-0 max-w-[520px]">
+          {about.paragraphs.map((parts, i) => (
+            <p
+              key={i}
+              className="m-0 font-display text-[clamp(16px,1.4vw,18.5px)] leading-[1.62] font-medium tracking-[-0.005em] not-first:mt-[14px]"
+            >
+              {parts.map((p, j) => (
+                <span
+                  key={j}
+                  className={
+                    "strong" in p && p.strong
+                      ? "font-semibold text-[var(--accent-ink)]"
+                      : "muted" in p && p.muted
+                        ? "text-[var(--ink-muted)]"
+                        : undefined
+                  }
+                >
+                  {p.t}
+                </span>
               ))}
-            </dl>
-          </div>
+            </p>
+          ))}
+
+          <dl className="mt-7 flex flex-col gap-[11px] border-t border-[var(--line)] pt-[22px]">
+            {about.fields.map((f) => (
+              <div key={f.k} className="flex items-baseline gap-[14px]">
+                <dt className="w-[84px] flex-none font-mono text-[10.5px] tracking-[0.1em] text-[var(--ink-faint)] uppercase">
+                  {f.k}
+                </dt>
+                <dd className="m-0 font-mono text-[13px] leading-[1.5] tracking-[-0.005em]">
+                  {f.v}
+                  {"sub" in f && f.sub && (
+                    <span className="ml-1 text-[11px] text-[var(--ink-muted)]">{f.sub}</span>
+                  )}
+                </dd>
+              </div>
+            ))}
+          </dl>
         </div>
       </div>
-    </section>
+    </Section>
   );
 }

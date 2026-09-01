@@ -12,16 +12,17 @@
 > 3. **Core Expertise / Stack** (§5.3) — mockup: `design/stack-v4.html`
 >
 > **🛑 TRAVAR (parar) depois de implementar essas três.** Não avançar para:
-> - **Experiência / Timeline (§5.4)** — segue ⏳ EM DISCUSSÃO. Um mockup de fio 3D foi tentado e **rejeitado pelo usuário** ("ficou horrível"); a direção final ainda não foi decidida. Não implementar nada desta seção, nem a versão 2D em canvas nem a 3D.
+> - **Experiência / Timeline (§5.4)** — ✅ DESTRAVADA em 2026-09-01 por pedido explícito do usuário (spec + imagem de referência fornecidas em conversa) e implementada. Ver §5.4.
 > - **Projetos de Destaque (§5.5)** — não iniciado.
 > - **Contato / Footer (§5.6)** — não iniciado.
 >
 > **STATUS (2026-09-01): Hero + Sobre + Stack implementados, build/lint verdes.** As três seções estão em
 > `components/sections/Hero.tsx`, `Sobre.tsx` e `Expertise.tsx` (esfera em `components/StackSphere.tsx`,
-> cabeça 3D em `components/HeadStage.tsx`/`HeadScene.tsx`). `Experience.tsx`, `Projects.tsx` e `Contact.tsx`
+> cabeça 3D em `components/HeadStage.tsx`/`HeadScene.tsx`). **`Experience.tsx` foi desenhado e implementado
+> em 2026-09-01 (ver §5.4)** — núcleo 3D em `CoreStage.tsx`/`CoreScene.tsx`. `Projects.tsx` e `Contact.tsx`
 > continuam sendo os scaffolds crus pré-existentes — não foram desenhados.
 >
-> Ao terminar Hero + Sobre + Stack, **pare e avise que está aguardando a próxima seção ser decidida com o usuário** — não prossiga para as seções seguintes "pra não deixar incompleto". Essa é uma instrução temporária desta rodada de implementação; será atualizada aqui quando §5.4 for aprovada.
+> Com §5.4 aprovada e implementada (2026-09-01), o checkpoint atual é depois da Experiência: **pare e aguarde §5.5 (Projetos) ser decidida com o usuário** — não prossiga "pra não deixar incompleto".
 
 ---
 
@@ -50,7 +51,7 @@ Construção **conversacional e iterativa, seção por seção**. Ordem:
 1. Hero Section — ✅ aprovada (ver §5.1)
 2. Sobre — ✅ aprovada (ver §5.2)
 3. Core Expertise / Stack técnico — ✅ aprovada (ver §5.3)
-4. Experiência Profissional / Timeline — ⏳ em decisão (ver §5.4)
+4. Experiência Profissional / Timeline — ✅ aprovada (ver §5.4)
 5. Projetos de Destaque — não iniciado (ver §5.5)
 6. Contato / Footer — não iniciado (ver §5.6)
 
@@ -151,6 +152,14 @@ Integração na página:
 - A margem negativa do `<h1>` foi removida e o display caiu pra `clamp(26px,4.6vw,132px)`: o
   vídeo preenche a caixa inteira (o canvas 3D tinha folga transparente), então tucar o texto
   por baixo dele escondia letra.
+
+**🔁 TESTADO E REVERTIDO (2026-09-01) — modelo PBR sem decimar:** chegou-se a trocar o Hero
+para `Desktop/android/base_basic_pbr.glb` (mesmo busto do Tripo, ~500K tris / 38 MB, texturas 2K,
+contra os 30K tris do `head_final.glb`). Mesmo node/material único (`model`) e mesma bounding box,
+então foi só trocar o caminho em `RobotHead.tsx` — nenhum ajuste de layout/câmera/luz.
+**Desfeito pelo usuário na mesma sessão: pesado demais** (38 MB baixados antes do Hero aparecer).
+O Hero segue em `head_final.glb`. Para reabrir, o caminho é comprimir (Draco/meshopt + KTX2)
+antes de trocar, não subir o `.glb` cru.
 
 **⛔ REVISÃO (2026-09-01) — cabeça 3D SEM ANIMAÇÃO (substitui o IDLE desta seção):**
 
@@ -522,9 +531,97 @@ acabado e com animações mais fluidas") a seção foi refeita em R3F — `compo
 
 *Nota de implementação:* o mockup é vanilla JS puro; a implementação React final deve portar a lógica de projeção/rotação para dentro de um componente `StackSphere.tsx` (client-only, sem SSR, já que depende de `window.scrollY`/`requestAnimationFrame`), possivelmente com `framer-motion` só para transições de entrada/hover, mantendo o loop de animação principal em JS puro por performance.
 
-### 5.4 Experiência / Timeline — ⏳ EM DISCUSSÃO
+### 5.4 Experiência / Timeline — ✅ APROVADA
 
-*(opções visuais a apresentar ao usuário; nada aprovado ainda)*
+**Aprovação (2026-09-01):** o usuário forneceu em conversa a spec completa + imagem de referência (layout zigue-zague ao redor de um núcleo 3D central) e pediu implementação explícita, destravando o checkpoint. O mockup de "fio 3D" anterior segue rejeitado e não tem relação com esta direção.
+
+**Especificação final aprovada:**
+
+*Composição (desktop):* seção full-height, grid de 3 colunas. Coluna esquerda, de cima pra baixo: header (eyebrow "04 EXPERIÊNCIA" mono + linha fina; título "Jornada Profissional" em Instrument Sans bold) → bloco ALETHEIA → bloco VISÃO GERAL DE CARREIRA (`justify-between` dá o escalonamento vertical). Coluna direita: bloco BRAVEND no topo (com `pt-[8vh]`). Coluna central: núcleo 3D girando sobre uma linha vertical de 1px (`--line`) que atravessa a seção, com sombra de contato elíptica (mesmo tratamento do Hero §5.1). Mobile (≤980px): empilha header → núcleo → BRAVEND → ALETHEIA → VISÃO GERAL.
+
+*Blocos de texto:* título da organização em caps (Instrument Sans bold, `clamp(22px,2.1vw,32px)`), subtítulo semibold, período em IBM Plex Mono caps, bullets com marcador de traço fino (`h-px w-3`). **Dados 100% de `lib/resume.ts`** (Seção 4): a spec original do prompt trazia datas/cargos incorretos ("2023", "Sênior", "Cofundador 2022", "Satomak") que foram substituídos pelos reais — Bravend jun/2026–presente (Estágio em Engenharia de IA & ML), Aletheia 2025–presente (Co-Founder & AI Engineer). `highlights[0]` de cada experiência entra no subtítulo; o restante vira os bullets, verbatim.
+
+*Peça 3D:* `public/models/core.glb` (40 MB, cópia SEM otimização — decisão explícita do usuário: "deixe o arquivo com sua qualidade alta"). `components/CoreScene.tsx` + `CoreStage.tsx` espelham o padrão HeadScene/HeadStage: dynamic import sem SSR, fallback "LOADING CORE…" via `useProgress`, `StudioEnvironment` + NeutralToneMapping + anisotropia máxima. Hardening pós-review: error boundary no `CoreStage` (WebGL decorativo falha → seção degrada pra texto), montagem adiada por IntersectionObserver (o glb de 40 MB só baixa quando a seção se aproxima da viewport, sem competir com o Hero), `useProgress` filtrado por item (o manager é global), DOM em ordem de leitura com posicionamento explícito no grid (WCAG 1.3.2), copy da "Visão Geral" em `lib/resume.ts` (`careerSummary`).
+
+**🔁 REVISÃO (2026-09-01) — modelo trocado + arrasto, substitui o giro simples acima:**
+
+*Modelo vigente:* `Desktop/objeto-trajetoria/base_basic_pbr.glb` (conjunto de discos cromados com lentes azuis; 500K tris, texturas 2K diffuse/normal/metallic-roughness). Substituiu o export anterior (`pagina-trajetoria`), cuja textura difusa era literalmente cinza-chumbo — o render escuro daquele **não era bug**, era o modelo. A variante `base_basic_shaded.glb` foi descartada: tem `baseColorFactor` preto + `emissiveFactor` branco, ou seja, iluminação assada — não reflete o `StudioEnvironment` e leria como adesivo sobre o fundo claro. Orientação natural do glTF (Y-up), sem rotação corretiva: o objeto é achatado e a leitura de "discos" vem da inclinação de repouso, não de girar o modelo.
+
+*Interação:* ⛔ **substituído por §5.8** (scroll removido, arrasto livre sem trava de inclinação, legenda removida, giro no eixo vertical da tela).
+
+*Enquadramento:* ⛔ **substituído por §5.8** (fit pela esfera envolvente; `Bounds` segue removido).
+
+*Composição:* **a linha vertical de instrumento foi REMOVIDA** (pedido do usuário). A composição em coluna foi substituída pelo **overlay** descrito em §5.8 — ver lá para a versão vigente.
+
+*Paleta/tipografia:* tokens do site (§5.1) — nenhuma cor nova. O prompt pedia `#f4f4f4`/Inter; substituídos pelos tokens aprovados (`--bg #e7e8e7`, Instrument Sans/IBM Plex) por consistência de identidade. Eyebrow numerado como **04** (não "03" da referência — 03 já é o Stack na ordem real da página). Dock de navegação: reusa o `Nav.tsx` global, não foi duplicado.
+
+**🔁 REVISÃO (2026-09-01) — `core.glb` SUBSTITUÍDO por geometria procedural. Isto vence tudo acima sobre a peça 3D.**
+
+Motivo do usuário: o cromo escuro do glb não pertencia à página clara, e ele forneceu uma
+imagem de referência de uma peça em **cristal translúcido** (discos concêntricos em cascata).
+O `.glb` também custava 40 MB de download.
+
+*Peça vigente:* `components/core-geometry.ts` — `buildCore()` monta a peça em código e
+`CoreScene` renderiza o `THREE.Group` retornado. `public/models/core.glb` continua no repo,
+sem referência nenhuma (reverter = voltar o `useGLTF`).
+
+Decisões que não são óbvias no código:
+- **`LatheGeometry` é a peça-chave.** A referência é radialmente simétrica, então cada anel é
+  um perfil 2D (com bisel nos 4 cantos) revolvido em 360°. O bisel não é enfeite: canto reto
+  não pega reflexo do environment e a aresta some contra o `--bg` quase branco.
+- **Vidro SEM `transmission`.** Além do passe de render extra por frame, `transmission` não
+  enxerga outros objetos transparentes — num empilhado de discos de vidro um disco não
+  apareceria através do outro, que é justamente a leitura da referência. O que funciona é
+  blend comum com `depthWrite: false`: as camadas se somam de graça. Cor **mais escura** que a
+  página (`0xa3b0b6`), senão vidro branco sobre fundo branco desaparece.
+- **A peça vazada não é uma gaiola esférica.** A primeira versão era, e lia como o globo
+  geodésico do Stack (§5.3) repetido na seção seguinte. Virou um aro com nervuras radiais —
+  e são **poucas e largas** (13), porque muitas e finas leem como pá de turbina.
+- **Enquadramento pela união das esferas das peças, não pela diagonal da bounding box.** A
+  diagonal superestima muito uma composição espalhada (a peça saía com ~metade do tamanho).
+  O objeto é recentrado NESSA esfera e o `<Center>` do drei foi removido: com giro livre em
+  todos os eixos, o pivô correto é o centro da esfera envolvente, não o da caixa.
+- **`useProgress`/"LOADING CORE…" removidos** do `CoreStage` — não há mais asset carregando.
+  O IntersectionObserver ficou: agora adia a criação do contexto WebGL, não um download.
+
+*Acabamento (segunda passada, mesma sessão — o usuário apontou que faltava "material, textura,
+refinamento de detalhes e sombreamento"):*
+- **Texturas 100% procedurais via `<canvas>`**, zero asset: `dialCanvas()` desenha o mostrador
+  (anéis, coroa de ticks, legendas, trilhas de circuito) e `ringCanvas()` as ranhuras do aro.
+  O micro-texto **não é texto** — são blocos de 2–3px: fonte de verdade nesse tamanho vira
+  borrão e custa atlas; o que o olho reconhece é o ritmo de palavras curtas numa linha.
+  `normalFromCanvas()` deriva um normal map por Sobel do próprio desenho — sem ele a gravação
+  lê como decalque impresso; com ele a luz corre pela ranhura.
+- **Dois mostradores por disco (frente e verso).** Com face única, metade da volta mostrava o
+  verso liso e a gravação sumia.
+- **`CrystalEnvironment`** (`components/three/CrystalEnvironment.tsx`), separado do
+  `StudioEnvironment` do Hero/Stack: domo em gradiente + 3 softboxes. Cristal incolor só
+  aparece quando o que ele reflete tem contraste — a faixa branca do softbox no bisel É a
+  aresta brilhante. Calibragem delicada: um domo que escurece de verdade embaixo (`#3d4548`)
+  faz a peça ler como chumbo; claro demais e ela some. O valor atual é o meio-termo testado.
+- **Composição em TREVO** (três peças em triângulo, tangentes pelas bordas), e não em cascata
+  de discos quase paralelos. A cascata foi implementada e descartada por dois motivos:
+  as peças se atravessavam (apontado pelo usuário), e discos paralelos ficam de perfil todos
+  ao mesmo tempo — a cada meia volta a peça inteira virava uma lasca. No trevo os centros
+  ficam afastados por mais que a soma dos raios, então nenhuma peça cruza a outra em ângulo
+  nenhum e cada uma pode ter a inclinação que quiser.
+- **Anéis finos em terraço** (10 por disco) no lugar de 5 grossos: a densidade de arestas
+  biseladas é o que faz ler como cristal lapidado. Alturas baixas — anel alto lê como banda
+  de pneu.
+- **⛔ Shadow map testado e REMOVIDO.** Vidro transparente projeta sombra OPACA (o depth
+  material ignora a opacidade), então a peça se auto-sombreava e virava um bloco cinza-chumbo.
+  O volume vem do contraste do environment, não de sombra projetada.
+
+*Armadilha de diagnóstico (custou três iterações):* sob `prefers-reduced-motion` o Canvas roda
+em `frameloop="demand"`. Screenshot tirado assim mostra o frame ANTIGO — mudanças de material e
+de environment não aparecem, e parece que a edição não pegou. Para avaliar a peça em print,
+emular `reducedMotion: 'no-preference'`.
+
+*Limite conhecido, dito ao usuário antes de implementar:* a peça procedural lê como CAD limpo e
+simétrico. Não tem a refração real, as cáusticas nem os greebles irregulares do render offline
+da referência — a gravação existe, mas no tamanho em que a peça aparece na página ela lê como
+textura, não como legenda legível. Fechar mais essa distância significaria refração de verdade
+(`transmission`, com o custo e a limitação de camadas já registrados acima).
 
 ### 5.5 Projetos de Destaque — não iniciado
 
@@ -532,11 +629,37 @@ acabado e com animações mais fluidas") a seção foi refeita em R3F — `compo
 
 ---
 
+### 5.7 Sistema de página (padronização 2026-09-01) — ✅ APROVADA
+
+Pedido do usuário: *"cada sessão tem que ter o tamanho de uma página normal, como a do hero"* e *"melhore o layout, hoje está tudo meio jogado"*.
+
+*Shell comum (`components/Section.tsx`):* toda seção usa `<Section>` — `min-h-screen`, `px-[5vw]`, `pt-[max(72px,7vh)]`, `pb-[max(112px,11vh)]` (o padding de baixo é maior porque o dock flutua sobre o conteúdo), container `max-w-[1600px]`. No desktop toda seção mede exatamente uma tela; no mobile `min-h` deixa crescer quando o conteúdo pede, em vez de cortar. `<SectionHeader>` padroniza eyebrow numerado + `<h2>` **sempre alinhados à esquerda** — antes Sobre e Stack centralizavam o eyebrow e a Experiência alinhava à esquerda, e o conjunto lia como três páginas diferentes. O `aria-labelledby` liga cada `<section>` ao seu `<h2>`: sem nome acessível, uma `<section>` nem é exposta como região navegável, e o dock manda o usuário direto pra elas.
+
+*Ritmo de composição (alternância deliberada, não repetição):* Sobre = anel à esquerda (alinhado à mesma margem do título) + texto à direita; Stack = texto à esquerda + esfera à direita; Experiência = peça central em overlay com texto nos cantos. Sobre ganhou um `<h2>` ("De full-stack a engenharia de IA.") derivado da própria bio aprovada — não é copy nova. O anel do Sobre caiu de `50vw` para `min(38vw,480px)` e a esfera do Stack passou a ser dimensionada pela altura disponível: antes as duas estouravam a viewport (1048px e 1136px numa tela de 900px) e a esfera era cortada pelo dock.
+
+*Seções não desenhadas:* `Projects.tsx` (§5.5) e `Contact.tsx` (§5.6) receberam **só o shell padrão** + título placeholder, centrados verticalmente, para não ficarem como blocos órfãos no meio da página. O conteúdo continua ⏳ não iniciado — não desenhar sem aprovação.
+
+### 5.8 Interação dos objetos 3D (revisão 2026-09-01) — ✅ APROVADA
+
+Vale para o núcleo da Experiência (§5.4) e a esfera do Stack (§5.3):
+
+- **Giro por scroll REMOVIDO** nos dois. A página rolando mexia no objeto sem ninguém pedir. Sobrou giro automático contínuo + arrasto.
+- **Arrasto livre em todos os eixos** no núcleo: sem trava de inclinação e sem volta automática à pose de repouso (a esfera mantém a trava de ±1.35 rad, senão inverte nos polos). Como o núcleo gira sem limite, o enquadramento passou a ser calculado pela **esfera envolvente** — é a única medida que nenhum ângulo estoura.
+- **Legenda "arraste para girar" REMOVIDA** de tudo. O `cursor-grab` é a affordance. Na esfera, o `<p>` continua existindo com altura reservada só para o nome da ferramenta no hover (sem ele, o rótulo empurraria a esfera ao aparecer). A copy do Stack também perdeu o "role a página para girar".
+- **Pose inicial do núcleo:** `rotation=[1.15, 0.5, 0]`, escolhida para bater com a imagem de referência do usuário (discos em cascata, vistos de cima em três quartos). Para reavaliar a pose num print, emule `prefers-reduced-motion: reduce` — a cena congela exatamente nessa rotação.
+- **Composição da Experiência:** a peça vive na **coluna do meio** do grid, ocupando as três linhas; as colunas laterais são de 280px (os blocos já são limitados por `max-w-[42ch]`, ~286px, então não perdem nada). Uma versão em overlay — peça cobrindo o grid inteiro atrás do texto — foi implementada e **descartada no review**: com a peça dimensionada pela altura, o texto caía sobre o cromo em movimento e o contraste mudava a cada frame. Estar na coluna do meio faz a peça ser dimensionada pela faixa livre entre os textos, então nenhuma rotação pode passar por cima deles.
+- **Inércia em rad/s:** a velocidade do arremesso é dividida pelo tempo real entre eventos de ponteiro (`e.timeStamp`, com piso de 8 ms). Derivar só do delta em pixels fazia o mesmo gesto render menos impulso num mouse de 1000 Hz do que num de 60 Hz, e um último evento de 1px — comum ao parar a mão — matava o arremesso.
+- **`touch-pan-y`:** no toque, o arrasto vertical vira scroll da página, então só o eixo horizontal gira. `touch-none` resolveria, mas prenderia o scroll da seção — não trocar sem resolver isso.
+
+*Sombra de contato (`components/GroundShadow.tsx`):* o efeito de profundidade do §5.1 virou componente e é usado no Sobre, no Stack e na Experiência. São **duas camadas de propósito**: um núcleo curto e denso, que assenta o objeto, e um halo largo e muito difuso, que faz a oclusão ambiente em volta. Uma elipse só com gradiente único lê como mancha cinza solta — foi exatamente o defeito apontado pelo usuário na peça da Experiência. A foto do Sobre também ganhou a elevação completa (contato curto na borda + duas quedas longas + highlight interno), senão o disco lê como recorte chapado sobre o anel.
+
+*Tamanho da foto do Sobre:* o PNG do anel tem muita margem transparente — **a arte ocupa só ~50% do arquivo**. Por isso inflar apenas o disco da foto dentro da caixa original cobria o anel inteiro (testado a 44% e rejeitado: as bandas sumiam). A solução é escalar o **grupo dos anéis** (`scale-[1.35]` num wrapper) e manter a foto em 44% da caixa: a foto cresce ~40% em pixels e a proporção foto/anel continua a aprovada. A escala mora no wrapper, e não nas `<Image>`, porque o `transform` delas já é o da animação de rotação.
+
 ## 6. Instruções para o Claude Code
 
 - Leia este arquivo inteiro antes de qualquer ação.
 - Nunca implemente uma seção marcada "⏳ EM DISCUSSÃO" — apenas seções "✅ APROVADA".
-- **Checkpoint desta rodada:** implemente Hero (§5.1) → Sobre (§5.2) → Stack (§5.3), nessa ordem, e então **pare**. Não crie `Experiencia.tsx`, `Projetos.tsx` ou `Contato.tsx`/`Footer.tsx` — essas seções não estão aprovadas (ver instrução no topo do arquivo). Se o usuário pedir explicitamente pra seguir além do checkpoint numa conversa futura, essa nota deve ser atualizada/removida antes.
+- **Checkpoint atual:** Hero (§5.1), Sobre (§5.2), Stack (§5.3) e Experiência (§5.4) implementados. **Pare aqui.** Não crie/desenhe `Projects.tsx` ou `Contact.tsx`/Footer — essas seções não estão aprovadas. Se o usuário pedir explicitamente pra seguir além numa conversa futura, atualize esta nota antes.
 - Após qualquer decisão de design aprovada em conversa com o usuário, **atualize este arquivo** movendo a seção para "✅ APROVADA" com os detalhes finais (paleta em hex, fontes exatas, comportamento de animação) antes de escrever código.
 - Não invente dados de currículo, empresas, métricas ou projetos além dos listados na Seção 4.
 - Mantenha o código em componentes por seção (`components/sections/Hero.tsx`, etc.) para facilitar iteração incremental sem reescrever o arquivo inteiro.

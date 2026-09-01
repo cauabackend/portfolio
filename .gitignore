@@ -44,8 +44,12 @@ next-env.d.ts
 # variante em video do Hero (testada e descartada; arquivo de 4,5 MB)
 /public/video/
 components/HeroVideo.tsx
-# asset da secao de Experiencia, que ainda nao foi desenhada
+# asset do mockup de fio 3D rejeitado
 /public/models/fio1.glb
+# modelo da Experiencia, substituido pela geometria procedural de
+# components/core-geometry.ts: 39,7 MB que nenhum codigo carrega mais.
+# Continua na maquina local; pra voltar ao modelo, tire esta linha.
+/public/models/core.glb
 # mockups superados ou rejeitados (os aprovados seguem versionados)
 /design/experiencia-v1.html
 /design/experiencia-v2.html

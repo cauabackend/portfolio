@@ -1,15 +1,20 @@
 import { profile } from "@/lib/resume";
+import { Section, SectionHeader } from "@/components/Section";
 
-// Design ⏳ não iniciado (CLAUDE.md §5.5).
+// Design ⏳ não iniciado (CLAUDE.md §5.6). Só o shell padrão da página + o
+// e-mail real; o resto entra quando a seção for decidida com o usuário.
 export function Contact() {
   return (
-    <section id="contato" className="mx-auto w-full max-w-5xl px-6 py-24">
-      <h2 className="text-2xl font-medium tracking-tight">Contato</h2>
-      <p className="mt-4 text-sm">
-        <a className="underline underline-offset-4" href={`mailto:${profile.email}`}>
+    <Section id="contato" index="06" innerClassName="justify-center">
+      <SectionHeader index="06" label="Contato" title="Vamos conversar." />
+      <p className="mt-8">
+        <a
+          className="font-display text-[clamp(20px,2.4vw,34px)] font-semibold tracking-[-0.02em] underline decoration-[var(--line)] underline-offset-[6px] transition-colors hover:decoration-[var(--accent-ink)]"
+          href={`mailto:${profile.email}`}
+        >
           {profile.email}
         </a>
       </p>
-    </section>
+    </Section>
   );
 }

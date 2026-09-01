@@ -1,30 +1,33 @@
+import { stack } from "@/lib/resume";
 import { StackSphere } from "@/components/StackSphere";
+import { Section, SectionHeader } from "@/components/Section";
 
 // Core Expertise / Stack aprovado — CLAUDE.md §5.3 (mockup design/stack-v4.html).
+// Texto à esquerda, esfera à direita: alterna com o Sobre (anel à esquerda) e dá
+// ritmo à página em vez de empilhar tudo centralizado.
 export function Expertise() {
   return (
-    <section
-      id="expertise"
-      className="relative px-[6vw] pt-[min(12vw,130px)] pb-[min(11vw,120px)]"
-    >
-      <div className="mx-auto max-w-[1100px]">
-        <p className="mb-10 flex items-center justify-center gap-[10px] font-mono text-xs tracking-[0.14em] text-[var(--ink-muted)] uppercase">
-          <span aria-hidden className="h-px w-[60px] bg-[var(--line)]" />
-          <span className="font-medium text-[var(--accent-ink)]">03</span> Stack técnico
-          <span aria-hidden className="h-px w-[60px] bg-[var(--line)]" />
-        </p>
-
-        <div className="mx-auto max-w-[600px] text-center">
-          <h2 className="m-0 mb-4 font-display text-[clamp(28px,3.8vw,44px)] leading-[1.1] font-semibold tracking-[-0.02em]">
-            Minha stack, <span className="text-[var(--accent-ink)]">em órbita</span>.
-          </h2>
-          <p className="m-0 text-[clamp(15px,1.2vw,17px)] leading-[1.6] text-[var(--ink-muted)]">
-            Arraste ou role a página para girar — cada nó é uma ferramenta do dia a dia.
+    <Section id="expertise" index="03">
+      <div className="grid grid-cols-1 items-center gap-10 min-[981px]:flex-1 min-[981px]:grid-cols-[minmax(0,420px)_minmax(0,1fr)] min-[981px]:gap-[5vw]">
+        <SectionHeader index="03" label="Stack técnico" title={<>Minha stack, em órbita.</>}>
+          <p className="m-0 mt-5 max-w-[38ch] text-[15px] leading-[1.6] text-[var(--ink-muted)]">
+            Cada nó é uma ferramenta do dia a dia — das linguagens e frameworks aos
+            provedores de modelo e à esteira de CI que assina os artefatos.
           </p>
-        </div>
+          {/* As ferramentas só existem como textura dentro do WebGL: sem esta
+              lista, quem usa leitor de tela (ou cai no fallback sem WebGL) lê a
+              promessa de "cada nó é uma ferramenta" e não recebe nenhuma. */}
+          <ul className="sr-only">
+            {stack.map((t) => (
+              <li key={t.label}>{t.label}</li>
+            ))}
+          </ul>
+        </SectionHeader>
 
-        <StackSphere />
+        <div className="h-[min(62vh,560px)] min-[981px]:h-full min-[981px]:min-h-[420px]">
+          <StackSphere />
+        </div>
       </div>
-    </section>
+    </Section>
   );
 }

@@ -7,7 +7,7 @@ export function Hero() {
   return (
     <section
       id="hero"
-      className="relative isolate flex min-h-screen flex-col justify-between overflow-x-clip bg-[var(--bg)] pt-[26px] pb-[34px] max-[860px]:pb-[96px]"
+      className="relative isolate flex min-h-dvh flex-col justify-between overflow-x-clip bg-[var(--bg)] pt-[26px] pb-[34px] max-[860px]:pb-[96px]"
     >
       <div className="relative flex flex-1 items-center pr-[5vw] pl-[2vw] max-[860px]:flex-col max-[860px]:justify-center max-[860px]:gap-6 max-[860px]:px-[6vw]">
         <div className="relative z-[2] aspect-square w-[min(46vw,980px)] flex-none max-[860px]:w-[min(78vw,420px)]">
@@ -31,7 +31,10 @@ export function Hero() {
         </h1>
       </div>
 
-      <div className="flex items-end justify-between px-11 font-mono max-[720px]:flex-col max-[720px]:items-start max-[720px]:gap-[14px] max-[720px]:px-[22px]">
+      {/* mesma coluna das demais seções (px-[5vw] + cap de 1600px): antes esta
+          linha usava px-11 e não tinha cap, então a margem esquerda do Hero não
+          batia com a espinha do resto da página */}
+      <div className="mx-auto flex w-full max-w-[1600px] items-end justify-between px-[5vw] font-mono max-[720px]:flex-col max-[720px]:items-start max-[720px]:gap-[14px]">
         <p className="m-0 text-[11.5px] tracking-[0.1em] text-[var(--ink-muted)] uppercase">
           {profile.name} — {profile.location}
         </p>

@@ -71,6 +71,11 @@ export const experiences: Experience[] = [
   },
 ];
 
+// Linha de posicionamento da seção Experiência (§5.4) — copy fornecida pelo
+// usuário em 2026-09-01, com o título alinhado ao profile.role do site.
+export const careerSummary =
+  "Desenvolvimento de soluções baseadas em dados | AI & Machine Learning Engineer";
+
 // Copy da seção Sobre — texto aprovado no mockup sobre-v1.html (CLAUDE.md §5.2).
 // Marcações inline viram <b>/<span class="muted"> no componente.
 export const about = {

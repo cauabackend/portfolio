@@ -16,7 +16,8 @@ export default function Page() {
         Pular para o conteúdo
       </a>
       <Nav />
-      <main id="conteudo" className="pb-[110px]">
+      {/* cada seção já reserva o respiro do dock no próprio padding-bottom */}
+      <main id="conteudo">
         <Hero />
         <Sobre />
         <Expertise />

@@ -145,7 +145,7 @@ function Globe({ still, onHover }: { still: boolean; onHover: (label: string | n
   const dragging = useRef(false);
   const lastX = useRef(0);
   const lastY = useRef(0);
-  const lastScroll = useRef(0);
+  const lastT = useRef(0);
   const pointerInside = useRef(false);
   const hoverTargets = useRef<THREE.Object3D[]>([]);
   const hoverLabel = useRef<string | null>(null);
@@ -165,14 +165,17 @@ function Globe({ still, onHover }: { still: boolean; onHover: (label: string | n
     /* eslint-enable react-hooks/immutability */
   }, [maps, gl]);
 
-  // Arrasto e scroll alimentam uma velocidade angular que decai por atrito —
-  // é o que dá o "peso" e a continuidade que faltavam ao giro fixo anterior.
+  // O arrasto alimenta uma velocidade angular que decai por atrito — é o que dá
+  // o "peso" e a continuidade que faltavam ao giro fixo anterior. O giro por
+  // scroll foi removido em 2026-09-01 a pedido do usuário (aqui e no núcleo da
+  // Experiência): a página rolando mexia no objeto sem ninguém pedir.
   useEffect(() => {
     const el = gl.domElement;
     const down = (e: PointerEvent) => {
       dragging.current = true;
       lastX.current = e.clientX;
       lastY.current = e.clientY;
+      lastT.current = e.timeStamp;
       velY.current = 0;
       velX.current = 0;
       el.setPointerCapture(e.pointerId);
@@ -181,25 +184,22 @@ function Globe({ still, onHover }: { still: boolean; onHover: (label: string | n
       if (!dragging.current) return;
       const dx = e.clientX - lastX.current;
       const dy = e.clientY - lastY.current;
+      // inércia em rad/s: sem o tempo real entre eventos, o mesmo gesto rende
+      // menos impulso num mouse de alta taxa (ver nota igual no CoreScene)
+      const dt = Math.max(e.timeStamp - lastT.current, 8) / 1000;
       lastX.current = e.clientX;
       lastY.current = e.clientY;
+      lastT.current = e.timeStamp;
       spinY.current += dx * 0.0065;
       // o eixo vertical trava perto dos polos: passar de ±80° inverte a esfera
       // e o giro fica desorientador.
       spinX.current = THREE.MathUtils.clamp(spinX.current + dy * 0.0055, -1.35, 1.35);
-      velY.current = dx * 0.32;
-      velX.current = dy * 0.28;
+      velY.current = (dx * 0.0065) / dt;
+      velX.current = (dy * 0.0055) / dt;
     };
     const up = (e: PointerEvent) => {
       dragging.current = false;
       el.releasePointerCapture?.(e.pointerId);
-    };
-
-    lastScroll.current = window.scrollY;
-    const onScroll = () => {
-      const d = window.scrollY - lastScroll.current;
-      lastScroll.current = window.scrollY;
-      velY.current += d * 0.011;
     };
 
     const enter = () => {
@@ -215,7 +215,6 @@ function Globe({ still, onHover }: { still: boolean; onHover: (label: string | n
     el.addEventListener("pointermove", move);
     el.addEventListener("pointerup", up);
     el.addEventListener("pointercancel", up);
-    window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
       el.removeEventListener("pointerenter", enter);
       el.removeEventListener("pointerleave", leave);
@@ -223,7 +222,6 @@ function Globe({ still, onHover }: { still: boolean; onHover: (label: string | n
       el.removeEventListener("pointermove", move);
       el.removeEventListener("pointerup", up);
       el.removeEventListener("pointercancel", up);
-      window.removeEventListener("scroll", onScroll);
     };
   }, [gl]);
 
