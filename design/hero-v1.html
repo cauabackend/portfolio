@@ -1,0 +1,140 @@
+<title>Hero — Núcleo Sintético</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root{
+    --bg:#e7e8e7; --surface:#f2f3f2; --surface-2:#ffffff;
+    --ink:#191a1a; --ink-muted:#6b6d6c; --ink-faint:#a2a4a2;
+    --accent:#6d716e; --accent-ink:#4c4f4c; --accent-soft:#6d716e22;
+    --line:rgba(18,20,19,.10);
+    --shadow-sm:0 1px 1px rgba(15,17,17,.05), 0 2px 6px rgba(15,17,17,.06);
+    --shadow-lg:0 10px 20px rgba(15,17,17,.11), 0 40px 80px rgba(15,17,17,.16);
+    --inset-hi:inset 0 1px 0 rgba(255,255,255,.7);
+    color-scheme:light;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0; height:100%;}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:'IBM Plex Sans',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  }
+
+  .hero{
+    position:relative; min-height:100vh; display:flex; flex-direction:column;
+    justify-content:space-between; padding:26px 0 34px; isolation:isolate;
+  }
+  /* giant type + head stack */
+  .stack{position:relative; flex:1; display:flex; align-items:center; justify-content:center;}
+  .type-line{
+    font-family:'Instrument Sans',sans-serif; font-weight:700;
+    font-size:clamp(64px,11vw,168px); line-height:.94; letter-spacing:-.03em;
+    color:var(--ink); white-space:nowrap; user-select:none;
+  }
+  .type-line.top{align-self:flex-end; margin-right:-.01em;}
+  .type-line.bottom{align-self:flex-start;}
+  .type-wrap{
+    position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center;
+    z-index:1; pointer-events:none;
+  }
+  .type-wrap .row{display:flex; width:100%;}
+  .row.r1{justify-content:flex-end; padding-right:6vw;}
+  .row.r2{justify-content:flex-start; padding-left:6vw;}
+  .type-accent{color:var(--accent-ink);}
+
+  .head-zone{position:relative; z-index:2; display:flex; flex-direction:column; align-items:center;}
+  .stage{
+    position:relative; width:min(360px,34vw); height:min(360px,34vw); min-width:220px; min-height:220px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .contact-shadow{
+    position:absolute; bottom:6%; width:74%; height:22px; border-radius:50%;
+    background:radial-gradient(ellipse, rgba(15,17,17,.24), transparent 72%); filter:blur(3px);
+  }
+  .head-ph{
+    position:relative; width:78%; height:78%; border-radius:50%;
+    background:linear-gradient(155deg,#fcfcfb,#d6d7d5 60%,#adafac);
+    box-shadow:
+      inset 0 -16px 30px rgba(15,17,17,.12),
+      inset 0 12px 20px rgba(255,255,255,.85),
+      var(--shadow-lg);
+  }
+  .head-ph .ring{position:absolute; inset:16%; border-radius:50%; border:1px solid rgba(28,27,24,.15);}
+  .head-ph .label{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center; text-align:center;
+    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.06em; color:var(--ink-faint); padding:0 20%;
+  }
+  /* bottom chrome */
+  .botbar{display:flex; justify-content:space-between; align-items:flex-end; padding:0 44px; font-family:'IBM Plex Mono',monospace;}
+  .name{font-size:11.5px; letter-spacing:.1em; color:var(--ink-muted);}
+  .scroll-cue{display:flex; align-items:center; gap:10px; font-size:11px; color:var(--ink-faint); letter-spacing:.08em;}
+  .scroll-cue .ln{width:1px; height:28px; background:linear-gradient(var(--ink-faint), transparent);}
+
+  /* floating dock nav */
+  .dock{
+    display:flex; align-items:center; gap:4px; padding:9px; border-radius:20px;
+    background:#191a1a; box-shadow:var(--shadow-lg);
+  }
+  .dock a{
+    display:flex; align-items:center; justify-content:center; width:38px; height:38px;
+    border-radius:13px; color:#e7e8e7; opacity:.72; transition:.18s; position:relative;
+  }
+  .dock a svg{width:17px; height:17px;}
+  .dock a:hover{opacity:1; background:rgba(255,255,255,.09);}
+  .dock a.current{opacity:1; background:var(--accent); color:#191a1a;}
+  .dock .sep{width:1px; height:20px; background:rgba(255,255,255,.14); margin:0 4px;}
+
+  @media (max-width:720px){
+    .botbar{padding:0 22px; flex-direction:column; gap:14px; align-items:flex-start;}
+    .type-line{font-size:clamp(38px,13vw,64px);}
+  }
+</style>
+
+<section class="hero">
+  <div class="stack">
+    <div class="type-wrap">
+      <div class="row r1"><span class="type-line top">AI &amp; <span class="type-accent">MACHINE</span></span></div>
+      <div class="row r2"><span class="type-line bottom">LEARNING ENGINEER</span></div>
+    </div>
+
+    <div class="head-zone">
+      <div class="stage">
+        <div class="contact-shadow"></div>
+        <div class="head-ph">
+          <div class="ring"></div>
+          <div class="label">‹ cabeça 3D entra aqui ›</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="botbar">
+    <div class="name">CAUÃ PEREIRA DA SILVA — SÃO PAULO, SP</div>
+    <div class="scroll-cue"><span class="ln"></span>SCROLL</div>
+  </div>
+
+  <nav class="dock" style="position:fixed; left:50%; bottom:22px; transform:translateX(-50%); z-index:10;">
+    <a href="#hero" class="current" title="Início">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 4l9 6.5"/><path d="M5 9.5V20h5v-6h4v6h5V9.5"/></svg>
+    </a>
+    <a href="#sobre" title="Sobre">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6"/></svg>
+    </a>
+    <a href="#expertise" title="Expertise">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></svg>
+    </a>
+    <a href="#experience" title="Experiência">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/></svg>
+    </a>
+    <a href="#projects" title="Projetos">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="M3 13l9 5 9-5"/></svg>
+    </a>
+    <span class="sep"></span>
+    <a href="#contact" title="Contato">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+    </a>
+    <a href="https://github.com" title="GitHub" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>
+    </a>
+  </nav>
+</section>

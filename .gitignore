@@ -1,0 +1,60 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# --- fora do repo por escolha: pesado, superado ou nao usado pelo app ---
+# variante em video do Hero (testada e descartada; arquivo de 4,5 MB)
+/public/video/
+components/HeroVideo.tsx
+# asset da secao de Experiencia, que ainda nao foi desenhada
+/public/models/fio1.glb
+# mockups superados ou rejeitados (os aprovados seguem versionados)
+/design/experiencia-v1.html
+/design/experiencia-v2.html
+/design/experiencia-v3-3d.html
+/design/sobre-v1.html
+/design/stack-v1.html
+/design/stack-v2.html
+/design/stack-v3.html
+# duplicata: os PNGs servidos vivem em public/images/sobre/
+/design/rings/
+# artefatos de inspecao via navegador
+/.playwright-mcp/

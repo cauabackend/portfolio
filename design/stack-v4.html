@@ -1,0 +1,347 @@
+<meta charset="UTF-8">
+<title>Stack Técnico — Esfera Geodésica</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/devicon/2.16.0/devicon.min.css">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root{
+    --bg:#e7e8e7; --surface:#f2f3f2; --surface-2:#ffffff;
+    --ink:#191a1a; --ink-muted:#6b6d6c; --ink-faint:#a2a4a2;
+    --accent:#6d716e; --accent-ink:#4c4f4c; --accent-soft:#6d716e22;
+    --line:rgba(18,20,19,.10);
+    --shadow-sm:0 1px 1px rgba(15,17,17,.05), 0 2px 6px rgba(15,17,17,.06);
+    --shadow-lg:0 10px 20px rgba(15,17,17,.11), 0 40px 80px rgba(15,17,17,.16);
+    --inset-hi:inset 0 1px 0 rgba(255,255,255,.7);
+    color-scheme:light;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:'IBM Plex Sans',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .stack{ position:relative; padding:min(12vw,130px) 6vw min(11vw,120px); }
+  .inner{ max-width:1100px; margin:0 auto; }
+
+  .eyebrow{
+    display:flex; align-items:center; gap:10px; margin-bottom:40px; justify-content:center;
+    font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.14em;
+    color:var(--ink-muted); text-transform:uppercase;
+  }
+  .eyebrow .idx{color:var(--accent-ink); font-weight:500;}
+  .eyebrow .ln{width:60px; height:1px; background:var(--line);}
+
+  .head{ max-width:600px; margin:0 auto; text-align:center; }
+  .head h2{
+    font-family:'Instrument Sans',sans-serif; font-weight:600;
+    font-size:clamp(28px,3.8vw,44px); line-height:1.1; letter-spacing:-.02em;
+    margin:0 0 16px;
+  }
+  .head h2 em{ font-style:normal; color:var(--accent-ink); }
+  .head p{
+    font-family:'IBM Plex Sans',sans-serif; font-weight:400;
+    font-size:clamp(15px,1.2vw,17px); line-height:1.6; color:var(--ink-muted);
+    margin:0;
+  }
+
+  .stage-wrap{ position:relative; margin-top:24px; }
+  .stage{
+    position:relative; height:min(72vw,640px);
+    display:flex; align-items:center; justify-content:center;
+    cursor:grab; user-select:none;
+  }
+  .stage.grabbing{ cursor:grabbing; }
+  .stage canvas{ position:absolute; inset:0; width:100%; height:100%; }
+  .nodes{ position:absolute; inset:0; pointer-events:none; }
+
+  .ground{
+    position:absolute; left:50%; bottom:6%; width:46%; height:34px;
+    transform:translateX(-50%);
+    background:radial-gradient(ellipse at center, rgba(25,26,26,.16), transparent 70%);
+    filter:blur(2px);
+  }
+
+  .node{
+    position:absolute; left:50%; top:50%; width:40px; height:40px; margin:-20px 0 0 -20px;
+    display:flex; align-items:center; justify-content:center;
+    pointer-events:auto; cursor:pointer;
+    will-change:transform,opacity;
+    filter:drop-shadow(0 3px 5px rgba(15,17,17,.22));
+  }
+  .node .glyph{ position:relative; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-size:32px; line-height:1; }
+  .node .glyph.mask{
+    width:28px; height:28px;
+    -webkit-mask-image:var(--glyph); mask-image:var(--glyph);
+    -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
+    -webkit-mask-position:center; mask-position:center;
+    -webkit-mask-size:contain; mask-size:contain;
+    background-color:var(--tint);
+  }
+
+  .tip{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-140%);
+    padding:5px 10px; border-radius:8px; white-space:nowrap;
+    background:var(--ink); color:#f4f4f3;
+    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.03em;
+    opacity:0; pointer-events:none; transition:opacity .15s ease;
+  }
+  .node:hover .tip{ opacity:1; }
+
+  .hint{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    margin-top:14px;
+    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.05em;
+    color:var(--ink-faint); text-transform:uppercase;
+  }
+
+  .note{
+    max-width:1100px; margin:26px auto 0; padding:0 6px;
+    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.02em;
+    color:var(--ink-faint); text-align:center;
+  }
+
+  @media (max-width:720px){
+    .node{ width:32px; height:32px; margin:-16px 0 0 -16px; }
+    .node .glyph{ width:26px; height:26px; font-size:26px; }
+  }
+</style>
+
+<section class="stack">
+  <div class="inner">
+    <div class="eyebrow"><span class="ln"></span><span class="idx">03</span> STACK TÉCNICO <span class="ln"></span></div>
+
+    <div class="head">
+      <h2>Minha stack, <em>em órbita</em>.</h2>
+      <p>Arraste ou role a página para girar — cada nó é uma ferramenta do dia a dia.</p>
+    </div>
+
+    <div class="stage-wrap">
+      <div class="stage" id="stage">
+        <canvas id="mesh"></canvas>
+        <div class="nodes" id="nodes"></div>
+        <div class="ground"></div>
+      </div>
+      <div class="hint">◐ arraste para girar</div>
+    </div>
+
+    <div class="note">esboço v1 — malha geodésica + ícones reais via devicon/simple-icons · lista ajustável</div>
+  </div>
+</section>
+
+<script>
+  function siMask(slug, tint){ return { mask:`https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/${slug}.svg`, tint }; }
+
+  // subset of the stack that has a real brand glyph available — the rest
+  // (XGBoost, SHAP, Sigstore, in-toto, soft skills…) will get their own
+  // text-index treatment below/around the sphere once this base is approved.
+  const SKILLS = [
+    { label:'Python',        devicon:'devicon-python-plain colored' },
+    { label:'Claude',        ...siMask('anthropic','#D97757') },
+    { label:'OpenAI',        ...siMask('openai','#111111') },
+    { label:'Next.js',       devicon:'devicon-nextjs-original' },
+    { label:'React',         devicon:'devicon-react-original colored' },
+    { label:'TypeScript',    devicon:'devicon-typescript-plain colored' },
+    { label:'JavaScript',    devicon:'devicon-javascript-plain colored' },
+    { label:'Node.js',       devicon:'devicon-nodejs-plain colored' },
+    { label:'Tailwind CSS',  devicon:'devicon-tailwindcss-plain colored' },
+    { label:'Git',           devicon:'devicon-git-plain colored' },
+    { label:'GitHub',        devicon:'devicon-github-original' },
+    { label:'GitHub Actions',devicon:'devicon-githubactions-plain colored' },
+  ];
+
+  const stage = document.getElementById('stage');
+  const canvas = document.getElementById('mesh');
+  const ctx = canvas.getContext('2d');
+  const nodesWrap = document.getElementById('nodes');
+
+  const TOTAL_VERTS = 60;   // mesh density (icon nodes are a subset of these)
+  const K_NEIGHBORS = 3;    // strut connections per vertex
+  const FOV = 900;
+
+  let W = 0, H = 0, R = 0, DPR = 1;
+
+  // --- build a Fibonacci-lattice sphere, then pick which verts get icons ---
+  const verts = [];
+  const offset = 2 / TOTAL_VERTS;
+  const increment = Math.PI * (3 - Math.sqrt(5));
+  for (let i = 0; i < TOTAL_VERTS; i++) {
+    const y = (i * offset) - 1 + offset / 2;
+    const r = Math.sqrt(Math.max(0, 1 - y * y));
+    const phi = i * increment;
+    verts.push({ x: Math.cos(phi) * r, y, z: Math.sin(phi) * r, skill: null });
+  }
+  // spread the icon nodes evenly across the vertex list
+  const step = TOTAL_VERTS / SKILLS.length;
+  SKILLS.forEach((skill, i) => { verts[Math.floor(i * step)].skill = skill; });
+
+  // k-nearest-neighbor edges (angular distance), computed once — the sphere
+  // is rigid, so neighbor pairs don't change as it spins.
+  function angDist(a, b) { return a.x*b.x + a.y*b.y + a.z*b.z; } // cos(angle), higher = closer
+  const edges = [];
+  const edgeSet = new Set();
+  verts.forEach((v, i) => {
+    const dists = verts.map((o, j) => ({ j, d: i === j ? -Infinity : angDist(v, o) }));
+    dists.sort((a, b) => b.d - a.d);
+    for (let k = 0; k < K_NEIGHBORS; k++) {
+      const j = dists[k].j;
+      const key = i < j ? `${i}-${j}` : `${j}-${i}`;
+      if (!edgeSet.has(key)) { edgeSet.add(key); edges.push([i, j]); }
+    }
+  });
+
+  // --- DOM nodes for the icon vertices only ---
+  const iconVerts = verts.filter(v => v.skill);
+  iconVerts.forEach(v => {
+    const el = document.createElement('div');
+    el.className = 'node';
+    let glyphHTML;
+    if (v.skill.devicon) glyphHTML = `<i class="glyph ${v.skill.devicon}"></i>`;
+    else if (v.skill.mask) glyphHTML = `<span class="glyph mask" style="--glyph:url('${v.skill.mask}'); --tint:${v.skill.tint};"></span>`;
+    else glyphHTML = `<span class="glyph" style="font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600;">${v.skill.label.slice(0,3).toUpperCase()}</span>`;
+    el.innerHTML = glyphHTML + `<span class="tip">${v.skill.label}</span>`;
+    nodesWrap.appendChild(el);
+    v.el = el;
+  });
+
+  // --- rotation state ---
+  let rotY = 0.4;
+  const rotX = -0.19; // static camera tilt, ~-11deg, matching the reference's 3/4 view
+  let autoSpeed = 0.0016;
+  let lastScrollY = window.scrollY;
+
+  function onScroll() {
+    const dy = window.scrollY - lastScrollY;
+    lastScrollY = window.scrollY;
+    rotY += dy * 0.0026;
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  // drag-to-spin
+  let dragging = false, lastX = 0;
+  stage.addEventListener('pointerdown', e => { dragging = true; lastX = e.clientX; stage.classList.add('grabbing'); });
+  window.addEventListener('pointerup', () => { dragging = false; stage.classList.remove('grabbing'); });
+  window.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    rotY += (e.clientX - lastX) * 0.006;
+    lastX = e.clientX;
+  });
+
+  function resize() {
+    const rect = stage.getBoundingClientRect();
+    W = rect.width; H = rect.height;
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = W * DPR; canvas.height = H * DPR;
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    R = Math.min(W, H) * 0.34;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  function project(v, cosY, sinY, cosX, sinX) {
+    // rotate around Y then tilt around X
+    let x = v.x * cosY + v.z * sinY;
+    let z = -v.x * sinY + v.z * cosY;
+    let y = v.y * cosX - z * sinX;
+    z = v.y * sinX + z * cosX;
+    const scale = FOV / (FOV + z * R);
+    return { sx: x * R * scale, sy: y * R * scale, scale, z };
+  }
+
+  function frame() {
+    if (!dragging) rotY += autoSpeed;
+    const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
+    const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
+
+    const projected = verts.map(v => project(v, cosY, sinY, cosX, sinX));
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.save();
+    ctx.translate(W / 2, H / 2);
+
+    // struts — rendered as shaded metal rods (gradient across the rod's
+    // width, like a lit cylinder), not flat hairlines. Sorted back-to-front
+    // so nearer rods overlap farther ones correctly.
+    const edgeDepths = edges.map(([i, j]) => (projected[i].z + projected[j].z) / 2);
+    const edgeOrder = edges.map((_, idx) => idx).sort((a, b) => edgeDepths[a] - edgeDepths[b]);
+
+    edgeOrder.forEach(idx => {
+      const [i, j] = edges[idx];
+      const a = projected[i], b = projected[j];
+      const depthN = 1 - (edgeDepths[idx] + 1) / 2; // 0 back .. 1 front
+      const dx = b.sx - a.sx, dy = b.sy - a.sy;
+      const len = Math.hypot(dx, dy) || 1;
+      const nx = -dy / len, ny = dx / len; // unit normal (rod cross-section axis)
+      const w = (1.1 + depthN * 2.6) / 2;
+
+      // higher-contrast polished-chrome gradient: dark edge -> tight bright
+      // specular streak -> mid reflection band -> dark edge (real chrome
+      // shows a sharp highlight plus a secondary darker reflection, not a
+      // single soft glow).
+      const grad = ctx.createLinearGradient(a.sx - nx * w, a.sy - ny * w, a.sx + nx * w, a.sy + ny * w);
+      const op = 0.4 + depthN * 0.5;
+      grad.addColorStop(0.00, `rgba(80,81,80,${(op * 0.85).toFixed(3)})`);
+      grad.addColorStop(0.30, `rgba(150,151,150,${op.toFixed(3)})`);
+      grad.addColorStop(0.46, `rgba(255,255,255,${Math.min(1, op * 1.15).toFixed(3)})`);
+      grad.addColorStop(0.58, `rgba(170,171,170,${op.toFixed(3)})`);
+      grad.addColorStop(0.8, `rgba(120,121,120,${(op * 0.9).toFixed(3)})`);
+      grad.addColorStop(1.00, `rgba(70,71,70,${(op * 0.8).toFixed(3)})`);
+
+      ctx.filter = depthN < 0.42 ? `blur(${((0.42 - depthN) * 3.4).toFixed(2)}px)` : 'none';
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = w * 2;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(a.sx, a.sy);
+      ctx.lineTo(b.sx, b.sy);
+      ctx.stroke();
+    });
+
+    // plain vertex joints (non-icon) — small chrome ball-joints: radial
+    // gradient with an offset specular highlight, so each reads as a sphere.
+    const jointOrder = verts
+      .map((v, i) => i)
+      .filter(i => !verts[i].skill)
+      .sort((a, b) => projected[a].z - projected[b].z);
+
+    jointOrder.forEach(i => {
+      const p = projected[i];
+      const depth = 1 - (p.z + 1) / 2;
+      const rad = 2.4 + depth * 3.2;
+      ctx.filter = depth < 0.42 ? `blur(${((0.42 - depth) * 2.6).toFixed(2)}px)` : 'none';
+      // chrome ball: tight bright specular, darker reflection ring, then a
+      // lighter rim at the very edge (environment light wrapping the sphere)
+      const g = ctx.createRadialGradient(
+        p.sx - rad * 0.42, p.sy - rad * 0.42, rad * 0.06,
+        p.sx, p.sy, rad
+      );
+      const op = 0.22 + depth * 0.68;
+      g.addColorStop(0, `rgba(255,255,255,${Math.min(1, op * 1.1).toFixed(3)})`);
+      g.addColorStop(0.32, `rgba(210,212,210,${(op * 0.92).toFixed(3)})`);
+      g.addColorStop(0.62, `rgba(110,112,110,${(op * 0.85).toFixed(3)})`);
+      g.addColorStop(0.86, `rgba(150,152,150,${(op * 0.8).toFixed(3)})`);
+      g.addColorStop(1, `rgba(230,231,230,${(op * 0.55).toFixed(3)})`);
+      ctx.beginPath();
+      ctx.arc(p.sx, p.sy, rad, 0, Math.PI * 2);
+      ctx.fillStyle = g;
+      ctx.fill();
+    });
+    ctx.filter = 'none';
+    ctx.restore();
+
+    // icon nodes: real DOM elements, billboarded (always face camera)
+    iconVerts.forEach((v, idx) => {
+      const p = projected[verts.indexOf(v)];
+      const depth = (1 - (p.z + 1) / 2); // 0 back .. 1 front
+      const s = 0.62 + depth * 0.56;
+      v.el.style.transform = `translate3d(${p.sx.toFixed(1)}px, ${p.sy.toFixed(1)}px, 0) scale(${s.toFixed(3)})`;
+      v.el.style.opacity = (0.4 + depth * 0.6).toFixed(2);
+      v.el.style.zIndex = Math.round(p.z * 1000) + 1000;
+      v.el.style.filter = depth < 0.5 ? `blur(${((0.5 - depth) * 3.2).toFixed(2)}px)` : 'none';
+    });
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+</script>
