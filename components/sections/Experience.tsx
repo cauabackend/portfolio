@@ -68,9 +68,9 @@ export function Experience() {
             passar por cima deles. Cobrir o grid inteiro daria uma peça maior,
             mas o texto cairia sobre o cromo em movimento — contraste que muda a
             cada frame. No mobile volta pro fluxo, como um bloco quadrado.
-            touch-pan-y: no toque o arrasto vertical vira scroll da página, então
-            só o eixo horizontal gira. touch-none prenderia o scroll da seção. */}
-        <div className="relative aspect-square w-full cursor-grab touch-pan-y active:cursor-grabbing min-[981px]:col-start-2 min-[981px]:row-start-1 min-[981px]:row-end-4 min-[981px]:aspect-auto min-[981px]:h-full min-[981px]:w-auto">
+            A peça é um vídeo em loop, então não há arrasto: o cursor-grab saiu
+            junto, senão prometeria uma interação que não existe. */}
+        <div className="relative aspect-square w-full min-[981px]:col-start-2 min-[981px]:row-start-1 min-[981px]:row-end-4 min-[981px]:aspect-auto min-[981px]:h-full min-[981px]:w-auto">
           <GroundShadow className="bottom-[13%] h-[24px] w-[20%]" />
           <CoreStage />
         </div>

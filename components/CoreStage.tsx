@@ -1,10 +1,15 @@
 "use client";
 
-import { Component, type ReactNode, useEffect, useRef, useState } from "react";
+import { Component, type ReactNode } from "react";
 import dynamic from "next/dynamic";
+import { useInViewport } from "@/lib/useInViewport";
 
 // Three.js precisa de WebGL: nada de SSR — mesmo padrão do HeadStage.
-const CoreScene = dynamic(() => import("./CoreScene"), { ssr: false });
+//
+// A peça da Experiência é o vídeo com chroma key. A versão em geometria
+// procedural continua em ./CoreScene, intacta: reverter é trocar o caminho
+// desta linha.
+const CoreScene = dynamic(() => import("./CoreVideoScene"), { ssr: false });
 
 // WebGL decorativo nunca pode derrubar a rota: sem contexto WebGL a seção
 // degrada pra texto puro — o significado mora nos blocos de texto.
@@ -19,35 +24,25 @@ class SceneBoundary extends Component<{ children: ReactNode }, { failed: boolean
 }
 
 export function CoreStage() {
-  const [seen, setSeen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  // Só cria o contexto WebGL quando a seção se aproxima da viewport — senão a
-  // cena disputaria GPU com o modelo do Hero já no load da página.
-  // ponytail: monta uma vez e não desmonta; pausar o frameloop ao sair da
-  // viewport fica pra quando isso medir custo real.
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setSeen(true);
-      },
-      { rootMargin: "200px" },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
+  // Duas margens, dois propósitos: a larga adianta o download do vídeo antes de
+  // a seção entrar em cena; a estreita decide se a cena deve continuar
+  // desenhando e decodificando — vídeo 2K decodificando fora da tela pesa na
+  // rolagem tanto quanto um canvas girando.
+  const { setNode: refCarga, inView: perto } = useInViewport({
+    rootMargin: "400px",
+    once: true,
+  });
+  const { setNode: refVisivel, inView: visivel } = useInViewport({ rootMargin: "100px" });
 
   return (
-    <div ref={ref} className="absolute inset-0">
-      {seen && (
-        <div className="absolute inset-0" aria-hidden>
+    <div ref={refCarga} className="absolute inset-0">
+      <div ref={refVisivel} className="absolute inset-0" aria-hidden>
+        {perto && (
           <SceneBoundary>
-            <CoreScene />
+            <CoreScene active={visivel} />
           </SceneBoundary>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

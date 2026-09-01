@@ -274,7 +274,13 @@ function Globe({ still, onHover }: { still: boolean; onHover: (label: string | n
   );
 }
 
-export default function StackSphereScene({ onHover }: { onHover: (label: string | null) => void }) {
+export default function StackSphereScene({
+  onHover,
+  active = true,
+}: {
+  onHover: (label: string | null) => void;
+  active?: boolean;
+}) {
   const reduced = useReducedMotion();
 
   return (
@@ -288,7 +294,9 @@ export default function StackSphereScene({ onHover }: { onHover: (label: string 
         toneMapping: THREE.NeutralToneMapping,
         toneMappingExposure: 1.02,
       }}
-      frameloop={reduced ? "demand" : "always"}
+      // fora da tela nada é desenhado: com "always" a esfera consumia GPU a
+      // página inteira, e é isso que deixa a rolagem pesada
+      frameloop={reduced || !active ? "demand" : "always"}
     >
       <StudioEnvironment intensity={1.25} />
       <ambientLight intensity={0.2} />

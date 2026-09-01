@@ -41,8 +41,8 @@ yarn-error.log*
 next-env.d.ts
 
 # --- fora do repo por escolha: pesado, superado ou nao usado pelo app ---
-# variante em video do Hero (testada e descartada; arquivo de 4,5 MB)
-/public/video/
+# variante em video do Hero (testada e descartada)
+/public/video/head-loop-2k.mp4
 components/HeroVideo.tsx
 # asset do mockup de fio 3D rejeitado
 /public/models/fio1.glb

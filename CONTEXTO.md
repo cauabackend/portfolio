@@ -625,6 +625,81 @@ da referência — a gravação existe, mas no tamanho em que a peça aparece na
 textura, não como legenda legível. Fechar mais essa distância significaria refração de verdade
 (`transmission`, com o custo e a limitação de camadas já registrados acima).
 
+**🔁 REVISÃO (2026-09-01) — a peça vigente é um VÍDEO com chroma key. Substitui a geometria
+procedural acima, que continua no repo (`core-geometry.ts` + `CoreScene.tsx`) e volta trocando
+o caminho do `dynamic import` no `CoreStage`.**
+
+O usuário produziu o vídeo do objeto sobre fundo verde. Fonte:
+`Desktop/Pessoal/upscaled-video.mp4` (2688×3072, 24fps, 8s, 21 MB).
+
+*Por que o key roda num SHADER e não é assado no arquivo:* WebM com alpha seria mais simples de
+consumir, mas Safari e iOS não tocam WebM com canal alpha — o formato que eles aceitam (HEVC com
+alpha) só se codifica no macOS. Com o key em runtime o arquivo continua um MP4 H.264 comum, que
+toca em todo lugar, e o vídeo não sofre recompressão além da de entrega.
+
+Decisões que não são óbvias no código (`components/ChromaKeyVideo.tsx`):
+- **Distância medida no espaço de CROMA (Cb/Cr), não em RGB.** Em RGB uma sombra sobre o fundo
+  verde fica "longe" do verde puro só por ter escurecido, e sobra sujeira.
+- **A cor do fundo é amostrada do PRÓPRIO frame** (média dos 4 cantos), não passada por uniform.
+  Passar por fora obriga os dois lados a estarem no mesmo espaço de cor, e a conversão que o
+  three aplica na amostragem quebra a comparação **em silêncio** — foi exatamente o bug que fez
+  o key sair invertido (fundo mantido, objeto apagado). Amostrando da mesma imagem, o filtro
+  fica imune a isso. O fundo real é um esmeralda escuro `rgb(2,89,60)`, não o verde clássico.
+- **`texture.colorSpace = NoColorSpace`.** Com `SRGBColorSpace` o three converte para linear na
+  amostragem, mas um `ShaderMaterial` sem `#include <colorspace_fragment>` escreve cru no
+  framebuffer: a imagem clareia e estoura. Sem conversão em ponta nenhuma, é passthrough exato.
+- **Despill** além do key: a borda recebe verde refletido, e o recorte sozinho não tira isso.
+- **Mipmaps LIGADOS** (o padrão de `VideoTexture` é desligado). A imagem é reduzida de 2048px
+  para ~600 na tela; sem mipmap cada pixel amostra um texel isolado e o resultado cintila — era
+  a causa do "estou vendo os pixels", e **não** a taxa de bits. Nenhum CRF conserta aliasing.
+- **O `<video>` fica NO DOM** (1px, opacidade 0). Fora do documento o Chrome trata o elemento
+  como invisível e suspende a decodificação.
+- **O arquivo é baixado uma vez e tocado de um blob.** Apontar o `<video>` para a URL parece
+  equivalente, mas medido: na virada do loop o `readyState` cai de 4 para 1 e a figura some até
+  rebufferizar, porque o browser já descartou o buffer reproduzido.
+
+*Tratamento do arquivo (o que estava errado no vídeo original):* ele **começa com um fade-in a
+partir do branco** — os 14 primeiros frames vêm de luminância ~199 e só então estabiliza em ~122.
+Era essa a causa real do "some e volta" no loop, não a reprodução. O pipeline corta esses 14
+frames e emenda as pontas com crossfade de 1,4s (a diferença entre último e primeiro frame cai
+de 101/765 para 33/765, e o resto se dilui ao longo do crossfade):
+
+```
+# 1) corta o fade-in e escala para 2K
+ffmpeg -i upscaled-video.mp4 -vf "select='gte(n\,14)',setpts=PTS-STARTPTS,scale=1792:2048:flags=lanczos" \
+  -fps_mode passthrough -c:v libx264 -crf 16 -preset slow -pix_fmt yuv420p -an sem_fade.mp4
+# 2) crossfade de emenda (D=7.458, C=1.4; o offset é D-2C, e o fade é IN, não OUT)
+ffmpeg -i sem_fade.mp4 -filter_complex "[0]split[body][pre];[pre]trim=duration=1.4,format=yuva420p,\
+fade=in:st=0:d=1.4:alpha=1,setpts=PTS+(4.658/TB)[jt];[body]trim=start=1.4,setpts=PTS-STARTPTS[main];\
+[main][jt]overlay=shortest=1,format=yuv420p[out]" -map "[out]" -c:v libx264 -crf 19 -preset slow \
+  -pix_fmt yuv420p -movflags +faststart -an public/video/core-loop.mp4
+```
+Resultado: `public/video/core-loop.mp4`, 1792×2048, 6,0s, **14,7 MB**. Resolução 2K por decisão
+explícita do usuário (o 4K original não cabia: em CRF 17 chegava a 35 MB, **maior** que a fonte,
+porque upscaling injeta ruído de alta frequência caríssimo de codificar).
+
+*A interação de arrasto (§5.8) deixou de existir* nesta seção — vídeo não gira. O `cursor-grab`
+saiu junto, senão prometeria uma interação que não há.
+
+### 5.9 Performance da navegação (2026-09-01) — ✅ APROVADA
+
+Pedido: *"otimize o que der para tornar a navegação mais leve"*. Medido antes de mexer.
+
+- **`head_final.glb`: 15,9 MB → 2,8 MB** (`gltf-transform optimize --texture-compress webp`).
+  É o maior asset do carregamento inicial, e o Hero o baixa de cara. **Sem Draco nem meshopt de
+  propósito**: os dois chegariam a ~1,8 MB, mas exigem um decoder em runtime (Draco puxa de CDN
+  externa). Os 82% vieram só das texturas — 1 MB a mais não paga uma dependência de decodificação.
+- **Canvas WebGL param fora da tela** (`lib/useInViewport.ts`). A esfera do Stack rodava
+  `frameloop="always"` a página inteira, ocupando GPU mesmo com a seção longe da viewport — era
+  o que travava a rolagem. Agora `frameloop` vira `demand`/`never` ao sair de cena.
+- **O vídeo pausa fora da tela.** Decodificar 2K continuamente pesa tanto quanto um canvas
+  girando. Pausar preserva o `currentTime`: ao voltar, continua de onde parou.
+- **Duas margens distintas no observer**, e a diferença importa: `400px` com `once` adianta o
+  DOWNLOAD do vídeo antes da seção entrar; `100px` decide se a cena deve seguir DESENHANDO.
+- O hook devolve um **callback ref** (`setNode`), não um objeto ref: o valor é lido durante o
+  render, e ler `.current` no render é leitura de estado mutável fora do fluxo do React
+  (`react-hooks/refs` acusa).
+
 ### 5.5 Projetos de Destaque — não iniciado
 
 ### 5.6 Contato / Footer — não iniciado
