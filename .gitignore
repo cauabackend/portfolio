@@ -47,8 +47,8 @@ components/HeroVideo.tsx
 # asset do mockup de fio 3D rejeitado
 /public/models/fio1.glb
 # modelo da Experiencia, substituido pela geometria procedural de
-# components/core-geometry.ts: 39,7 MB que nenhum codigo carrega mais.
-# Continua na maquina local; pra voltar ao modelo, tire esta linha.
+# components/core-geometry.ts. Foi apagado do projeto (39,7 MB que nenhum
+# codigo carregava); o original segue em Desktop/objeto-trajetoria/.
 /public/models/core.glb
 # mockups superados ou rejeitados (os aprovados seguem versionados)
 /design/experiencia-v1.html

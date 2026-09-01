@@ -562,8 +562,10 @@ imagem de referência de uma peça em **cristal translúcido** (discos concêntr
 O `.glb` também custava 40 MB de download.
 
 *Peça vigente:* `components/core-geometry.ts` — `buildCore()` monta a peça em código e
-`CoreScene` renderiza o `THREE.Group` retornado. `public/models/core.glb` continua no repo,
-sem referência nenhuma (reverter = voltar o `useGLTF`).
+`CoreScene` renderiza o `THREE.Group` retornado. **`public/models/core.glb` foi apagado**
+(39,7 MB que nenhum código carregava) e está no `.gitignore`; o original continua em
+`Desktop/objeto-trajetoria/base_basic_pbr.glb`. Para reverter: copiar o glb de volta para
+`public/models/` e restaurar o `useGLTF` no `CoreScene`.
 
 Decisões que não são óbvias no código:
 - **`LatheGeometry` é a peça-chave.** A referência é radialmente simétrica, então cada anel é
