@@ -14,7 +14,7 @@ const BASE_SPIN = 0.16; // rad/s
 const POSE_X = 0.2;
 const POSE_Y = -0.16;
 
-// Núcleo da seção Experiência (CLAUDE.md §5.4): geometria procedural com giro
+// Núcleo da seção Experiência (CONTEXTO.md §5.4): geometria procedural com giro
 // contínuo e arrasto, mesmo modelo de interação da esfera do Stack (§5.3).
 function Core({ still }: { still: boolean }) {
   const yaw = useRef<THREE.Group>(null);

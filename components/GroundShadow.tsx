@@ -1,4 +1,4 @@
-// Sombra de contato do sistema de elevação (CLAUDE.md §5.1) — o que impede a
+// Sombra de contato do sistema de elevação (CONTEXTO.md §5.1) — o que impede a
 // página de ficar chapada. São DUAS camadas de propósito: um núcleo curto e
 // denso logo abaixo do objeto, que dá o assentamento, e um halo largo e muito
 // difuso, que dá a luz ambiente ocluída em volta. Uma elipse só, com um

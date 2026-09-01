@@ -26,7 +26,7 @@ npm run dev
 
 ## Onde fica o contexto
 
-**`CLAUDE.md` é a fonte de verdade do projeto.** Toda decisão de design aprovada — paleta em hex,
+**`CONTEXTO.md` é a fonte de verdade do projeto.** Toda decisão de design aprovada — paleta em hex,
 tipografia, comportamento de animação, o que foi tentado e rejeitado e por quê — está registrada
 lá, seção por seção. Leia antes de mexer em qualquer coisa: várias escolhas que parecem
 arbitrárias no código têm o motivo documentado (e o motivo costuma ser "já testamos o contrário").

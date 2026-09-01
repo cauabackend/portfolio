@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-// Núcleo da seção Experiência (CLAUDE.md §5.4) construído por código, no lugar
+// Núcleo da seção Experiência (CONTEXTO.md §5.4) construído por código, no lugar
 // do core.glb de 40 MB. A peça da referência é radialmente simétrica — discos
 // concêntricos em cascata —, e isso é exatamente o que LatheGeometry faz de
 // graça: revoluciona um perfil 2D (o corte lateral do anel, com bisel) em 360°.

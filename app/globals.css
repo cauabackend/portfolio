@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Paleta aprovada — CLAUDE.md §5.1. Tema claro cinza-neutro, acento cinza
+/* Paleta aprovada — CONTEXTO.md §5.1. Tema claro cinza-neutro, acento cinza
    (não dourado, não azul). Vale para a página inteira, não só o Hero. */
 :root {
   --bg: #e7e8e7;

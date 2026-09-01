@@ -3,13 +3,13 @@ import { CoreStage } from "@/components/CoreStage";
 import { GroundShadow } from "@/components/GroundShadow";
 import { Section, SectionHeader } from "@/components/Section";
 
-// Experiência aprovada — CLAUDE.md §5.4 (referência visual do usuário, 2026-09-01).
+// Experiência aprovada — CONTEXTO.md §5.4 (referência visual do usuário, 2026-09-01).
 // Composição em overlay: a peça 3D ocupa a área inteira da seção como camada de
 // fundo e o texto se distribui nos cantos por cima — header em cima à esquerda,
 // Bravend em cima à direita, Aletheia no meio e a visão de carreira embaixo.
 // A ordem do DOM é a ordem de leitura; o desktop só reposiciona no grid.
 //
-// Curadoria dos dados (fonte: lib/resume.ts, Seção 4 do CLAUDE.md — nada inventado):
+// Curadoria dos dados (fonte: lib/resume.ts, Seção 4 do CONTEXTO.md — nada inventado):
 // bravend.highlights[0] ("Atuação central no core de IA…") vira o subtítulo
 // "Núcleo de IA da Bravend"; aletheia.highlights[0] ("Governança de IA") entra no
 // subtítulo. Os bullets são o restante, verbatim.

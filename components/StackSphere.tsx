@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useState } from "react";
 import { GroundShadow } from "./GroundShadow";
 
-// WebGL só existe no cliente (CLAUDE.md §5.3: componente client-only).
+// WebGL só existe no cliente (CONTEXTO.md §5.3: componente client-only).
 const StackSphereScene = dynamic(() => import("./StackSphereScene"), { ssr: false });
 
 export function StackSphere() {

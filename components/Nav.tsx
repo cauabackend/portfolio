@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Briefcase, Cpu, House, Layers, Mail, User } from "lucide-react";
 import { sections } from "@/lib/resume";
 
-// Dock flutuante inferior (CLAUDE.md §5.1): pill escura, ícones, item ativo no
+// Dock flutuante inferior (CONTEXTO.md §5.1): pill escura, ícones, item ativo no
 // accent. O separador isola o contato do resto da navegação de conteúdo.
 const ICONS = { hero: House, sobre: User, expertise: Cpu, experiencia: Briefcase, projetos: Layers, contato: Mail };
 

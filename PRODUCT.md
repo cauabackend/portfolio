@@ -25,8 +25,8 @@ Templates genéricos de IA: gradientes roxo/azul, glassmorphism raso, cérebros 
 1. Instrumento, não personagem — todo elemento 3D/visual lê como equipamento de precisão.
 2. Nada chapado — sistema de elevação (sombra dupla + inset highlight) em tudo que flutua.
 3. Acento cirúrgico — o cinza `--accent` aparece em pouquíssimos pontos deliberados.
-4. Dados reais só — conteúdo vem exclusivamente da Seção 4 do CLAUDE.md (lib/resume.ts).
-5. Seção por seção, aprovação explícita antes de codar (CLAUDE.md é a fonte de verdade).
+4. Dados reais só — conteúdo vem exclusivamente da Seção 4 do CONTEXTO.md (lib/resume.ts).
+5. Seção por seção, aprovação explícita antes de codar (CONTEXTO.md é a fonte de verdade).
 
 ## Accessibility & Inclusion
 

@@ -3,7 +3,7 @@ import { about } from "@/lib/resume";
 import { GroundShadow } from "@/components/GroundShadow";
 import { Section, SectionHeader } from "@/components/Section";
 
-// Sobre aprovado — CLAUDE.md §5.2 (mockup design/sobre-v1.html).
+// Sobre aprovado — CONTEXTO.md §5.2 (mockup design/sobre-v1.html).
 const RINGS = [
   { src: "/images/sobre/ring_outer.png", anim: "animate-[ring-spin-cw_200s_linear_infinite]" },
   { src: "/images/sobre/ring_mid.png", anim: "animate-[ring-spin-ccw_150s_linear_infinite]" },

@@ -3,7 +3,7 @@ import { Instrument_Sans, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google"
 import { profile } from "@/lib/resume";
 import "./globals.css";
 
-// Tipografia aprovada (CLAUDE.md §5.1): Instrument Sans no display,
+// Tipografia aprovada (CONTEXTO.md §5.1): Instrument Sans no display,
 // IBM Plex Sans no corpo, IBM Plex Mono nos dados/labels.
 const display = Instrument_Sans({
   variable: "--font-instrument-sans",

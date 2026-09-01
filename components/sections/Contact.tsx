@@ -1,7 +1,7 @@
 import { profile } from "@/lib/resume";
 import { Section, SectionHeader } from "@/components/Section";
 
-// Design ⏳ não iniciado (CLAUDE.md §5.6). Só o shell padrão da página + o
+// Design ⏳ não iniciado (CONTEXTO.md §5.6). Só o shell padrão da página + o
 // e-mail real; o resto entra quando a seção for decidida com o usuário.
 export function Contact() {
   return (

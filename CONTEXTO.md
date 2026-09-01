@@ -1,6 +1,6 @@
 # Contexto do Projeto — Portfólio Cauã Pereira da Silva
 
-> **Este arquivo é a fonte de verdade do projeto.** Ele deve ser lido por completo antes de qualquer implementação. Toda decisão de design/UX/conteúdo aprovada com o usuário é registrada aqui, na seção "Decisions Log", para que o contexto nunca se perca entre sessões do Claude Code.
+> **Este arquivo é a fonte de verdade do projeto.** Ele deve ser lido por completo antes de qualquer implementação. Toda decisão de design/UX/conteúdo aprovada com o usuário é registrada aqui, na seção "Decisions Log", para que o contexto nunca se perca entre sessões de trabalho.
 >
 > **Regra de ouro:** nunca gerar ou alterar código de uma seção sem que ela conste como "✅ APROVADA" abaixo. Se uma seção estiver "⏳ EM DISCUSSÃO", apresentar opções e aguardar decisão — não implementar prematuramente.
 
@@ -404,7 +404,7 @@ Ao tentar rodar o Cell Fracture no Blender, a malha exportada pelo Tripo se most
 
 Pré-requisito (usuário faz fora do editor): `head_final.glb` exportado do Blender → colocado em `public/models/head_final.glb` → `npm install three @react-three/fiber @react-three/drei` → opcionalmente `npx gltfjsx public/models/head_final.glb -o components/RobotHead.tsx -r public` como ponto de partida.
 
-Claude Code implementa:
+A implementar em código:
 1. `components/RobotHead.tsx`: carrega o `.glb` via `useGLTF` (drei), roda dentro de um `<Canvas>`.
 2. Comportamento IDLE (sempre ativo, via `useFrame`): rotação leve senoidal no eixo Y (±2–4°, período lento ~4-6s), "respiração" sutil (scale ou emissive intensity oscilando muito discretamente), sem qualquer movimento de olhos independente (não segmentamos os olhos — ficou fora do escopo simplificado).
 3. Comportamento AWAKENING/TRACKING (opcional, nice-to-have): pequena rotação adicional respondendo à posição do mouse ou ao progresso de scroll do Hero — bem sutil, não é obrigatório pra v1.
@@ -413,7 +413,7 @@ Claude Code implementa:
 6. **Não é mais necessário:** hero `sticky`/pinned, `scrollYProgress` controlando múltiplas fases, sistema de partículas, fase de desmontagem/rebuild — tudo isso foi removido do escopo (ver nota de mudança de escopo acima).
 7. Resultado final: um componente `<RobotHead />` autocontido, pronto pra ser encaixado dentro do `Hero.tsx` assim que o layout do texto ao redor for decidido.
 
-**✅ CONFIRMADO — `public/models/head_final.glb` presente e validado.** 30.000 triângulos, 1 mesh/node único (`model`), 3 texturas PBR embutidas (cor/normal/metálico-rugosidade) intactas. Pronto para o Claude Code implementar o `RobotHead.tsx` assim que `three`/`@react-three/fiber`/`@react-three/drei` forem instalados via npm.
+**✅ CONFIRMADO — `public/models/head_final.glb` presente e validado.** 30.000 triângulos, 1 mesh/node único (`model`), 3 texturas PBR embutidas (cor/normal/metálico-rugosidade) intactas. Pronto para implementar o `RobotHead.tsx` assim que `three`/`@react-three/fiber`/`@react-three/drei` forem instalados via npm.
 
 *(Decisão final do usuário sobre A/B/C/D e ajustes devem ser adicionados aqui assim que aprovados — Hero segue ⏳ EM DISCUSSÃO até então.)*
 
@@ -657,7 +657,7 @@ Vale para o núcleo da Experiência (§5.4) e a esfera do Stack (§5.3):
 
 *Tamanho da foto do Sobre:* o PNG do anel tem muita margem transparente — **a arte ocupa só ~50% do arquivo**. Por isso inflar apenas o disco da foto dentro da caixa original cobria o anel inteiro (testado a 44% e rejeitado: as bandas sumiam). A solução é escalar o **grupo dos anéis** (`scale-[1.35]` num wrapper) e manter a foto em 44% da caixa: a foto cresce ~40% em pixels e a proporção foto/anel continua a aprovada. A escala mora no wrapper, e não nas `<Image>`, porque o `transform` delas já é o da animação de rotação.
 
-## 6. Instruções para o Claude Code
+## 6. Instruções de execução
 
 - Leia este arquivo inteiro antes de qualquer ação.
 - Nunca implemente uma seção marcada "⏳ EM DISCUSSÃO" — apenas seções "✅ APROVADA".

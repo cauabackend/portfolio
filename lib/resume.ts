@@ -1,4 +1,4 @@
-// Fonte única de conteúdo do site. Espelha a Seção 4 do CLAUDE.md.
+// Fonte única de conteúdo do site. Espelha a Seção 4 do CONTEXTO.md.
 // Não adicionar nada aqui que não esteja no currículo real.
 
 export const profile = {
@@ -76,7 +76,7 @@ export const experiences: Experience[] = [
 export const careerSummary =
   "Desenvolvimento de soluções baseadas em dados | AI & Machine Learning Engineer";
 
-// Copy da seção Sobre — texto aprovado no mockup sobre-v1.html (CLAUDE.md §5.2).
+// Copy da seção Sobre — texto aprovado no mockup sobre-v1.html (CONTEXTO.md §5.2).
 // Marcações inline viram <b>/<span class="muted"> no componente.
 export const about = {
   paragraphs: [
@@ -107,7 +107,7 @@ export const about = {
   ],
 } as const;
 
-// Nós da esfera geodésica (CLAUDE.md §5.3). Só as ferramentas que têm logo de
+// Nós da esfera geodésica (CONTEXTO.md §5.3). Só as ferramentas que têm logo de
 // marca real — SVGs baixados uma vez para public/icons/stack/ (sem CDN em runtime).
 // XGBoost/SHAP/Sigstore/in-toto e soft skills seguem pendentes de decisão.
 export const stack = [

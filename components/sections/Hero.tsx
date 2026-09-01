@@ -1,7 +1,7 @@
 import { profile } from "@/lib/resume";
 import { HeadStage } from "@/components/HeadStage";
 
-// Hero aprovado — CLAUDE.md §5.1 (mockup design/hero-v1.html).
+// Hero aprovado — CONTEXTO.md §5.1 (mockup design/hero-v1.html).
 // Composição minimalista: tipografia gigante + cabeça 3D + dock (em Nav).
 export function Hero() {
   return (

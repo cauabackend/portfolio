@@ -1,6 +1,6 @@
 import { Section, SectionHeader } from "@/components/Section";
 
-// Design ⏳ não iniciado (CLAUDE.md §5.5). Só o shell padrão da página — o
+// Design ⏳ não iniciado (CONTEXTO.md §5.5). Só o shell padrão da página — o
 // conteúdo entra quando a seção for decidida com o usuário.
 export function Projects() {
   return (

@@ -2,7 +2,7 @@ import { stack } from "@/lib/resume";
 import { StackSphere } from "@/components/StackSphere";
 import { Section, SectionHeader } from "@/components/Section";
 
-// Core Expertise / Stack aprovado — CLAUDE.md §5.3 (mockup design/stack-v4.html).
+// Core Expertise / Stack aprovado — CONTEXTO.md §5.3 (mockup design/stack-v4.html).
 // Texto à esquerda, esfera à direita: alterna com o Sobre (anel à esquerda) e dá
 // ritmo à página em vez de empilhar tudo centralizado.
 export function Expertise() {

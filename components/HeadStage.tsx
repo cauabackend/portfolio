@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useProgress } from "@react-three/drei";
 
-// Three.js precisa de WebGL: nada de SSR (CLAUDE.md §5.1, item 4 do checklist).
+// Three.js precisa de WebGL: nada de SSR (CONTEXTO.md §5.1, item 4 do checklist).
 const HeadScene = dynamic(() => import("./HeadScene"), { ssr: false });
 
 export function HeadStage() {
