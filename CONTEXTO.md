@@ -681,6 +681,17 @@ porque upscaling injeta ruído de alta frequência caríssimo de codificar).
 *A interação de arrasto (§5.8) deixou de existir* nesta seção — vídeo não gira. O `cursor-grab`
 saiu junto, senão prometeria uma interação que não há.
 
+*Sombra de contato:* **o vídeo não traz sombra própria** — a que existia era projetada no fundo
+verde e saiu junto no chroma key. Quem sustenta o objeto é a `GroundShadow` em CSS, e a caixa
+dela teve que ser remedida contra a figura do vídeo (a herdada do objeto 3D antigo, `bottom-13%
+h-24px w-20%`, ficava estreita e **acima** do ponto de contato — o núcleo denso desaparecia atrás
+da peça e sobrava um escurecimento de 14 níveis que sumia em 12px). Medido na figura: base a ~7%
+do rodapé da coluna e ~34% da largura dela. Com `bottom-7% h-30px w-38%` o núcleo chega a 191
+contra o fundo 231 e decai em ~36px.
+
+*Enquadramento:* fator `0.9` da menor dimensão do viewport (era `0.98`) — a figura preenchia
+demais a coluna do meio.
+
 ### 5.9 Performance da navegação (2026-09-01) — ✅ APROVADA
 
 Pedido: *"otimize o que der para tornar a navegação mais leve"*. Medido antes de mexer.

@@ -71,7 +71,13 @@ export function Experience() {
             A peça é um vídeo em loop, então não há arrasto: o cursor-grab saiu
             junto, senão prometeria uma interação que não existe. */}
         <div className="relative aspect-square w-full min-[981px]:col-start-2 min-[981px]:row-start-1 min-[981px]:row-end-4 min-[981px]:aspect-auto min-[981px]:h-full min-[981px]:w-auto">
-          <GroundShadow className="bottom-[13%] h-[24px] w-[20%]" />
+          {/* Medida contra a figura do vídeo, não herdada do objeto 3D antigo:
+              na base a peça tem ~33% da largura da coluna e termina a ~10% do
+              rodapé. Com os valores antigos (20% / 13%) a sombra ficava estreita
+              e flutuava acima do ponto de contato.
+              O vídeo não traz sombra própria — a que existia era projetada no
+              fundo verde e saiu junto no chroma key. */}
+          <GroundShadow className="bottom-[7%] h-[30px] w-[38%]" />
           <CoreStage />
         </div>
 
