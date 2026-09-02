@@ -682,12 +682,19 @@ porque upscaling injeta ruído de alta frequência caríssimo de codificar).
 saiu junto, senão prometeria uma interação que não há.
 
 *Sombra de contato:* **o vídeo não traz sombra própria** — a que existia era projetada no fundo
-verde e saiu junto no chroma key. Quem sustenta o objeto é a `GroundShadow` em CSS, e a caixa
-dela teve que ser remedida contra a figura do vídeo (a herdada do objeto 3D antigo, `bottom-13%
-h-24px w-20%`, ficava estreita e **acima** do ponto de contato — o núcleo denso desaparecia atrás
-da peça e sobrava um escurecimento de 14 níveis que sumia em 12px). Medido na figura: base a ~7%
-do rodapé da coluna e ~34% da largura dela. Com `bottom-7% h-30px w-38%` o núcleo chega a 191
-contra o fundo 231 e decai em ~36px.
+verde e saiu junto no chroma key (o filtro compara croma, então pega o verde escurecido pela
+sombra com o mesmo limiar do verde claro). Quem sustenta o objeto é a `GroundShadow` em CSS.
+
+Duas correções, nesta ordem, e a segunda é a que importa:
+1. A caixa herdada do objeto 3D antigo (`bottom-13% h-24px w-20%`) ficava estreita e **acima** do
+   ponto de contato: o núcleo denso desaparecia atrás da peça e sobrava um escurecimento de 14
+   níveis que sumia em 12px.
+2. Mesmo reposicionada continuava invisível, porque estava dimensionada pela ÁREA DE CONTATO
+   (~34% da coluna). Sombra pequena sob objeto grande não lê como profundidade, lê como mancha
+   solta — o que dá volume é sombra proporcional ao VOLUME da peça. Daí `w-52%` e, sobretudo,
+   `strength={2.2}`: a densidade da `GroundShadow` era fixa e virou prop, com padrão 1 para não
+   mexer no Sobre nem no Stack. O núcleo passou de 14 para **104 níveis** abaixo do fundo,
+   decaindo em ~60px.
 
 *Enquadramento:* fator `0.9` da menor dimensão do viewport (era `0.98`) — a figura preenchia
 demais a coluna do meio.

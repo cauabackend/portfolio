@@ -77,7 +77,7 @@ export function Experience() {
               e flutuava acima do ponto de contato.
               O vídeo não traz sombra própria — a que existia era projetada no
               fundo verde e saiu junto no chroma key. */}
-          <GroundShadow className="bottom-[7%] h-[30px] w-[38%]" />
+          <GroundShadow className="bottom-[6%] h-[42px] w-[52%]" strength={2.2} />
           <CoreStage />
         </div>
 
