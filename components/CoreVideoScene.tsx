@@ -18,11 +18,12 @@ const KEY: ChromaKeyOptions = {
 
 // A peça 3D era enquadrada por `0.94 * min(largura, altura)` do viewport. O
 // vídeo é retrato (1792×2048), então a ALTURA é a dimensão limitante: casar a
-// altura do plano com aquela mesma medida faz a figura ocupar a mesma área que
-// o objeto ocupava — a troca fica no lugar, sem redesenhar a seção.
+// altura do plano com aquela medida põe a figura no lugar do objeto sem
+// redesenhar a seção. O fator ficou em 0.9 (e não 0.98) a pedido do usuário:
+// a figura preenchia demais a coluna do meio e sufocava o respiro em volta.
 function Stage({ active }: { active: boolean }) {
   const viewport = useThree((s) => s.viewport);
-  const fit = 0.98 * Math.min(viewport.width, viewport.height);
+  const fit = 0.9 * Math.min(viewport.width, viewport.height);
   return <ChromaKeyVideo src="/video/core-loop.mp4" options={KEY} fit={fit} playing={active} />;
 }
 
