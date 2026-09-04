@@ -56,18 +56,24 @@ export function Sobre() {
               ))}
             </div>
 
-            {/* TODO: foto real do Cauã entra aqui (asset ainda não fornecido).
-                Elevação reforçada (§5.1): um contato curto e escuro na borda +
+            {/* Elevação reforçada (§5.1): um contato curto e escuro na borda +
                 duas quedas longas, além do highlight interno no topo — sem as
                 três camadas o disco lê como recorte chapado sobre o anel. */}
-            <div className="relative z-[2] flex h-[44%] w-[44%] items-center justify-center rounded-full bg-[linear-gradient(155deg,#fcfcfb,#d6d7d5_60%,#adafac)] shadow-[inset_0_-20px_36px_rgba(15,17,17,.14),inset_0_14px_24px_rgba(255,255,255,.9),0_2px_5px_rgba(15,17,17,.12),0_22px_44px_rgba(15,17,17,.2),0_60px_96px_rgba(15,17,17,.18)]">
+            <div className="relative z-[2] flex h-[44%] w-[44%] items-center justify-center overflow-hidden rounded-full bg-[linear-gradient(155deg,#fcfcfb,#d6d7d5_60%,#adafac)] shadow-[inset_0_-20px_36px_rgba(15,17,17,.14),inset_0_14px_24px_rgba(255,255,255,.9),0_2px_5px_rgba(15,17,17,.12),0_22px_44px_rgba(15,17,17,.2),0_60px_96px_rgba(15,17,17,.18)]">
+              <Image
+                src="/images/sobre/profile.jpg"
+                alt="Cauã Pereira da Silva"
+                width={800}
+                height={800}
+                quality={90}
+                sizes="(max-width: 860px) 32vw, 17vw"
+                priority
+                className="h-full w-full object-cover"
+              />
               <span
                 aria-hidden
                 className="absolute inset-[4%] rounded-full border border-[rgba(25,26,26,.14)]"
               />
-              <span className="px-[16%] text-center font-mono text-[11px] tracking-[0.05em] text-[var(--ink-faint)]">
-                ‹ foto entra aqui ›
-              </span>
             </div>
           </div>
         </div>

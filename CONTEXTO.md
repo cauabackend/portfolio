@@ -460,6 +460,12 @@ viewport no mobile; como a arte é circular, o clip não corta nada visível.
 
 *Nota de implementação:* assim como no Hero, o mockup é HTML/CSS estático simplificado — na implementação React final, considerar usar `next/image` para as 4 camadas do anel (com `priority` na foto principal) e mover as animações CSS para um módulo de estilos do componente `Sobre.tsx`.
 
+**✅ IMPLEMENTADO (2026-09-04) — foto real do Cauã no lugar do placeholder.** O usuário
+enviou uma foto pessoal (retrato em Paris, Torre Eiffel ao fundo); recortada via ffmpeg
+(rosto+ombros, 800×800) e salva em `public/images/sobre/profile.jpg`. `Sobre.tsx` renderiza
+via `next/image` com `object-cover` dentro do disco (o `<span>` de texto placeholder foi
+removido, mantendo a borda/highlight sobrepostos). O TODO de asset pendente está resolvido.
+
 ### 5.3 Core Expertise / Stack — ✅ APROVADA
 
 **⚠️ Nota de precedência:** esta seção passou por 4 direções descartadas antes da aprovada — registradas aqui só como histórico de racional, não como opções válidas: (1) carrossel de duas esteiras horizontais infinitas com tiles de logo; (2) índice categorizado de "pills" (ferramenta com ícone + label, agrupadas por domínio), inspirado no layout de "Skills & Expertise" do portfólio-referência do usuário (aaabadcode.com, feito com o produto Fastfolio); (3) chat simulado no cliente (bolhas de pergunta/resposta, chips de categoria, digitação com efeito typewriter, sem IA/API real) — também inspirado na mesma referência, mas na parte de simular uma conversa; descartado a pedido do usuário em favor da direção 4. Leia a especificação final abaixo; as anteriores não devem ser reimplementadas.
