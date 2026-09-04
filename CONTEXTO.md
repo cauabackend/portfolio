@@ -118,6 +118,18 @@ A cor pedida foi **cinza-chumbo** no lugar do preto: `--nav: #3a3e3d` (globals.c
 - **Sutileza:** estado ativo é só cor/peso do texto (branco vs `white/50`), não pílula
   preenchida — a pílula pesava demais perto da referência, que é toda em texto plano.
   Altura ~42px (`h-[30px]` + `py-[6px]`), texto 13px.
+- **Acabamento (2026-09-04, pedido de "mais bonita, nada agressivo"):** duas adições, ambas
+  discretas de propósito — a forma e a cor não mudaram.
+  1. **Marca ativa que desliza** (`motion` + `layoutId="nav-active"`): UMA marca que viaja de
+     um link ao outro em spring, em vez de aparecer/sumir em cada um. Fica em `white/10` —
+     fraca de propósito, porque aqui quem informa é o MOVIMENTO, não o contraste (foi o que
+     tornou a pílula chapada rejeitada aceitável de novo). Como ela segue a seção visível,
+     a barra também vira um indicador de progresso. `useReducedMotion` zera a duração: o
+     bloco global de reduced-motion do CSS não alcança animação de layout feita em JS.
+  2. **Material:** degradê vertical curto + fio de luz de 1px no topo (o `--inset-hi` do site
+     invertido pro escuro). O truque pra não abrir emenda nas pontas é
+     `background-size: 100% 42px` + `no-repeat` nas DUAS peças: a ponta tem 20px de altura e
+     assim pinta exatamente o mesmo trecho de cima do mesmo gradiente.
 - **As "pontas" (`.nav-wing`)** são um quadrado da cor da barra com um quarto de círculo
   recortado por `mask-image: radial-gradient(...)`, ancorado no canto EXTERNO de baixo. Dois
   detalhes que não são óbvios e custaram uma rodada cada: (1) a máscara precisa de uma rampa
@@ -984,6 +996,59 @@ as URLs. Enquanto forem `null`, o card dedicado simplesmente **não renderiza** 
 regra dos canais do Contato, §5.6): ou o link existe e funciona, ou não aparece. Preencher em
 `lib/projects.ts` faz o botão surgir sem tocar em componente. Se houver print/screenshot real dos
 projetos no futuro, ele entra no lugar do mostrador — hoje não existe asset nenhum.
+
+**🔁 REVISÃO (2026-09-04, rodada 2) — o anel cilíndrico foi DESCARTADO e substituído por
+coverflow. Tudo que a spec acima diz sobre geometria do anel, esmaecimento por profundidade,
+mostrador `Dial` e giro automático não vale mais; o resto (dados, regra de link, diálogo) vale.**
+
+O usuário colou um segundo componente de referência (coverflow) e pediu para usá-lo no lugar do
+anterior, com as placas **pretas e sem imagem** — para avaliar a forma antes de existir print
+real de cada projeto.
+
+- `components/ProjectCarousel.tsx` foi **apagado**. Entraram `components/CoverflowCarousel.tsx`
+  (geometria + gesto, agnóstico de conteúdo: as faces são `ReactNode`),
+  `components/ProjectsGallery.tsx` (monta as placas e o diálogo) e `components/ProjectDetail.tsx`
+  (o card dedicado, extraído do arquivo antigo com as correções de acessibilidade do review).
+- **Adaptações obrigatórias em relação ao componente de referência** (não "corrigir" de volta):
+  sem `cn`/`@/lib/utils` e sem `components/ui/` — o projeto não é shadcn e usa classes por
+  template literal; e os tokens `bg-muted`/`text-foreground`/`ring-ring`/`bg-background` não
+  existem aqui, viraram os tokens do site (`bg-surface-2`, `text-ink`, `outline-accent-ink`).
+  As props de caption/paginação da referência saíram: o conteúdo do cartão e o texto de apoio já
+  vivem fora do carrossel.
+- **Ativação com pointer capture:** o palco chama `setPointerCapture`, então o `click` é entregue
+  ao palco e nunca ao cartão. Por isso o índice é lido do `data-slide` no **pointerdown** e o
+  clique é decidido no `pointerup` (deslocamento < 6px): no cartão central abre o diálogo, num
+  vizinho traz aquele cartão para o centro.
+- **Teclado:** setas percorrem, Enter/Espaço abre o cartão em foco, e há um texto `sr-only`
+  dizendo isso — a regra do §5.8 bane a legenda *visível*, não o nome acessível.
+- **Placas pretas (`#0a0b0b`) com `.elevated`:** o highlight interno do sistema de elevação vira
+  um fio de luz na borda superior do cartão preto.
+- **Capa procedural (`components/CoverArt.tsx`)** no lugar da placa lisa, a pedido do usuário
+  ("imagens fictícias em cada card"): SVG determinístico pela id do projeto, três composições
+  (orbe + horizonte, faixas diagonais, anéis concêntricos), grão por `feTurbulence` e vinheta.
+  **Não** é imagem gerada por modelo — não há chave nem CLI de imagem nesta máquina —, é
+  desenho em código: sem asset, sem rede, sem dependência. Tons neutros porque o acento do site
+  é neutro (§5.1); a lista `TONES` no topo do arquivo é o único ponto a mexer se entrar cor.
+  ⚠️ É **provisória**: sai inteira quando houver print real de cada projeto.
+- **Vagas rotuladas na fila (`PREVIEW_SLOTS`, hoje 6):** o coverflow só mostra o leque com muitos
+  cartões (a referência tinha 12) e há três projetos reais. São vagas **rotuladas**, não projetos
+  inventados — não abrem card nenhum. Zerar a constante devolve a fila só aos reais.
+- **Pontas dissolvidas, não cortadas:** o `overflow-hidden` do palco decepava o cartão da ponta
+  numa linha reta. A borda ganhou máscara em degradê (`edgeFade`, 14% de cada lado) e o `fade`
+  subiu de 0,1 para 0,16 — com o palco mais estreito que o da referência, o cartão distante chega
+  quase de perfil e virava uma lasca clara.
+- **Legenda sob o carrossel** (título, subtítulo em mono e linhas de dados), como na referência.
+  O fade a cada troca vem do `motion`: o projeto não tem `animate-in`, que é do
+  `tailwindcss-animate` e não está instalado.
+
+**Card dedicado — redesenho (2026-09-04):** a placa escura genérica saiu do diálogo e ele virou
+uma **ficha de instrumento**: lombada escura à esquerda (o preto da placa do carrossel reduzido a
+um filete, o que costura o card à peça de onde ele abriu), janela de esquema com a moldura de
+cantos + rótulo em mono que o Contato já usa, e datasheet à direita. O esquema é próprio de cada
+projeto (`components/ProjectSchematic.tsx`), na mesma linguagem de blueprint do `KinematicArm`.
+Vale aqui o mesmo limite de dados do resto do site: os pontos e barras são **desenho**, nunca
+carregam eixo, escala ou valor impresso, e o texto só cita fato do currículo (114k faixas,
+Sigstore/in-toto, RAG).
 
 ### 5.6 Contato / Footer — ✅ APROVADA
 
