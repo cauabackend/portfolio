@@ -724,7 +724,56 @@ Pedido: *"otimize o que der para tornar a navegação mais leve"*. Medido antes 
   render, e ler `.current` no render é leitura de estado mutável fora do fluxo do React
   (`react-hooks/refs` acusa).
 
-### 5.5 Projetos de Destaque — não iniciado
+### 5.5 Projetos de Destaque — ✅ APROVADA
+
+**Aprovação (2026-09-04):** o usuário destravou a seção pedindo explicitamente um carrossel 3D
+(colou o componente `3d-carousel` da comunidade shadcn como referência) em que o clique abre um
+card dedicado do projeto, com descrição e link do repositório e do site no ar.
+
+**O que veio da referência e o que foi adaptado (não "corrigir" de volta):**
+- **O projeto não é shadcn** (sem `components.json`, sem `components/ui/`, sem `cn()`), é Next 16
+  + Tailwind v4 CSS-first. O componente vive em `components/ProjectCarousel.tsx`, junto com o
+  resto — criar `components/ui/` por um arquivo introduziria uma convenção que o repo não usa.
+- **`framer-motion` NÃO foi instalado**: o repo já tem `motion@13` (a mesma biblioteca, nome
+  novo), import de `motion/react`. Zero dependência nova — a regra do projeto exige perguntar
+  antes de adicionar dep, e aqui não havia o que adicionar.
+- **Sem picsum/Unsplash e sem `bg-mauve-dark-2`** (classe de Radix Colors que não existe aqui).
+  Nenhuma seção do site usa foto de banco, e não existe print real dos projetos: cada face é uma
+  **placa de instrumento** desenhada na paleta do site (mostrador `<svg>` determinístico por id —
+  anéis, coroa de ticks e um arco, SEM eixo ou número, pra não ler como métrica inventada).
+- **A geometria do anel foi refeita**: a referência fixa `cylinderWidth` e deriva a face (funciona
+  com 14 cartões); com 3 projetos reais isso deixaria as placas se atravessando. Aqui o raio é
+  derivado da face — `max(w / (2·tan(π/n)), w·0.95)` — então nenhuma face cruza a vizinha em
+  ângulo nenhum.
+- **Esmaecimento por profundidade** (`useTransform` sobre o `cos` do ângulo de cada face:
+  opacidade + blur) no lugar do `layoutId` compartilhado da referência. Isso resolve dois
+  problemas de uma vez: as faces de trás não aparecem espelhadas/legíveis, e o card dedicado não
+  precisa animar geometria vinda de dentro de um pai com `rotate3d` — projeção de layout
+  atravessando transform 3D distorce.
+- **Giro:** velocidade angular com atrito exponencial, derivada do tempo real entre eventos de
+  ponteiro (§5.8), com giro automático lento. Sem giro por scroll e sem legenda "arraste para
+  girar" — as duas coisas já foram removidas do site em §5.8.
+- `pointermove`/`pointerup` no `window`, e **não** `setPointerCapture`: capturado, o `click`
+  passa a ser entregue ao palco e os botões das faces nunca abririam o card. Arrasto acima de
+  6px cancela o clique, e a medida é **consumida** no `onClickCapture` — um clique de teclado
+  (Enter/Espaço) não passa por `pointerdown` e herdaria a distância do último arrasto, ficando
+  engolido para sempre.
+- **Teclado:** a face que recebe foco visível vem pra frente do anel — sem isso o usuário abriria
+  um card que não consegue ver; o `pointerdown` cancela esse spring (`rotation.stop()`), senão
+  ele disputa o arrasto por ~1s. O card dedicado é `role="dialog"`/`aria-modal` com trap de Tab
+  nas duas pontas (inclusive quando o foco cai no `<body>`, ao clicar num trecho não focável),
+  Esc, fechamento pelo backdrop via `pointerdown` (com `click`, selecionar texto e soltar fora
+  fechava o card), scroll-lock no `documentElement` e foco devolvido ao botão de origem no
+  `onExitComplete` — as mesmas lições do modal antigo do Contato (§5.6).
+
+**Conteúdo (Seção 4, nada inventado):** `lib/projects.ts` — Aletheia, Core de IA (Bravend) e
+Resonance, com `summary` parafraseando os highlights do currículo.
+
+**⚠️ Pendências reais:** `repo` e `site` estão `null` nos três projetos — falta o usuário passar
+as URLs. Enquanto forem `null`, o card dedicado simplesmente **não renderiza** o botão (mesma
+regra dos canais do Contato, §5.6): ou o link existe e funciona, ou não aparece. Preencher em
+`lib/projects.ts` faz o botão surgir sem tocar em componente. Se houver print/screenshot real dos
+projetos no futuro, ele entra no lugar do mostrador — hoje não existe asset nenhum.
 
 ### 5.6 Contato / Footer — não iniciado
 
@@ -760,7 +809,11 @@ Vale para o núcleo da Experiência (§5.4) e a esfera do Stack (§5.3):
 
 - Leia este arquivo inteiro antes de qualquer ação.
 - Nunca implemente uma seção marcada "⏳ EM DISCUSSÃO" — apenas seções "✅ APROVADA".
-- **Checkpoint atual:** Hero (§5.1), Sobre (§5.2), Stack (§5.3) e Experiência (§5.4) implementados. **Pare aqui.** Não crie/desenhe `Projects.tsx` ou `Contact.tsx`/Footer — essas seções não estão aprovadas. Se o usuário pedir explicitamente pra seguir além numa conversa futura, atualize esta nota antes.
+- **Checkpoint atual (2026-09-04):** Projetos (§5.5) foi destravada pelo usuário e implementada
+  (`components/ProjectCarousel.tsx` + `lib/projects.ts`). Não há mais seção pendente de design —
+  o que falta são dados que só o usuário tem: os links de repositório/site dos projetos
+  (`lib/projects.ts`) e a URL do LinkedIn (`lib/contact.tsx`). Enquanto forem `null`, os botões
+  simplesmente não renderizam.
 - Após qualquer decisão de design aprovada em conversa com o usuário, **atualize este arquivo** movendo a seção para "✅ APROVADA" com os detalhes finais (paleta em hex, fontes exatas, comportamento de animação) antes de escrever código.
 - Não invente dados de currículo, empresas, métricas ou projetos além dos listados na Seção 4.
 - Mantenha o código em componentes por seção (`components/sections/Hero.tsx`, etc.) para facilitar iteração incremental sem reescrever o arquivo inteiro.
