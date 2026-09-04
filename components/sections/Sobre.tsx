@@ -73,8 +73,11 @@ export function Sobre() {
                   // gradiente metálico sutil: a compressão padrão (75) borra as
                   // bandas do anel e cria banding visível
                   quality={100}
+                  // sem `priority`: o Sobre é a segunda seção e nasce fora da
+                  // tela — precarregar as quatro imagens punha ~95 KB no
+                  // caminho crítico, disputando banda com o vídeo do Hero. O
+                  // lazy do next/image já as busca antes de a seção aparecer.
                   sizes="(max-width: 860px) 98vw, 52vw"
-                  priority
                   className={`pointer-events-none absolute inset-0 h-full w-full select-none ${r.anim}`}
                 />
               ))}
@@ -91,7 +94,6 @@ export function Sobre() {
                 height={800}
                 quality={90}
                 sizes="(max-width: 860px) 38vw, 22vw"
-                priority
                 className="h-full w-full object-cover"
               />
               <span

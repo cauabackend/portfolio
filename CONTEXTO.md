@@ -627,6 +627,11 @@ Ao tentar rodar o Cell Fracture no Blender, a malha exportada pelo Tripo se most
 
 Pré-requisito (usuário faz fora do editor): `head_final.glb` exportado do Blender → colocado em `public/models/head_final.glb` → `npm install three @react-three/fiber @react-three/drei` → opcionalmente `npx gltfjsx public/models/head_final.glb -o components/RobotHead.tsx -r public` como ponto de partida.
 
+> ⚠️ **Esta linha é histórica e o `npm install` dela é uma ARMADILHA.** O `@react-three/drei`
+> foi REMOVIDO do projeto em 2026-09-04 (§5.10) e nada mais o importa. Não rodar esse comando
+> como se fosse instrução viva: reinstalaria a dependência que foi tirada de propósito. Só volta
+> a valer se o Hero em modelo 3D for reaberto, e aí o `useGLTF` é que traz o drei de volta.
+
 A implementar em código:
 1. `components/RobotHead.tsx`: carrega o `.glb` via `useGLTF` (drei), roda dentro de um `<Canvas>`.
 2. Comportamento IDLE (sempre ativo, via `useFrame`): rotação leve senoidal no eixo Y (±2–4°, período lento ~4-6s), "respiração" sutil (scale ou emissive intensity oscilando muito discretamente), sem qualquer movimento de olhos independente (não segmentamos os olhos — ficou fora do escopo simplificado).
@@ -833,7 +838,8 @@ O `stack-v4.html` simulava 3D em `<canvas>` 2D (Fibonacci lattice + k-vizinhos +
 desenhados à mão). A pedido do usuário ("quero um globo melhor desenhado 3d em metálico bem
 acabado e com animações mais fluidas") a seção foi refeita em R3F — `components/StackSphereScene.tsx`:
 
-- **Malha:** `IcosahedronGeometry(1, 1)` + `mergeVertices` (three-stdlib) — geodésica de
+- **Malha:** `IcosahedronGeometry(1, 1)` + `mergeVertices` (de
+  `three/examples/jsm/utils/BufferGeometryUtils.js`, ver §5.10) — geodésica de
   triângulos regulares, 42 nós / 120 arestas. Substitui o Fibonacci+kNN, que gerava triângulos
   irregulares.
 - **Material:** hastes e juntas são `InstancedMesh` com `MeshStandardMaterial` `metalness: 1` —
@@ -1161,6 +1167,55 @@ Pedido: *"otimize o que der para tornar a navegação mais leve"*. Medido antes 
 - O hook devolve um **callback ref** (`setNode`), não um objeto ref: o valor é lido durante o
   render, e ler `.current` no render é leitura de estado mutável fora do fluxo do React
   (`react-hooks/refs` acusa).
+
+### 5.10 Peso do carregamento inicial (2026-09-04) — ✅ APROVADA
+
+Pedido: *"otimize para deixar a landing mais leve, mas não mude nada no visual"*. Tudo medido
+antes e depois; nenhum pixel mudou.
+
+**Onde o peso REALMENTE está (medido, gzip, primeiro carregamento):** vídeo do Hero **3,2 MB**,
+chunk do three.js 230 KB, JS inicial 228 KB, fontes 88 KB. O vídeo é **~87% do total** — todo o
+resto somado é arredondamento. `core-loop.mp4` (13 MB) não entra na conta: o `CoreStage` já o
+adia com IntersectionObserver de 400px (§5.9). **Encolher o Hero exige re-encodar, ou seja,
+mexer em pixel — não foi feito.** Ao otimizar peso aqui de novo, é esse o único número que move
+o ponteiro; micro-otimização de JS não move.
+
+- **`priority` REMOVIDO das 4 `<Image>` do Sobre** (3 anéis + foto). O Sobre é a SEGUNDA seção e
+  nasce fora da tela, mas o `priority` gerava `<link rel=preload as=image>` no HTML: **~95 KB
+  disputando banda com o vídeo do Hero**, que é o gargalo. Verificado depois: as 4 carregam
+  normalmente, com `w` e `q` idênticos aos de antes (mesmos pixels). Nenhuma delas podia ser o
+  LCP — o Hero não tem `next/image` nenhum, é canvas WebGL + `<h1>`, e canvas não é candidato a
+  LCP. Sem CLS: a geometria vem do pai `aspect-square`, não do `priority`.
+  **Se algum dia um anel aparecer em branco numa viewport muito alta, o conserto é
+  `loading="eager"`, NÃO voltar o `priority`** — o eager refaz a busca adiantada sem recriar o
+  preload, que era justamente a parte que roubava banda.
+- **`@react-three/drei` REMOVIDO do `package.json`.** Só duas coisas o usavam, ambas com
+  equivalente exato já instalado: `useTexture` virou `useLoader(THREE.TextureLoader, urls)` do
+  fiber (o `useTexture` do drei *é* isso por dentro — mesma suspensão, mesmo cache
+  `suspend-react`, mesmo array de saída, mesma identidade estável entre renders) e
+  `mergeVertices` passou a vir de `three/examples/jsm/utils/BufferGeometryUtils.js` (o
+  three-stdlib é um port desse mesmo arquivo; mesma assinatura, mesma tolerância padrão). O
+  caminho `three/examples/jsm/*` está no `exports` do three — não é deep-import ilegal, e é o
+  mesmo padrão que o `StudioEnvironment` já usava.
+  - **Isso NÃO deixou o site mais leve, e o registro é honesto:** o chunk do three saiu byte a
+    byte idêntico (875,2 KB), porque o Turbopack já eliminava o drei por tree-shaking. O ganho é
+    instalação/lockfile (36 pacotes transitivos a menos) e uma cópia duplicada de `three` que
+    sumiu (`stats-gl/node_modules/three`) — fonte clássica de bug de instância dupla.
+  - **O único extra do drei que se perdeu é `gl.initTexture`** (upload adiantado pra GPU). Aqui
+    ele já era desperdício: rodava num efeito anterior e o `needsUpdate = true` logo em seguida
+    invalidava o upload que ele tinha acabado de fazer.
+- **Lazy-load da ficha de projeto (`ProjectDetail`) foi TESTADO e DESCARTADO:** rendia 4 KB gzip,
+  o que não paga um chunk extra baixando no clique. Não reintroduzir sem medir de novo.
+
+**Achados registrados e NÃO corrigidos** (mexeriam no visual, decisão do usuário):
+1. **`quality={100}` do anel e `quality={90}` da foto estão sendo ignorados** — o Next 16 serve
+   `q=75` nos dois (visto no HTML gerado, tanto no `srcset` quanto no `src`). O comentário do
+   código diz que 75 borra as bandas do anel, ou seja, hoje o site renderiza exatamente a
+   qualidade que foi rejeitada. Conserto: declarar `images.qualities` no `next.config.ts`.
+2. **`font-semibold` (600) sobre IBM Plex Sans** em `Sobre.tsx` e `Experience.tsx`, mas a família
+   é carregada só com 400 e 500 (`app/layout.tsx`) — não há face 600 pra casar, então o negrito
+   sai sintético em vez do desenho real. Conserto: acrescentar "600" à lista de pesos (~10 KB).
+3. **Projetos estoura 43px** de altura em 1500×720, contra o "zero de overflow" que o §5.7 exige.
 
 ### 5.5 Projetos de Destaque — ✅ APROVADA
 

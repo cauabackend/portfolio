@@ -1,11 +1,13 @@
 "use client";
 
 import { Suspense, useEffect, useMemo, useRef } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useTexture } from "@react-three/drei";
+import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import { useReducedMotion } from "motion/react";
 import * as THREE from "three";
-import { mergeVertices } from "three-stdlib";
+// mergeVertices vem do próprio three, e não do three-stdlib/drei: são a mesma
+// função (o stdlib é um port dos examples), mas o pacote inteiro entrava no
+// bundle que o Hero baixa — e o Hero não usa nada disso.
+import { mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { stack } from "@/lib/resume";
 import { StudioEnvironment } from "./three/StudioEnvironment";
 
@@ -163,7 +165,15 @@ function Globe({ still, onHover }: { still: boolean; onHover: (label: string | n
   const camera = useThree((s) => s.camera);
   const raycaster = useMemo(() => new THREE.Raycaster(), []);
 
-  const maps = useTexture(stack.map((t) => `/icons/stack/${t.icon}.svg`));
+  // useLoader do fiber no lugar do useTexture do drei: mesma suspensão, mesmo
+  // array de Texture, sem arrastar o drei inteiro para o bundle. O único extra
+  // que o drei tinha era `gl.initTexture` (upload adiantado pra GPU), e aqui ele
+  // já era desperdício: o `needsUpdate = true` logo abaixo invalidava o upload
+  // que ele acabava de fazer. Não "restaurar" isso achando que se perdeu algo.
+  const maps = useLoader(
+    THREE.TextureLoader,
+    stack.map((t) => `/icons/stack/${t.icon}.svg`),
+  );
   useEffect(() => {
     // Texturas do three são objetos mutáveis por contrato da lib.
     /* eslint-disable react-hooks/immutability */

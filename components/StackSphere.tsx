@@ -28,7 +28,7 @@ export function StackSphere() {
         {/* Sombra de contato em CSS, atrás do canvas transparente. A ContactShadows
             do three desenhava um plano quadrado cujo corte reto aparecia no fundo. */}
         <GroundShadow className="bottom-[7%] h-[26px] w-[30%]" />
-        {/* 23 texturas carregando: se uma falhar, o useLoader lança e sem
+        {/* 22 texturas carregando: se uma falhar, o useLoader lança e sem
             boundary o erro sobe até a raiz e derruba a página. A seção degrada
             de graça, porque a legenda abaixo já traz os nomes em texto. */}
         <SceneBoundary>
