@@ -866,6 +866,39 @@ Resultado: `public/video/core-loop.mp4`, 1792×2048, 6,0s, **14,7 MB**. Resoluç
 explícita do usuário (o 4K original não cabia: em CRF 17 chegava a 35 MB, **maior** que a fonte,
 porque upscaling injeta ruído de alta frequência caríssimo de codificar).
 
+**🔁 REVISÃO (2026-09-04) — o arquivo servido foi RECOMPOSTO sobre verde puro, com a figura
+dessaturada. O de fundo esmeralda escuro virou `design/src/core-loop-green.mp4` (fora do repo).**
+
+Motivo (pedido do usuário: *"retire os verdes ainda presentes nesse vídeo"*): a peça é cristal
+TRANSLÚCIDO, então o verde do fundo não ficava só na borda — atravessava o objeto. E o esmeralda
+escuro (rgb(2,89,60)) fica a apenas **0,161** de distância de croma do cinza, então não existe
+limiar capaz de separar os dois. O despill então trocava o problema de cor em vez de resolvê-lo:
+ele corta o verde no teto acromático (a média de R e B), e como o fundo tem B ≫ R, o pixel
+tratado saía **ciano/azulado**. Medido no composto sobre o fundo da página: 3.439 pixels com
+saturação > 25 e pico de 175 — era isso que se via como "verde que sobrou".
+
+```
+ffmpeg -i design/src/core-loop-green.mp4 -an -filter_complex \
+"color=c=0x00FF00:s=1792x2048:r=24:d=6.05[bg];\
+[0:v]format=yuva420p,chromakey=0x02593C:0.051:0.02,hue=s=0[fg];\
+[bg][fg]overlay=shortest=1,format=yuv420p[out]" -map "[out]" -c:v libx264 -crf 20 -preset slow \
+-pix_fmt yuv420p -movflags +faststart public/video/core-loop.mp4
+```
+- `hue=s=0` dessatura a FIGURA (a peça é cristal incolor — a §5.1 já proíbe cor introduzida),
+  então não há mais verde transmitido para o despill ter que consertar.
+- O verde novo é **0x00FF00 de propósito, e não outro tom qualquer**: (a) triplica a distância de
+  croma até a figura (0,161 → 0,56), dando folga de sobra ao limiar; (b) tem **R == B**, e essa é
+  a parte que mata o resíduo ciano — misturado com cinza pelo mipmap, o texel de borda continua
+  com R == B, então o despill o devolve exatamente neutro.
+- O `0.051` do `chromakey` é o mesmo limiar que o shader usava (0,072 na escala do shader ÷ √2,
+  que é a normalização do ffmpeg): recompor não come nada além do que o runtime já cortava.
+- **Verificado:** varredura dos 145 frames, compostos sobre `--bg`, contando saturação por pixel.
+  Antes: média 4,2 / p99 24,3 / máx 175, com 3.439 pixels acima de 25. Depois: média **0,6** /
+  p99 4,5 / máx 21, com **zero** pixel acima de 25. O clipe inteiro também não tem nenhum pixel
+  com excesso de verde > 6.
+- Custo: uma geração a mais de codificação (13,7 MB, contra 15,4 MB do anterior). O original
+  colorido fica em `design/src/` para o caso de a peça precisar de cor algum dia.
+
 *A interação de arrasto (§5.8) deixou de existir* nesta seção — vídeo não gira. O `cursor-grab`
 saiu junto, senão prometeria uma interação que não há.
 

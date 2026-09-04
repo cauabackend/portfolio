@@ -4,18 +4,26 @@ import { Canvas, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { ChromaKeyVideo, type ChromaKeyOptions } from "./ChromaKeyVideo";
 
-// A cor do fundo é amostrada do próprio frame (ver ChromaKeyVideo). O fundo
-// deste arquivo é um verde esmeralda ESCURO (~rgb(2,89,60)), não o verde chroma
-// clássico — medido no vídeo, não presumido.
+// O fundo deste arquivo ERA um verde esmeralda escuro (rgb(2,89,60)) e a peça é
+// cristal TRANSLÚCIDO — o verde não ficava só na borda, atravessava o objeto.
+// Como a distância de croma entre aquele verde e o cinza era de só 0,161, não
+// existia limiar que separasse os dois, e o despill (que corta o verde no teto
+// acromático, a média de R e B) trocava o verde por um resíduo CIANO: medidos
+// 3.439 pixels com saturação > 25 e pico de 175 no composto sobre a página.
 //
-// `similarity` cobre a variação de iluminação do fundo; `smoothness` é a
-// largura da transição (0 daria borda serrilhada).
+// Por isso o arquivo foi refeito (receita no CONTEXTO.md §5.4): figura
+// dessaturada de vez e recomposta sobre verde PURO (0x00FF00). Duas
+// consequências: a distância de croma até a figura triplicou (0,56), então o
+// key sobra folga; e o verde novo tem R == B, então todo texel de borda que o
+// mipmap mistura com o cinza sai NEUTRO depois do despill, não azulado.
+// Medido no composto depois da troca: ZERO pixel com saturação > 25.
+//
+// `similarity` em 0,10 — e não nos 0,16 do Hero — porque aqui não há mais
+// contaminação de cor a esconder: o que o limiar decide agora é só quanto do
+// vidro mais fino sobrevive, e apertar mais come a cúpula de cristal.
 const KEY: ChromaKeyOptions = {
-  similarity: 0.072,
-  smoothness: 0.07,
-  // 1 = verde puxado até o teto acromático. O 2.4 daqui era da fórmula antiga
-  // de despill; com a atual o `mix` extrapola, o canal verde cai abaixo dos
-  // outros dois e o cristal ganha mancha magenta.
+  similarity: 0.1,
+  smoothness: 0.1,
   spill: 1,
 };
 
