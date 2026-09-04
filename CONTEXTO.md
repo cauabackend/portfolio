@@ -181,13 +181,19 @@ ligados, `<video>` no DOM, download único tocado de um blob). Só o cenário é
 `components/HeadVideoScene.tsx` (espelha `CoreVideoScene`), e `HeadStage` virou o wrapper com
 `useInViewport` que para o `frameloop` quando o Hero sai da tela.
 
-*Tratamento do arquivo → `public/video/head-loop.mp4` (1020×1040, 12,1s, 290 frames, 4,0 MB):*
+*Tratamento do arquivo → `public/video/head-loop.mp4` (1020×1040, 10,3s, 247 frames, 3,4 MB):*
 ```
-ffmpeg -i design/src/hero-head-source.mp4 -an -filter_complex \
-"[0:v]crop=1020:1040:442:40,trim=start_frame=3:end_frame=149,setpts=PTS-STARTPTS,split[f][r];\
-[r]reverse,trim=start_frame=1:end_frame=145,setpts=PTS-STARTPTS[rr];\
-[f][rr]concat=n=2:v=1:a=0[out]" -map "[out]" -c:v libx264 -crf 23 -preset slow \
--pix_fmt yuv420p -movflags +faststart public/video/head-loop.mp4
+# 1) ponte: 8 frames em volta da emenda (236..239 + 0..3), interpolados 8x com
+#    compensacao de movimento; ip_026..ip_032 sao os 7 quadros gerados entre o
+#    ultimo frame e o primeiro
+ffmpeg -framerate 24 -i bridge/in_%02d.png \
+  -vf "minterpolate=fps=192:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:vsbmc=1" bridge/ip_%03d.png
+# 2) clipe inteiro + a ponte no fim
+ffmpeg -i design/src/hero-head-source.mp4 -framerate 24 -start_number 26 -i bridge/ip_%03d.png \
+ -an -filter_complex "[0:v]crop=1020:1040:442:40,format=yuv420p,setsar=1[a];\
+[1:v]trim=end_frame=7,setpts=PTS-STARTPTS,format=yuv420p,setsar=1[b];[a][b]concat=n=2:v=1:a=0[out]" \
+ -map "[out]" -c:v libx264 -crf 23 -preset slow -pix_fmt yuv420p -movflags +faststart -r 24 \
+ public/video/head-loop.mp4
 ```
 - **O crop não foi escolhido a olho.** A caixa da figura veio de `cropdetect` rodando sobre o
   alpha do próprio key (`format=rgba,colorkey=0x3CB93C:0.35:0,alphaextract,format=gray,cropdetect`):
@@ -199,30 +205,35 @@ ffmpeg -i design/src/hero-head-source.mp4 -an -filter_complex \
 - Sem fade de entrada a corrigir (diferente do vídeo da Experiência): o fundo já sai em
   rgb(42,208,40) desde o frame 0.
 
-**⛔ O LOOP É VAIVÉM (ida e volta), e NÃO um corte com crossfade — substitui a receita de
-crossfade de 1,2s usada na primeira montagem, rejeitada pelo usuário ("aparece aquele blur").**
+**⛔ A EMENDA DO LOOP É UMA PONTE INTERPOLADA. Duas abordagens foram testadas e REJEITADAS pelo
+usuário antes desta — não voltar a nenhuma das duas:**
+1. **Crossfade de 1,2s** — *"aparece aquele blur, embaçada"*. Dissolver duas poses de olhar
+   diferentes é fantasma, não transição.
+2. **Vaivém (ida e volta entre dois pontos de repouso)** — matematicamente perfeito (emenda
+   medida em 1,6 de MSE), mas *"você está repetindo as ações duas vezes... faça cada ação uma
+   vez"*. Tocar o clipe de trás pra frente repete cada gesto. **Requisito fechado: cada ação
+   aparece UMA vez, sem dissolve.**
 
 A fonte **não é um loop**: começa e termina com a cabeça de frente, mas a MICRO-pose difere (o
-olhar e o giro de uns poucos graus). Medido: distância entre o primeiro e o último frame = 324
-de MSE, contra 0,2 de um passo normal de 1 frame com a cabeça parada. Ou seja, num trecho calmo
-a emenda dava um solavanco do tamanho de um passo de movimento rápido. E a busca por um par de
-frames que casasse melhor não resolve — varrendo todos os pares com pelo menos 6s de intervalo,
-o melhor corte possível ainda ficava em 20 de distância de assinatura contra 30 do corte atual,
-uma melhora de 30% em cima de um erro grande. Por isso o crossfade tinha sido usado, e por isso
-ele borrava: dissolver duas poses de olhar diferentes é um fantasma, não uma transição.
+olhar e uns poucos graus de giro). Medido: distância entre o primeiro e o último frame = **324**
+de MSE, contra 0,2 de um passo normal de 1 frame com a cabeça parada — num trecho calmo, um
+solavanco do tamanho de um passo de movimento rápido. Procurar um par de frames que casasse
+melhor não resolve: varrendo TODOS os pares com ao menos 6s de intervalo (pose e movimento), o
+melhor corte possível ainda ficava a 20 de distância de assinatura contra 30 do corte atual —
+30% de melhora em cima de um erro grande.
 
-O que resolve é não ter emenda. A curva de movimento (MSE entre frames consecutivos) mostra que
-a animação tem **paradas**: frames 0–6 (MSE ≤ 0,8) e frames 144–153 (MSE ≤ 1,0) são repouso real.
-Tocando 3→148 e depois 148→3 de volta, os dois pontos de virada são exatamente os mesmos frames
-(erro zero por construção) E são pontos de velocidade zero — então não há nem salto de posição
-nem inversão brusca de movimento. **Verificado no arquivo final:** emenda do loop (último frame →
-primeiro) = **1,6** de MSE, e o pivô do vaivém = 0,1 — indistinguíveis de um passo normal com a
-cabeça parada (0,2), contra os 324 de antes.
+**A solução é sintetizar os frames que faltam.** O clipe roda inteiro uma vez (0..239, cada ação
+uma vez) e no fim entram **7 quadros interpolados por compensação de movimento** (`minterpolate`,
+`mi_mode=mci` + `aobmc` + `vsbmc`) que levam o frame 239 de volta ao frame 0. Interpolação com
+compensação **deforma** a imagem seguindo o fluxo do movimento, em vez de somar as duas por cima
+— por isso não borra: a cabeça continua nítida, só se desloca. **Verificado no arquivo final:**
+o maior passo dentro da ponte é **12,6** de MSE e a emenda final fica em **6,1**, ambos menores
+que um passo normal de 1 frame em movimento lento (22,8) e ~50x menores que o corte seco (324).
 
-Os `end_frame` do segundo `trim` descartam o primeiro e o último frame da metade revertida:
-sem isso os frames de virada apareceriam duplicados e a peça daria uma travadinha de 1 quadro em
-cada ponta. Custo: a metade de volta é a animação em marcha à ré — invisível numa cabeça
-mecânica que gira, e o clipe fica em 12,1s (a fonte tem 10s) por usar só o trecho 3–148.
+O `minterpolate` precisa de mais de dois frames para começar a produzir saída — daí a ponte ser
+gerada a partir de 8 quadros em volta da emenda (236..239 + 0..3) a 24fps, ampliados para 192fps
+(8x). Os quadros gerados entre 239 e 0 são o `ip_026..ip_032`; `ip_025` e `ip_033` são cópias dos
+originais e ficam de fora, senão o clipe repetiria um quadro em cada ponta.
 
 *Parâmetros do key (`HeadVideoScene.tsx`) e por que não são os da Experiência:*
 `similarity: 0.16` — muito acima do 0.072 de lá **por causa do mipmap**: a figura é exibida com
@@ -1287,6 +1298,32 @@ fecham a lacuna sem contrariar a decisão de "2D, sem peça 3D":
 ### 5.7 Sistema de página (padronização 2026-09-01) — ✅ APROVADA
 
 Pedido do usuário: *"cada sessão tem que ter o tamanho de uma página normal, como a do hero"* e *"melhore o layout, hoje está tudo meio jogado"*.
+
+**🔁 REVISÃO (2026-09-04) — "uma tela por seção" só valia em tela ALTA. Corrigido.**
+
+O usuário reclamou que a seção chegava cortada ao clicar na navbar. A primeira leitura foi
+errada (medi em 1920×920, onde tudo cabia, e respondi que estava certo). O que faltava era a
+condição real dele: **o navegador está com zoom**, então o viewport CSS é ~1500×720, não
+1920×920 — dá pra deduzir isso de um print comparando a largura da pill da navbar (556px na
+tela dele contra 434px na minha ⇒ fator ~1.28). Nessa altura **todas** as seções estouravam
+(Hero +89, Sobre +79, Experiência +95, Projetos +100, Contato +117; só a Stack cabia).
+
+Causa: tudo que definia altura era fixo em px ou derivado da LARGURA. Correções, todas na
+mesma ideia — dar um teto em `vh` a quem consome altura:
+- `Section`: respiro virou `pt-[clamp(52px,8vh,88px)] pb-[clamp(40px,6vh,72px)]`. Com
+  `max()` a tela baixa pagava os mesmos 160px de padding (22% da tela).
+- `SectionHeader`: `text-[clamp(26px,min(3.4vw,5.4vh),50px)]` — o `<h2>` quebra em 2 linhas,
+  então sozinho comia ~90px.
+- Figuras quadradas (a largura vira altura): Hero `w-[min(46vw,980px,76vh)]`, anel do Sobre
+  com teto em `vh` também.
+- Contato: **o `<svg>` do braço era o driver da linha** — viewBox 320×300 com 520px de
+  largura dá 487px de altura intrínseca, e era ela que definia a altura da linha do grid.
+  Resolvido com `max-h-[min(440px,52vh)]`, não mexendo no `min-h` do painel (que não era o
+  problema).
+- Experiência (a mais apertada): gaps, `mt` e corpo dos bullets viraram clamps por `vh`.
+
+Verificado com o overflow de cada seção medido no browser: **0px em 1280×640, 1500×720 e
+1920×1000**. Ao mexer nessas seções, medir de novo em 720 — é a altura real do usuário.
 
 *Shell comum (`components/Section.tsx`):* toda seção usa `<Section>` — `min-h-screen`, `px-[5vw]`, `pt-[max(72px,7vh)]`, `pb-[max(112px,11vh)]` (o padding de baixo é maior porque o dock flutua sobre o conteúdo), container `max-w-[1600px]`. No desktop toda seção mede exatamente uma tela; no mobile `min-h` deixa crescer quando o conteúdo pede, em vez de cortar. `<SectionHeader>` padroniza eyebrow numerado + `<h2>` **sempre alinhados à esquerda** — antes Sobre e Stack centralizavam o eyebrow e a Experiência alinhava à esquerda, e o conjunto lia como três páginas diferentes. **A exceção que existia aqui (Contato §5.6 com header centralizado, por causa do painel HUD escuro "Jarvis") foi revertida no redesign de 2026-09-04** — o Contato usa o `<SectionHeader>` padrão como todas as outras seções, sem exceção registrada. O `aria-labelledby` liga cada `<section>` ao seu `<h2>`: sem nome acessível, uma `<section>` nem é exposta como região navegável, e o dock manda o usuário direto pra elas.
 

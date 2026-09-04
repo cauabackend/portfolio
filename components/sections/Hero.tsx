@@ -1,4 +1,3 @@
-import { profile } from "@/lib/resume";
 import { HeadStage } from "@/components/HeadStage";
 
 // Hero aprovado — CONTEXTO.md §5.1 (mockup design/hero-v1.html).
@@ -32,15 +31,6 @@ export function Hero() {
           </span>
           <span className="block w-full text-left">LEARNING ENGINEER</span>
         </h1>
-      </div>
-
-      {/* mesma coluna das demais seções (px-[5vw] + cap de 1600px): antes esta
-          linha usava px-11 e não tinha cap, então a margem esquerda do Hero não
-          batia com a espinha do resto da página */}
-      <div className="mx-auto w-full max-w-[1600px] px-[5vw] font-mono">
-        <p className="m-0 text-[11.5px] tracking-[0.1em] text-[var(--ink-muted)] uppercase">
-          {profile.name} — {profile.location}
-        </p>
       </div>
     </section>
   );
