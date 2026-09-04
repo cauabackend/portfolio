@@ -869,7 +869,7 @@ do LinkedIn na mesma conversa. Ambos estão agora na Seção 4 deste arquivo.
 1. **Globo = marca.** 23 nós, só o que tem logotipo oficial: Python, Claude, OpenAI, Hugging
    Face, LangChain, PyTorch, TensorFlow, scikit-learn, Pandas, NumPy, FastAPI, Streamlit,
    PostgreSQL, MySQL, Docker, AWS, Vercel, Git, GitHub, GitHub Actions, TypeScript, React,
-   Next.js. **Saíram** JavaScript (redundante com TypeScript), Node.js e Tailwind CSS: não
+   Next.js. *(Vercel saiu na revisão do fim desta seção — hoje são 22.)* **Saíram** JavaScript (redundante com TypeScript), Node.js e Tailwind CSS: não
    constam do currículo e diluíam o posicionamento de IA. Os SVGs ficam em
    `public/icons/stack/`, baixados uma vez (devicon para os coloridos, simple-icons para
    LangChain, logo oficial da Hugging Face). **Sigstore, in-toto e XGBoost continuam fora
@@ -879,7 +879,13 @@ do LinkedIn na mesma conversa. Ambos estão agora na Seção 4 deste arquivo.
    na mesma sessão (*"cadê AWS, Docker e outras skills no texto?? lá você pode colocar
    tudo"*): a repetição de AWS/Docker/Python entre globo e índice é **de propósito**, porque
    o índice é o que o recrutador lê e o que uma busca por palavra encontra. **Vercel foi
-   removido do índice** a pedido dele, e segue como nó do globo.
+   removido do índice** a pedido dele.
+
+**🔁 REVISÃO (2026-09-04) — Vercel saiu também do GLOBO**, a pedido do usuário: o nó caía
+colado no do GitHub Actions e os dois logos disputavam o mesmo espaço na tela. São **22 nós**
+agora, e `public/icons/stack/vercel.svg` foi apagado (nada mais o carregava). A legenda não
+precisou de conserto: o `<figcaption>` é `stack.map(t => t.label)`, então o nome sumiu junto.
+Vercel continua fora do índice de texto e permanece no currículo em PDF (bloco de Engenharia).
 
 *Legenda da figura (pedido: "tem skill no globo que não tem legenda"):* o nome de cada nó
 dependia de passar o mouse por cima, e sumia de vez em leitor de tela ou sem WebGL. A lista

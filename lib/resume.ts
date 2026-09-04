@@ -167,7 +167,8 @@ export const stack = [
   { label: "MySQL", icon: "mysql" },
   { label: "Docker", icon: "docker" },
   { label: "AWS", icon: "aws" },
-  { label: "Vercel", icon: "vercel" },
+  // Vercel saiu do globo em 2026-09-04: caía colado no nó do GitHub Actions e os
+  // dois logos brigavam pelo mesmo espaço. Continua fora do índice de texto.
   { label: "Git", icon: "git" },
   { label: "GitHub", icon: "github" },
   { label: "GitHub Actions", icon: "githubactions" },
