@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Cauã Pereira da Silva - Currículo</title>
+<style>
+/* ---------------------------------------------------------------------------
+   Fonte do PDF em public/cv/curriculo.pdf. Gerar com design/cv/build.ps1.
+
+   O PDF original foi produzido pelo WeasyPrint 62.3 em Liberation Sans. Este
+   arquivo reconstrói aquele layout medido a partir do próprio PDF (posição de
+   cada linha de base, cada régua e cada recuo), para que o currículo possa ser
+   editado como texto em vez de remendado byte a byte no content stream.
+
+   Arial no lugar de Liberation Sans: as duas são metricamente compatíveis
+   (mesmas larguras de glifo), então as quebras de linha caem nos mesmos
+   pontos. Liberation Sans é justamente o substituto que o Linux usa para
+   Arial, ou seja, este é o desenho que o documento sempre pediu.
+
+   Todas as medidas estão em px CSS a 96dpi, como no PDF de origem.
+   NÃO arredondar 12.266667px: é o corpo real dos títulos de seção (9,2pt).
+--------------------------------------------------------------------------- */
+
+@page { size: A4; margin: 10mm 12mm; }
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font: 12px/16.8px Arial, Helvetica, sans-serif;
+  color: #111827;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* --- cabeçalho ----------------------------------------------------------- */
+header {
+  text-align: center;
+  color: #000;
+  padding-bottom: 5px;
+  border-bottom: 1.5px solid #000;
+}
+/* o cabeçalho e os títulos de seção são espacejados; o corpo não. Medido no
+   PDF de origem: os TJ dos títulos trazem um avanço extra entre CADA glifo
+   (~0,5px), enquanto os parágrafos só ajustam em volta do espaço (justificação) */
+h1 { font-size: 20px; line-height: 1.4; letter-spacing: 0.5px; }
+.tagline { font-size: 12.266667px; font-weight: bold; line-height: 1.4; margin-top: 2px; }
+.contact { margin-top: 3px; }
+/* precisa vir depois de `p, li { text-align: justify }` para não ser desfeito */
+header p { text-align: center; }
+.contact a { color: #111827; text-decoration: none; }
+/* o separador nasce de margem, não de espaço em branco: um espaço de Arial 12px
+   mede 3,336px e o PDF de origem abre 5px de cada lado do bullet */
+.sep { margin: 0 5px; }
+
+/* --- seções -------------------------------------------------------------- */
+h2 {
+  font-size: 12.266667px;
+  line-height: 1.4;
+  letter-spacing: 0.5px;
+  color: #000;
+  margin-top: 6px;
+  padding-bottom: 1px;
+  border-bottom: 1px solid #000;
+}
+
+p, ul, .row { margin-top: 4px; }
+/* o corpo de um cargo/curso cola mais na sua própria linha de título do que
+   dois itens irmãos colam entre si */
+.row + ul { margin-top: 2px; }
+li + li { margin-top: 3px; }
+
+p, li { text-align: justify; }
+
+/* linha de título: cargo/curso à esquerda, local e período à direita.
+   Duas colunas de METADE da largura cada, não um space-between elástico. É o
+   que o PDF original faz e o que explica o título do RESONANCE quebrar em duas
+   linhas mesmo sobrando espaço à direita: ele tem 371px e a coluna tem 351,5px.
+   Em flex as colunas alinham pelo topo, então o período fica na primeira linha. */
+.row {
+  display: flex;
+  font-weight: bold;
+  color: #000;
+}
+.row > span { width: 50%; }
+.row .when { text-align: right; }
+
+/* marcador desenhado à mão em vez do ::marker do Chrome, que sai maior e mais
+   afastado do texto. No PDF original o bullet é encostado à esquerda do texto
+   por exatamente a largura de "• " (350 + 278 unidades a 12px = 7,536px), que
+   é o recuo que ::marker não deixa controlar. */
+ul { list-style: none; padding-left: 15px; }
+li { position: relative; }
+li::before { content: "•"; position: absolute; left: -7.536px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>CAUÃ PEREIRA DA SILVA</h1>
+  <p class="tagline">AI &amp; Machine Learning Engineer | Software Engineering Student</p>
+  <p class="contact">São Paulo, SP<span class="sep">•</span><a href="mailto:cauabackend@gmail.com">cauabackend@gmail.com</a><span class="sep">•</span>+55 11 91109-0137<span class="sep">•</span><a href="https://linkedin.com/in/cauapereira">LinkedIn</a><span class="sep">•</span><a href="https://github.com/cauapereira">GitHub</a></p>
+</header>
+
+<h2>SOBRE MIM</h2>
+<p>Estudante de Engenharia de Software na FIAP, com sólida experiência em IA Generativa, LLMs, Machine Learning e confiabilidade de sistemas estocásticos. Atuação de destaque no ecossistema de IA corporativa e fundação de startup voltada à segurança, cadeia de custódia e atestação criptográfica de modelos (Sigstore/in-toto). Foco em escalabilidade, rigor estatístico e impacto operacional.</p>
+
+<h2>EDUCAÇÃO</h2>
+<div class="row">
+  <span>BACHARELADO EM ENGENHARIA DE SOFTWARE</span>
+  <span class="when">FIAP - São Paulo, SP | 2025 – Jun 2029 (Cursando 3º sem)</span>
+</div>
+<ul>
+  <li>Algoritmos, Estrutura de Dados, Inteligência Artificial, Machine Learning, Bancos de Dados e Computação em Nuvem.</li>
+</ul>
+
+<h2>COMPETÊNCIAS</h2>
+<ul>
+  <li><b>IA Generativa &amp; LLMs:</b> OpenAI API, Claude, Codex, LLaMA, RAG, Prompt Engineering, Fine-tuning, LLMOps, LangChain, Hugging Face, Vector Databases, Multi-agent Systems.</li>
+  <li><b>Machine Learning &amp; Confiabilidade:</b> Python (avançado), Pandas, NumPy, PyTorch, TensorFlow, Scikit-learn, XGBoost, SHAP, MLOps, Estatística Aplicada (Testes de Hipótese, Wilcoxon, Bootstrap), Governança e Auditoria de IA, Atestação Criptográfica (Sigstore, in-toto).</li>
+  <li><b>Engenharia &amp; Ferramentas:</b> FastAPI, Streamlit, Arquitetura de Software, SQL (PostgreSQL, MySQL), Docker, AWS, Git, GitHub, GitHub Actions, CI/CD, Rest APIs, Deploy em nuvem (Streamlit Cloud, Vercel).</li>
+  <li><b>Idiomas:</b> Português (nativo) e Inglês (B2 - Leitura, Escrita e Conversação) | Espanhol (B1).</li>
+</ul>
+
+<h2>EXPERIÊNCIA PROFISSIONAL &amp; EMPREENDEDORISMO</h2>
+<div class="row">
+  <span>ALETHEIA — CO-FOUNDER &amp; AI ENGINEER</span>
+  <span class="when">São Paulo, SP | 2026 – Presente</span>
+</div>
+<ul>
+  <li>Co-fundação e liderança técnica de startup focada em governança, segurança e cadeia de custódia para sistemas de Inteligência Artificial.</li>
+  <li>Desenvolvimento de arquitetura de atestação criptográfica integrada ao Sigstore e in-toto via GitHub Actions, garantindo verificabilidade pré-deploy em pipelines de CI/CD sem exigir proxies de interceptação em tempo real.</li>
+  <li>Implementação de rigor estatístico (testes pareados de Wilcoxon e bootstrap por agrupamento) para medição defensiva de desvios em modelos estocásticos.</li>
+</ul>
+<div class="row">
+  <span>BRAVEND — ESTÁGIO EM ENGENHARIA DE IA &amp; ML</span>
+  <span class="when">São Paulo, SP | Junho 2026 – Presente</span>
+</div>
+<ul>
+  <li>Atuação central no core de IA de produtos corporativos (como o <i>Siv360</i>), liderando a idealização e implementação de arquiteturas inteligentes que aumentaram a eficiência do trabalho em quase 50% através de checagem automatizada de informações.</li>
+  <li>Responsável pela criação, fine-tuning e monitoramento de múltiplos agentes inteligentes baseados em LLMs (Claude, OpenAI, Codex) essenciais na rotina da empresa, reduzindo custos operacionais em 15%.</li>
+  <li>Desenvolvimento de pipelines RAG e assistentes avançados para correção automatizada de provas baseadas em perfis DISC, hard e soft skills.</li>
+</ul>
+
+<h2>PROJETOS DE PORTFÓLIO</h2>
+<div class="row">
+  <span>RESONANCE — PREDITOR DE HITS MUSICAIS (DATA SCIENCE)</span>
+  <span class="when">2026</span>
+</div>
+<ul>
+  <li>Pipeline completo de Machine Learning com XGBoost sobre 114 mil registros do Spotify, tratando desbalanceamento e aplicando SHAP para interpretabilidade.</li>
+</ul>
+
+</body>
+</html>

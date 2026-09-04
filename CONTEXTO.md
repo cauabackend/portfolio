@@ -122,6 +122,19 @@ porque o Chrome arredonda margem de impressão; (2) a última linha do bullet do
 uma palavra depois — o texto fica a 0,7px do limite da caixa e os dois motores de texto discordam
 nessa casa. O arquivo passou de 21,6 KB para 84 KB (o Chrome embute subconjunto de fonte maior).
 
+**Competências acrescentadas em 2026-09-04** (pedido do usuário, a partir da lista que ele
+mandou): Pandas, NumPy, MLOps, Testes de Hipótese, Governança e Auditoria de IA no bloco de
+ML; Arquitetura de Software, MySQL e Deploy em nuvem (Streamlit Cloud, Vercel) no bloco de
+Engenharia. Lógica/Algoritmos e Estruturas de Dados não foram duplicados — já estão na linha
+de EDUCAÇÃO. Soft skill ("sociável") ficou de fora: o currículo não tem seção de soft skills
+e criar uma mudaria a estrutura, que o usuário pediu para preservar.
+
+**⚠️ Divergência conhecida, NÃO corrigida por falta de pedido:** o PDF traz "BRAVEND — ESTÁGIO
+EM ENGENHARIA DE IA & ML", mas `lib/resume.ts` já usa "Estágio em Engenharia de Software" (a
+correção registrada logo abaixo, na Seção 4). Não foi aplicada ao PDF porque muda conteúdo além
+do pedido e o título mais longo pode quebrar em duas linhas na coluna de 50% — decidir com o
+usuário antes de mexer.
+
 ### Experiências & Projetos
 
 **Bravend — Estágio em Engenharia de Software** (jun/2026 – presente)
