@@ -15,8 +15,11 @@ export function Hero() {
             contato saiu junto: o corte não é um ponto de apoio, e a elipse
             aparecia por trás do canvas transparente como uma mancha solta. */}
         {/* a caixa é quadrada, então a largura vira altura: sem o teto em vh a
-            figura sozinha passava da tela numa viewport baixa */}
-        <div className="relative z-[2] aspect-square w-[min(46vw,980px,76vh)] flex-none self-end max-[860px]:w-[min(78vw,420px,54vh)] max-[860px]:self-center">
+            figura sozinha passava da tela numa viewport baixa. 84vh é o teto
+            REAL, não um número escolhido a olho — é o que sobra da linha
+            (100vh − 64 de topo − 34 de base − ~34 do rodapé). Estava em 76vh e
+            o usuário reclamou que a figura tinha encolhido. */}
+        <div className="relative z-[2] aspect-square w-[min(46vw,980px,84vh)] flex-none self-end max-[860px]:w-[min(78vw,420px,54vh)] max-[860px]:self-center">
           <HeadStage />
         </div>
 
