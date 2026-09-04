@@ -27,18 +27,20 @@ type EntryProps = {
 function Entry({ title, subtitle, period, bullets, className = "" }: EntryProps) {
   return (
     <article className={className}>
-      <h3 className="m-0 font-display text-[clamp(20px,1.9vw,30px)] leading-[1.05] font-bold tracking-[-0.01em] uppercase">
+      <h3 className="m-0 font-display text-[clamp(18px,min(1.9vw,3.4vh),30px)] leading-[1.05] font-bold tracking-[-0.01em] uppercase">
         {title}
       </h3>
-      <p className="m-0 mt-2 max-w-[38ch] text-[14px] leading-[1.45] font-semibold">{subtitle}</p>
-      <p className="m-0 mt-2 font-mono text-[11px] tracking-[0.12em] text-[var(--ink-muted)] uppercase">
+      <p className="m-0 mt-[clamp(4px,1.2vh,8px)] max-w-[38ch] text-[clamp(13px,2.1vh,14px)] leading-[1.45] font-semibold">
+        {subtitle}
+      </p>
+      <p className="m-0 mt-[clamp(4px,1.2vh,8px)] font-mono text-[11px] tracking-[0.12em] text-[var(--ink-muted)] uppercase">
         {period}
       </p>
-      <ul className="m-0 mt-4 flex max-w-[42ch] list-none flex-col gap-2 p-0">
+      <ul className="m-0 mt-[clamp(8px,1.5vh,16px)] flex max-w-[42ch] list-none flex-col gap-[clamp(4px,1.2vh,8px)] p-0">
         {bullets.map((b) => (
           <li
             key={b}
-            className="flex gap-[10px] text-[13px] leading-[1.55] text-[var(--ink-muted)]"
+            className="flex gap-[10px] text-[clamp(12px,1.95vh,13px)] leading-[1.5] text-[var(--ink-muted)]"
           >
             <span aria-hidden className="mt-[9px] h-px w-3 flex-none bg-[var(--ink-faint)]" />
             {b}
@@ -55,7 +57,7 @@ export function Experience() {
       {/* Colunas laterais em 280px — os blocos já são limitados por max-w-[42ch]
           (~286px), então não perdem nada, e a faixa central que sobra para a peça
           fica maior. */}
-      <div className="grid flex-1 grid-cols-1 gap-10 min-[981px]:grid-cols-[minmax(0,280px)_minmax(0,1fr)_minmax(0,280px)] min-[981px]:grid-rows-[auto_minmax(0,1fr)_auto] min-[981px]:gap-x-[3vw] min-[981px]:gap-y-8">
+      <div className="grid flex-1 grid-cols-1 gap-10 min-[981px]:grid-cols-[minmax(0,280px)_minmax(0,1fr)_minmax(0,280px)] min-[981px]:grid-rows-[auto_minmax(0,1fr)_auto] min-[981px]:gap-x-[3vw] min-[981px]:gap-y-[clamp(8px,1.5vh,32px)]">
         <SectionHeader
           index="04"
           label="Experiência"
@@ -99,10 +101,10 @@ export function Experience() {
 
         {/* resumo da própria seção, não conteúdo independente — div, não article */}
         <div className="min-[981px]:col-start-1 min-[981px]:row-start-3 min-[981px]:self-end">
-          <h3 className="m-0 font-display text-[clamp(20px,1.9vw,30px)] leading-[1.05] font-bold tracking-[-0.01em] uppercase">
+          <h3 className="m-0 font-display text-[clamp(18px,min(1.9vw,3.4vh),30px)] leading-[1.05] font-bold tracking-[-0.01em] uppercase">
             Visão Geral de Carreira
           </h3>
-          <p className="m-0 mt-2 max-w-[38ch] text-[14px] leading-[1.45] font-semibold">
+          <p className="m-0 mt-[clamp(4px,1.2vh,8px)] max-w-[38ch] text-[clamp(13px,2.1vh,14px)] leading-[1.45] font-semibold">
             {careerSummary}
           </p>
         </div>

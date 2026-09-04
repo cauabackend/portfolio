@@ -30,15 +30,20 @@ export function Sobre() {
             título e a seção ganha uma espinha em vez de dois blocos flutuando.
             O wrapper existe só pra sombra poder cair FORA do quadrado — o
             container do anel precisa de overflow-hidden e a clipparia. */}
-        <div className="relative mx-auto w-[min(72vw,300px)] min-[861px]:mx-0 min-[861px]:w-[min(38vw,480px)]">
-          <GroundShadow className="bottom-[12%] h-[24px] w-[34%]" />
+        {/* o teto em vh existe porque a caixa é quadrada: a largura vira altura
+            e numa tela baixa o anel sozinho passava do que sobra da seção */}
+        <div className="relative mx-auto w-[min(84vw,380px)] min-[861px]:mx-0 min-[861px]:w-[min(46vw,620px,64vh)]">
+          {/* a sombra segue o VOLUME do anel, não a área de contato (§5.4): com a
+              arte a 75% da caixa, o ponto de apoio fica a ~12,5% do rodapé — a
+              elipse fica logo abaixo disso e larga o bastante pra assentar a peça */}
+          <GroundShadow className="bottom-[7%] h-[30px] w-[54%]" strength={1.4} />
           <div className="relative flex aspect-square w-full items-center justify-center overflow-hidden">
             {/* O PNG tem muita margem transparente: a arte do anel ocupa só ~50%
                 do arquivo. Escalar o grupo faz a foto crescer em pixels sem
                 engolir as bandas — inflar só a foto dentro da caixa original
                 cobria o anel inteiro. A escala vive aqui, e não nas imagens,
                 porque o transform delas já é o da animação de rotação. */}
-            <div aria-hidden className="absolute inset-0 scale-[1.35]">
+            <div aria-hidden className="absolute inset-0 scale-[1.5]">
               {RINGS.map((r) => (
                 <Image
                   key={r.src}
@@ -59,14 +64,14 @@ export function Sobre() {
             {/* Elevação reforçada (§5.1): um contato curto e escuro na borda +
                 duas quedas longas, além do highlight interno no topo — sem as
                 três camadas o disco lê como recorte chapado sobre o anel. */}
-            <div className="relative z-[2] flex h-[44%] w-[44%] items-center justify-center overflow-hidden rounded-full bg-[linear-gradient(155deg,#fcfcfb,#d6d7d5_60%,#adafac)] shadow-[inset_0_-20px_36px_rgba(15,17,17,.14),inset_0_14px_24px_rgba(255,255,255,.9),0_2px_5px_rgba(15,17,17,.12),0_22px_44px_rgba(15,17,17,.2),0_60px_96px_rgba(15,17,17,.18)]">
+            <div className="relative z-[2] flex h-[49%] w-[49%] items-center justify-center overflow-hidden rounded-full bg-[linear-gradient(155deg,#fcfcfb,#d6d7d5_60%,#adafac)] shadow-[inset_0_-20px_36px_rgba(15,17,17,.14),inset_0_14px_24px_rgba(255,255,255,.9),0_2px_5px_rgba(15,17,17,.12),0_22px_44px_rgba(15,17,17,.2),0_60px_96px_rgba(15,17,17,.18)]">
               <Image
                 src="/images/sobre/profile.jpg"
                 alt="Cauã Pereira da Silva"
                 width={800}
                 height={800}
                 quality={90}
-                sizes="(max-width: 860px) 32vw, 17vw"
+                sizes="(max-width: 860px) 38vw, 22vw"
                 priority
                 className="h-full w-full object-cover"
               />

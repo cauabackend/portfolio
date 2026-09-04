@@ -13,8 +13,8 @@
 >
 > **🛑 TRAVAR (parar) depois de implementar essas três.** Não avançar para:
 > - **Experiência / Timeline (§5.4)** — ✅ DESTRAVADA em 2026-09-01 por pedido explícito do usuário (spec + imagem de referência fornecidas em conversa) e implementada. Ver §5.4.
-> - **Projetos de Destaque (§5.5)** — não iniciado.
-> - **Contato / Footer (§5.6)** — não iniciado.
+> - **Projetos de Destaque (§5.5)** — não iniciado. ⚠️ Foi PULADA de propósito: o usuário destravou §5.6 antes dela (2026-09-02).
+> - **Contato / Footer (§5.6)** — ✅ DESTRAVADA em 2026-09-02 por pedido explícito do usuário (prompt detalhado + 2 imagens de referência em conversa) e implementada. Ver §5.6.
 >
 > **STATUS (2026-09-01): Hero + Sobre + Stack implementados, build/lint verdes.** As três seções estão em
 > `components/sections/Hero.tsx`, `Sobre.tsx` e `Expertise.tsx` (esfera em `components/StackSphere.tsx`,
@@ -23,6 +23,11 @@
 > continuam sendo os scaffolds crus pré-existentes — não foram desenhados.
 >
 > Com §5.4 aprovada e implementada (2026-09-01), o checkpoint atual é depois da Experiência: **pare e aguarde §5.5 (Projetos) ser decidida com o usuário** — não prossiga "pra não deixar incompleto".
+>
+> **STATUS (2026-09-02): Contato (§5.6) implementado** — `components/sections/Contact.tsx` +
+> `components/NeuralNetwork.tsx` + `components/HudDataPanel.tsx` + `lib/contact.tsx`. O único
+> pendente de design agora é **§5.5 (Projetos)**, que continua como scaffold cru entre a
+> Experiência e o Contato — decidir com o usuário antes de desenhar.
 
 ---
 
@@ -52,8 +57,8 @@ Construção **conversacional e iterativa, seção por seção**. Ordem:
 2. Sobre — ✅ aprovada (ver §5.2)
 3. Core Expertise / Stack técnico — ✅ aprovada (ver §5.3)
 4. Experiência Profissional / Timeline — ✅ aprovada (ver §5.4)
-5. Projetos de Destaque — não iniciado (ver §5.5)
-6. Contato / Footer — não iniciado (ver §5.6)
+5. Projetos de Destaque — não iniciado (ver §5.5) — pulada de propósito; §5.6 foi destravada antes
+6. Contato / Footer — ✅ aprovada (ver §5.6)
 
 Para cada seção: propor 2–3 direções visuais concretas (paleta, tipografia, elementos interativos) → debater com o usuário → só codar após aprovação explícita → registrar a decisão neste arquivo → avançar para a próxima.
 
@@ -97,6 +102,42 @@ Para cada seção: propor 2–3 direções visuais concretas (paleta, tipografia
 
 *Composição:* full-viewport. Tipografia gigante em duas linhas ("AI & MACHINE" / "LEARNING ENGINEER") atrás/ao redor da cabeça 3D centralizada — linha 1 alinhada à direita, linha 2 alinhada à esquerda. Nome + localização no canto inferior esquerdo; cue "SCROLL" no canto inferior direito. Navbar flutuante tipo "dock" (pill escura `#191a1a`, ícones, item ativo destacado com o accent) fixa na parte inferior central — mantida por pedido explícito do usuário a partir da referência visual compartilhada. **Sem** grid/textura de fundo, **sem** HUD textual de status (`SYS_01`/`ONLINE`), **sem** topbar com blurb, **sem** legenda/role-tag de especialidades ao lado da cabeça — composição minimalista: só tipografia + cabeça + dock.
 
+**🔁 REVISÃO (2026-09-04) — o cue "SCROLL" do canto inferior direito foi REMOVIDO** a pedido do
+usuário (a linha vertical em degradê saiu junto). Sobrou só nome + localização no rodapé do Hero,
+agora numa faixa simples à esquerda (sem `justify-between`, que existia só por causa do par).
+
+**🔁 REVISÃO (2026-09-04) — o dock inferior de ícones virou NAVBAR SUPERIOR. Substitui a
+frase "fixa na parte inferior central" acima.**
+
+Referência trazida pelo usuário: a navbar do site do Supaste — pill encostada na borda de
+cima, cantos de baixo arredondados e as "pontas" côncavas ligando a barra ao topo da página.
+A cor pedida foi **cinza-chumbo** no lugar do preto: `--nav: #3a3e3d` (globals.css).
+
+- **Só links de seção.** Wordmark e CTA de currículo foram implementados e **removidos a
+  pedido do usuário** — a barra é a estrutura da referência sem a marca e sem o botão.
+- **Sutileza:** estado ativo é só cor/peso do texto (branco vs `white/50`), não pílula
+  preenchida — a pílula pesava demais perto da referência, que é toda em texto plano.
+  Altura ~42px (`h-[30px]` + `py-[6px]`), texto 13px.
+- **As "pontas" (`.nav-wing`)** são um quadrado da cor da barra com um quarto de círculo
+  recortado por `mask-image: radial-gradient(...)`, ancorado no canto EXTERNO de baixo. Dois
+  detalhes que não são óbvios e custaram uma rodada cada: (1) a máscara precisa de uma rampa
+  de ~1px (`transparent 19.4px, #000 20.4px`) — com corte seco a curva sai serrilhada; (2) a
+  sombra tem que ser `filter: drop-shadow` no elemento PAI (`.nav-bar`), não `box-shadow` na
+  pill: box-shadow contorna cada peça e desenha a emenda entre pill e pontas como uma linha —
+  foi exatamente o que o usuário apontou. As pontas também entram 1px por baixo da pill
+  (`width:21px` para 20px de recuo), senão sobra um fio claro por arredondamento de subpixel.
+- **Consequências de layout:** o respiro migrou de baixo para cima —
+  `Section` passou a `pt-[max(88px,8vh)] pb-[max(72px,7vh)]`, o Hero a `pt-[64px]` (e perdeu
+  o `pb-[96px]` do mobile, que existia só por causa do dock).
+- **`scroll-padding-top` fica em 0**, e isso é decisão, não esquecimento: reservar a altura
+  da barra empurrava o alvo da âncora pra baixo e o clique parava com uma faixa da seção
+  ANTERIOR ainda visível no topo — foi o "fica meio torto" que o usuário apontou. Como toda
+  seção mede exatamente `100dvh` (medido: tops em 0/900/1800/… numa viewport de 900) e já tem
+  88px de padding-top, alinhar o topo da seção com o topo da viewport encaixa a tela inteira
+  e a barra flutua sobre o padding, sem cobrir conteúdo.
+- **Mobile (≤860px):** os mesmos links viram só ícone (o rótulo fica em `sr-only`) — é a
+  versão compacta sem menu/estado extra.
+
 *Paleta (tema claro, cinza neutro — não bege/amarelado, não escuro fósforo):*
 ```css
 --bg:#e7e8e7; --surface:#f2f3f2; --surface-2:#ffffff;
@@ -122,6 +163,86 @@ Accent é um **cinza neutro** (não dourado — testado e rejeitado por ficar "a
 *Mockup de referência aprovado:* `hero-v1.html` (enviado ao usuário via chat e commitado em `design/hero-v1.html`, aprovado explicitamente — "gostei" — em 2026-08-31).
 
 *Nota do usuário sobre fidelidade:* os mockups desta fase de decisão são HTML/CSS estático simplificado — a implementação final em React/Tailwind/framer-motion deve ser refinada além do que está no mockup (transições, responsividade, performance, a cabeça 3D real no lugar do placeholder circular), aproveitando os recursos que só existem no ambiente React.
+
+**🔁 REVISÃO (2026-09-04) — a figura do Hero é um VÍDEO com chroma key. Substitui o modelo 3D
+(`head_final.glb` + `HeadScene.tsx`), que continua no repo e volta trocando o caminho do
+`dynamic import` em `HeadStage.tsx`. Também torna histórica a variante em vídeo de 2026-09-01
+descrita logo abaixo (`HeroVideo.tsx`/`head-loop-2k.mp4`), que era outro arquivo e outra técnica
+(blend `darken` em DOM, não key em shader).**
+
+O usuário forneceu o vídeo sobre fundo verde (1920×1080, 24fps, 10s, 5,6 MB). A fonte vive em
+`design/src/hero-head-source.mp4` e está **fora do repo** (`.gitignore`) — o que o app serve é o
+recorte tratado.
+
+*Pipeline reaproveitado, não reescrito:* o key roda no MESMO shader da peça da Experiência
+(`components/ChromaKeyVideo.tsx`, §5.4) — todas as decisões registradas lá continuam valendo
+(key no espaço de croma, cor amostrada dos 4 cantos do próprio frame, `NoColorSpace`, mipmaps
+ligados, `<video>` no DOM, download único tocado de um blob). Só o cenário é novo:
+`components/HeadVideoScene.tsx` (espelha `CoreVideoScene`), e `HeadStage` virou o wrapper com
+`useInViewport` que para o `frameloop` quando o Hero sai da tela.
+
+*Tratamento do arquivo → `public/video/head-loop.mp4` (1020×1040, 12,1s, 290 frames, 4,0 MB):*
+```
+ffmpeg -i design/src/hero-head-source.mp4 -an -filter_complex \
+"[0:v]crop=1020:1040:442:40,trim=start_frame=3:end_frame=149,setpts=PTS-STARTPTS,split[f][r];\
+[r]reverse,trim=start_frame=1:end_frame=145,setpts=PTS-STARTPTS[rr];\
+[f][rr]concat=n=2:v=1:a=0[out]" -map "[out]" -c:v libx264 -crf 23 -preset slow \
+-pix_fmt yuv420p -movflags +faststart public/video/head-loop.mp4
+```
+- **O crop não foi escolhido a olho.** A caixa da figura veio de `cropdetect` rodando sobre o
+  alpha do próprio key (`format=rgba,colorkey=0x3CB93C:0.35:0,alphaextract,format=gray,cropdetect`):
+  622..1282 × 66..1080. O crop mantém **180 px de verde de margem de cada lado**, e essa margem é
+  requisito, não estética: o shader amostra a cor-chave nos 4 CANTOS do frame, e os ombros
+  encostam na borda de baixo — cortar rente poria figura no canto e envenenaria a referência.
+- `-crf 23` comparado a olho com `-crf 18` num recorte 1:1 do rosto: indistinguíveis, metade do
+  peso. Importa porque este é o maior asset do PRIMEIRO carregamento.
+- Sem fade de entrada a corrigir (diferente do vídeo da Experiência): o fundo já sai em
+  rgb(42,208,40) desde o frame 0.
+
+**⛔ O LOOP É VAIVÉM (ida e volta), e NÃO um corte com crossfade — substitui a receita de
+crossfade de 1,2s usada na primeira montagem, rejeitada pelo usuário ("aparece aquele blur").**
+
+A fonte **não é um loop**: começa e termina com a cabeça de frente, mas a MICRO-pose difere (o
+olhar e o giro de uns poucos graus). Medido: distância entre o primeiro e o último frame = 324
+de MSE, contra 0,2 de um passo normal de 1 frame com a cabeça parada. Ou seja, num trecho calmo
+a emenda dava um solavanco do tamanho de um passo de movimento rápido. E a busca por um par de
+frames que casasse melhor não resolve — varrendo todos os pares com pelo menos 6s de intervalo,
+o melhor corte possível ainda ficava em 20 de distância de assinatura contra 30 do corte atual,
+uma melhora de 30% em cima de um erro grande. Por isso o crossfade tinha sido usado, e por isso
+ele borrava: dissolver duas poses de olhar diferentes é um fantasma, não uma transição.
+
+O que resolve é não ter emenda. A curva de movimento (MSE entre frames consecutivos) mostra que
+a animação tem **paradas**: frames 0–6 (MSE ≤ 0,8) e frames 144–153 (MSE ≤ 1,0) são repouso real.
+Tocando 3→148 e depois 148→3 de volta, os dois pontos de virada são exatamente os mesmos frames
+(erro zero por construção) E são pontos de velocidade zero — então não há nem salto de posição
+nem inversão brusca de movimento. **Verificado no arquivo final:** emenda do loop (último frame →
+primeiro) = **1,6** de MSE, e o pivô do vaivém = 0,1 — indistinguíveis de um passo normal com a
+cabeça parada (0,2), contra os 324 de antes.
+
+Os `end_frame` do segundo `trim` descartam o primeiro e o último frame da metade revertida:
+sem isso os frames de virada apareceriam duplicados e a peça daria uma travadinha de 1 quadro em
+cada ponta. Custo: a metade de volta é a animação em marcha à ré — invisível numa cabeça
+mecânica que gira, e o clipe fica em 12,1s (a fonte tem 10s) por usar só o trecho 3–148.
+
+*Parâmetros do key (`HeadVideoScene.tsx`) e por que não são os da Experiência:*
+`similarity: 0.16` — muito acima do 0.072 de lá **por causa do mipmap**: a figura é exibida com
+menos da metade dos texels do arquivo, então cada texel de borda que chega ao shader é a MÉDIA
+de verde com metal (~0.18 de distância). Com limiar baixo essa média passa como opaca e vira um
+contorno verde em toda a silhueta — foi exatamente o que apareceu na primeira montagem.
+`spill: 1` — remoção total do verde acima do teto acromático, o máximo da escala. É seguro
+porque a figura é metal cromado e não tem verde legítimo; e é necessário porque cromo REFLETE
+o fundo, então o resíduo não fica só na silhueta, aparece em rastros dentro do rosto.
+**Verificação:** varredura pixel a pixel do screenshot da página contando `g - max(r,b) > 6`;
+caiu de 2.917 para 4 — e os 4 são antisserrilha do texto do rodapé, não o vídeo. A mesma
+varredura no sentido oposto (`min(r,b) - g`) confirma que o despill não puxou a figura pro
+magenta: os 50 pixels que sobram estão todos nas linhas 849–863, ou seja, no mesmo texto.
+
+*Composição:* a coluna da figura ganhou `self-end` (e `self-center` no mobile, onde a linha
+empilha e `self-end` empurraria a cabeça pra direita), e o plano usa `fadeBottom={0.06}`: o
+quadro corta os ombros numa linha reta, e ancorar no meio da linha sem dissolver essa faixa
+deixava a figura cortada no ar. **A sombra de contato saiu**: o corte não é ponto de apoio, e a
+elipse aparecia por trás do canvas transparente como mancha solta. `fit = 0.98 * min(largura,
+altura)` do viewport, e não `Bounds fit` — não há geometria pra medir.
 
 **🔀 VARIANTE EM VÍDEO (2026-09-01) — testada e DESATIVADA; o Hero voltou ao modelo 3D:**
 
@@ -416,6 +537,56 @@ A implementar em código:
 **✅ CONFIRMADO — `public/models/head_final.glb` presente e validado.** 30.000 triângulos, 1 mesh/node único (`model`), 3 texturas PBR embutidas (cor/normal/metálico-rugosidade) intactas. Pronto para implementar o `RobotHead.tsx` assim que `three`/`@react-three/fiber`/`@react-three/drei` forem instalados via npm.
 
 *(Decisão final do usuário sobre A/B/C/D e ajustes devem ser adicionados aqui assim que aprovados — Hero segue ⏳ EM DISCUSSÃO até então.)*
+
+**🔁 REVISÃO (2026-09-04) — loop, corte seco, rastros verdes e limpeza do modelo 3D:**
+
+Três defeitos apontados pelo usuário na figura em vídeo do Hero, e o que cada um exigiu:
+
+- **Loop visível.** Medido antes de mexer: o último quadro contra o primeiro dá **PSNR 21 dB**, e
+  varrendo o clipe inteiro contra o primeiro quadro **nenhum** quadro passa de 24 dB — não existe
+  ponto de loop natural, porque a cabeça faz um *dolly* contínuo e nunca volta ao enquadramento
+  inicial. Crossfade foi descartado: com poses tão distantes ele fantasmaria (é exatamente o
+  "borrado" que o usuário relatou). A solução é **ping-pong**: o clipe toca e volta, então a
+  emenda é a própria continuidade do movimento — 23,96 dB na virada, o mesmo nível de dois
+  quadros vizinhos quaisquer deste vídeo. Sem blend, nada a borrar.
+  ```
+  # ida + volta (sem repetir os quadros das pontas), ruído temporal removido
+  ffmpeg -i head-loop.mp4 -filter_complex "[0]hqdn3d=0:0:6:6,split[a][b];\
+  [b]reverse,trim=start_frame=1:end_frame=210,setpts=PTS-STARTPTS[r];\
+  [a][r]concat=n=2:v=1[v]" -map "[v]" -c:v libx264 -crf 21 -preset slow -pix_fmt yuv420p \
+    -movflags +faststart -an public/video/head-loop.mp4
+  ```
+  Resultado: 1020×1040, 420 quadros, 17,5s, **6,63 MB** (o arquivo anterior tinha 3,2 MB e 8,8s).
+  `hqdn3d=0:0:6:6` é só temporal (spatial em 0): tira o ruído entre quadros — caríssimo de
+  codificar e ainda sujava o chroma key — sem amolecer o metal.
+
+  **⚠️ Erro cometido e desfeito no mesmo dia, não repetir:** a primeira tentativa cortou o clipe
+  em 5s (`trim=end_frame=120`) pra segurar o arquivo em 3,58 MB. **O arremesso da cabeça pra
+  cima/direita acontece depois desse ponto** — o corte matou a animação, e o usuário percebeu na
+  hora. O clipe inteiro é conteúdo, não gordura: peso se resolve em CRF, nunca em tesoura.
+
+  Verificação da emenda (vale repetir se o clipe for trocado): o par (419, 1) dá **36,8 dB**, ou
+  seja, são o mesmo quadro de origem — a construção está certa. A virada (419→0) dá **24,0 dB**,
+  exatamente o mesmo valor do par (0,1) do arquivo original: o passo do loop é o passo natural do
+  clipe naquele trecho, não um salto. Não confundir com os 31,4 dB de um par vizinho no meio do
+  clipe — ali o movimento é mais lento, então a linha de base é outra.
+- **Corte seco embaixo.** O quadro corta a figura na altura do peito. Resolvido no shader
+  (`fadeBottom`, em `ChromaKeyVideo`): `alpha *= smoothstep(0, fadeBottom, vUv.y)`. Fica no
+  shader, e não numa máscara CSS no container, porque a máscara também apagaria a sombra de
+  contato do Hero, que é irmã do canvas.
+- **Rastros verdes dentro da figura.** O despill antigo misturava o pixel com o cinza da própria
+  luminância — lava a peça e não mata o verde. Agora o verde é limitado ao **teto acromático**
+  `(R+B)/2`: a cabeça é metal cromado e não tem verde legítimo, então tudo acima disso é reflexo
+  do fundo (e, sendo cromada, ela reflete o fundo no meio do rosto, não só na silhueta). A
+  luminância perdida no corte é devolvida na escala — sem isso a área tratada escurece e vira
+  mancha. `spill` mudou de escala aberta (2.4) para **0–1**, onde 1 = remoção total.
+- **Modelo 3D do Hero APAGADO** a pedido do usuário: `components/HeadScene.tsx`,
+  `components/RobotHead.tsx` e `public/models/head_final.glb` (nenhum código os carregava desde
+  que a figura virou vídeo). `public/models/` deixou de existir e entrou inteiro no `.gitignore`.
+  Para reabrir, regerar o componente com `npx gltfjsx` a partir do `.glb`.
+- **Fonte bruta fora da raiz:** o MP4 com fundo verde saiu de `/` e virou
+  `design/src/hero-head-source.mp4` (`design/src/` está no `.gitignore` — é fonte, não asset
+  servido).
 
 ### 5.2 Sobre — ✅ APROVADA
 
@@ -755,16 +926,11 @@ card dedicado do projeto, com descrição e link do repositório e do site no ar
   girar" — as duas coisas já foram removidas do site em §5.8.
 - `pointermove`/`pointerup` no `window`, e **não** `setPointerCapture`: capturado, o `click`
   passa a ser entregue ao palco e os botões das faces nunca abririam o card. Arrasto acima de
-  6px cancela o clique, e a medida é **consumida** no `onClickCapture` — um clique de teclado
-  (Enter/Espaço) não passa por `pointerdown` e herdaria a distância do último arrasto, ficando
-  engolido para sempre.
+  6px cancela o clique (`onClickCapture`), senão girar o anel abre um projeto por acidente.
 - **Teclado:** a face que recebe foco visível vem pra frente do anel — sem isso o usuário abriria
-  um card que não consegue ver; o `pointerdown` cancela esse spring (`rotation.stop()`), senão
-  ele disputa o arrasto por ~1s. O card dedicado é `role="dialog"`/`aria-modal` com trap de Tab
-  nas duas pontas (inclusive quando o foco cai no `<body>`, ao clicar num trecho não focável),
-  Esc, fechamento pelo backdrop via `pointerdown` (com `click`, selecionar texto e soltar fora
-  fechava o card), scroll-lock no `documentElement` e foco devolvido ao botão de origem no
-  `onExitComplete` — as mesmas lições do modal antigo do Contato (§5.6).
+  um card que não consegue ver. O card dedicado é `role="dialog"`/`aria-modal` com trap de Tab,
+  Esc, clique no backdrop, scroll-lock no `documentElement` e foco devolvido ao botão de origem
+  **no `onExitComplete`** (as mesmas lições do modal antigo do Contato, §5.6).
 
 **Conteúdo (Seção 4, nada inventado):** `lib/projects.ts` — Aletheia, Core de IA (Bravend) e
 Resonance, com `summary` parafraseando os highlights do currículo.
@@ -775,7 +941,346 @@ regra dos canais do Contato, §5.6): ou o link existe e funciona, ou não aparec
 `lib/projects.ts` faz o botão surgir sem tocar em componente. Se houver print/screenshot real dos
 projetos no futuro, ele entra no lugar do mostrador — hoje não existe asset nenhum.
 
-### 5.6 Contato / Footer — não iniciado
+### 5.6 Contato / Footer — ✅ APROVADA
+
+**Aprovação (2026-09-02):** o usuário forneceu em conversa um prompt de spec completo (em inglês,
+estilo "Senior Front-end Developer") + 2 imagens de referência (rede neural com nós de contato;
+painel HUD estilo Jarvis), pedindo implementação explícita — isso destravou a seção ANTES de §5.5
+(Projetos), que segue não iniciada. A spec do prompt foi seguida à risca no que era decisão de
+design e **adaptada onde colidia com regras do projeto** (dados reais, deps, convenções) — cada
+adaptação registrada abaixo.
+
+**Conceito aprovado:** a página clara termina num **"laboratório à noite"** — a ÚNICA seção escura
+do site, por decisão explícita do usuário ("Dark Tech" monocromático: zinc-950/slate/branco puro,
+**proibido azul/ciano saturado**). A voz é a mesma do resto (mono, instrumento, elevação); só o
+tratamento inverte. Nota de identidade: "rede neural" consta nas anti-referências do projeto, mas
+a versão monocromática branca/cinza (sem o cérebro azul brilhante dos templates) foi o pedido
+explícito do usuário nesta conversa — o que o registro de anti-referência bania era o clichê
+azul-neon, mantido banido.
+
+**Dois estados:**
+
+*Estado 1 (padrão):* eyebrow "06 CONTATO" + título "VAMOS CONVERSAR." centralizados (exceção
+deliberada ao header à esquerda do §5.7 — spec explícita do usuário para esta seção); palco
+central com a rede de partículas interativa (tsparticles: ~110 pontos brancos/cinza com links,
+deriva lenta, hover "grab" puxa linhas até o cursor); 5 nós orbitais clicáveis (E-MAIL, CALENDLY,
+LINKEDIN, GITHUB, CV/RESUME) ligados ao centro por linhas SVG tracejadas com fluxo animado
+(dashoffset) na direção do centro; rodapé técnico "LATÊNCIA DE RESPOSTA: < 24H | SISTEMA DE
+CONECTIVIDADE: ATIVO" com dot pulsando. Fundo: gradiente near-black + **piso em perspectiva real**
+(grade com `rotateX`+`perspective`, mask radial — classe `.contact-floor` em globals.css) + glow
+radial atrás da rede.
+
+*Estado 2 (HUD, clique num nó):* o palco escala pra 0.95/opacidade 0.5 e fica `inert`; painel
+glassmorphism central (`bg-black/40` + `backdrop-blur-md` + borda hairline branca + inset
+highlight — o sistema de elevação do §5.1 invertido pro escuro) entra com spring
+(stiffness 240/damping 26). O overlay é **`fixed` (z-60, acima do dock) com scroll lock** no
+`documentElement` — em `absolute` a página rolava por baixo e levava o modal pra fora da tela.
+Dialog de verdade: `role`/`aria-modal`, **focus trap manual** (Tab cicla entre X e CTA — sem
+trap o Tab vazava pra página borrada), Esc, clique no backdrop, foco devolvido ao nó **só no
+`onExitComplete`** (refocar com o painel ainda visível confunde leitor de tela), e
+`AnimatePresence mode="wait"` (trocar de canal durante o exit não duplica o dialog/id).
+Centro: aro circular brilhante + ícone do canal + handle + CTA outline com hover invertido
+(fundo branco/texto preto). Flancos (desktop only): barras de "sinal" (alturas FIXAS
+determinísticas, não random — random divergiria entre renders) + telemetria k/v
+(STATUS/CANAL/REGIÃO/RESPOSTA — "Ativo" e "< 24h" espelham a copy do rodapé fornecida
+literalmente pelo usuário, não são métrica inventada) à esquerda; **conteúdo real do
+currículo** à direita (FOCO ATUAL curado da Seção 4 + IDIOMAS).
+
+*Canais sem URL real:* `href: null` em `lib/contact.tsx` → o nó continua na órbita (a
+composição de 5 nós é spec explícita) e o HUD abre normal, mas no lugar do CTA renderiza
+**"CANAL EM PROVISIONAMENTO"** (borda tracejada, mono) — decisão de review: três CTAs mortos
+de cinco seria pior que a composição íntegra com estado honesto. Preencher o `href` faz o CTA
+aparecer sozinho.
+
+**Adaptações da spec original (registrar para não "corrigir" de volta):**
+- **`react-tsparticles` (pedido no prompt) NÃO existe no projeto** — o instalado (pelo próprio
+  usuário, antes da sessão) é `tsparticles@4.4.0` + `@tsparticles/react@4.4.0`, API v4
+  (`ParticlesProvider init` + `<Particles options>` memoizado; interatividade/links viraram
+  plugins). O init usa **`loadSlim` de `@tsparticles/slim`** (dep transitiva do bundle
+  `tsparticles`, travada no lockfile): cobre tudo que a config usa e corta os
+  emitters/absorbers/shapes do `loadFull` — payload puro. Nenhuma dependência nova foi
+  adicionada ao package.json.
+- **`pauseOnOutsideViewport` do engine é NO-OP nesta config** (achado de review, verificado no
+  código do plugin): com `detectsOn: "window"` o elemento de interatividade vira `document`,
+  que não é HTMLElement, e o observer de viewport do plugin nunca liga. A pausa fora da tela é
+  do APP: segundo `useInViewport` (100px, sem `once`) alimentando o prop `playing` — o mesmo
+  prop que pausa a rede sob o HUD aberto. Não trocar para `detectsOn: "canvas"`: aí o plugin
+  passa a dar `container.play()` ao reentrar na viewport, ignorando o estado do app.
+- **Ícones de marca GitHub/LinkedIn foram REMOVIDOS do lucide v1** — `Github`/`Linkedin` não
+  existem mais no pacote. Solução: componentes SVG inline em `lib/contact.tsx` com
+  `currentColor` (path do GitHub reaproveitado do asset devicon da esfera, LinkedIn do
+  simple-icons). Mail/Calendar/FileText/X seguem lucide.
+- **Dados reais (Seção 4) no lugar dos das imagens de referência** (que eram de outra pessoa,
+  "Sérgio Augusto"): e-mail `cauabackend@gmail.com`, GitHub `github.com/cauabackend` (autor dos
+  commits deste repo). **Sem métricas inventadas** — nada de "843 conexões +12%"; a telemetria
+  decorativa usa fatos (região GMT-3, foco técnico, idiomas).
+- Arquivos com os nomes do repo, não os do prompt: `components/sections/Contact.tsx` (controller
+  de estado — o "ContactPage" do prompt), `components/NeuralNetwork.tsx`, `components/HudDataPanel.tsx`,
+  `lib/contact.tsx` (config de canais + ícones de marca). Shell `<Section>` mantido (dock por cima,
+  âncora `#contato` viva); fundo full-bleed via filhos `absolute` da `<section>`.
+- Tipografia do site (Instrument Sans display / IBM Plex Mono), não "clean sans-serif" genérica.
+
+**Performance/a11y (padrões §5.9 mantidos):** engine só baixa perto da viewport
+(`dynamic` ssr:false + `useInViewport` 600px once); `pauseOnOutsideViewport` no tsparticles;
+simulação PAUSADA enquanto o HUD está aberto (animar sob blur é GPU jogada fora);
+sob `prefers-reduced-motion` a rede é SUBSTITUÍDA por uma constelação SVG estática
+(`StaticNetwork` no Contact.tsx, pontos determinísticos por LCG semeado) — descoberto que o
+worker do tsparticles v4 não pinta frame nenhum com tudo desanimado (canvas ficava em branco),
+e o swap ainda poupa o download do engine; pulsos/tracejados são neutralizados pelo bloco
+global de reduced-motion do CSS (NUNCA condicionar essas classes em `useReducedMotion` no
+markup SSR — o hook é null no servidor e quebrava a hidratação); springs viram fade; dialog com
+`role`/`aria-modal`/`aria-labelledby`, Esc, foco no X ao abrir e devolvido ao nó ao fechar,
+palco `inert` sob o painel; contraste mínimo slate-400 (≈6.9:1) nos textos de 10px.
+
+**⚠️ Pendência (atualizado 2026-09-04 — ver revisão completa no fim desta seção):**
+1. **LinkedIn** — `href: null` em `lib/contact.tsx`, falta a URL real do perfil. No redesign
+   vigente um canal sem link real simplesmente **não renderiza** (nada de estado "em
+   provisionamento") — o botão de LinkedIn aparece assim que o `href` for preenchido.
+2. ~~Calendly~~ — **removido do site** (redesign 2026-09-04): o usuário não conhecia/usava a
+   ferramenta. Não recriar sem pedido explícito.
+3. ~~CV~~ — **resolvido**: o usuário enviou o PDF real, salvo em `public/cv/curriculo.pdf`
+   (21.628 bytes), e `href` em `lib/contact.tsx` aponta pra lá.
+4. ~~GitHub~~ — confirmado: `github.com/cauabackend`.
+
+**⛔ REVISÃO (2026-09-02) — paleta monocromática CANCELADA, volta pro ciano vibrante. Isto
+substitui a frase "Dark Tech monocromático... proibido azul/ciano saturado" acima — não é
+mais válida. Não "corrigir" de volta ao monocromático sem novo pedido explícito do usuário.**
+
+Pedido do usuário na mesma sessão de implementação: rejeitou o resultado monocromático
+comparando com as duas imagens de referência originais e exigiu, por escrito, a reescrita
+completa de `Contact.tsx`, `NeuralNetwork.tsx` e `HudDataPanel.tsx` para a estética
+"cyberpunk/Jarvis" das referências — paleta ciano `#00f0ff` em glows/linhas/bordas, grid de
+piso mais denso, cérebro de partículas com silhueta real (não mais elipse genérica), nós
+orbitais sem disco de fundo, e um HUD com anéis de progresso/gráfico de área/barra "JARVIS".
+
+**Mudanças aplicadas:**
+- **Paleta:** todo acento branco/cinza-slate virou ciano `#00f0ff` (bordas, glows,
+  drop-shadows, dashed lines, telemetria). Fundo recolorido pra navy quase preto
+  (`#03050a → #050c16 → #02040a`) com glow radial ciano atrás da rede.
+- **`.contact-floor` (globals.css):** grade dupla (linhas grossas a cada 4 células + linhas
+  finas), cor ciano, cobertura maior (`h-[92%]` em vez de `h-[85%]`) — mesma técnica de
+  `rotateX`+`perspective` de antes, só mais densa/brilhante.
+- **Máscara de cérebro (`components/NeuralNetwork.tsx`):** a spec do usuário pedia
+  `polygonMask` do tsparticles ou, alternativamente, um "path" — optou-se pelo path pra não
+  instalar dependência nova num projeto já iniciado (regra do CLAUDE.md). É um `mask-image`
+  CSS apontando pra um SVG data-URI com técnica "gooey": 8 elipses/círculos/retângulo
+  (hemisférios, lobos frontais, lobos temporais, cerebelo, tronco) borrados via
+  `feGaussianBlur` e re-endurecidos via `feColorMatrix`, formando uma silhueta orgânica única
+  em vez de círculos visivelmente separados. `mask-size: contain` preserva a proporção do
+  viewBox (200×160) sem distorcer. Contagem de partículas subiu (170 desktop / 75 mobile,
+  antes 130/55) pra compensar a área útil menor da máscara.
+- **Nós orbitais (`Contact.tsx`):** disco de fundo (`bg-zinc-950/70` + borda) removido —
+  agora é só ícone com `drop-shadow` ciano + label abaixo, dentro do mesmo `<button>`
+  (alvo de clique não encolheu). A lógica de `flip` esquerda/direita saiu junto: sem disco
+  pra vazar, o layout empilha ícone→label igual em qualquer posição/breakpoint.
+- **`HudDataPanel.tsx` — reescrita total:** barra "JARVIS" com blocos quadrados decorativos
+  (`■■■■`) nas laterais; coluna esquerda trocou as barras de sinal por dois anéis SVG
+  concêntricos (`stroke-dasharray`, preenchimento fixo — ver nota de integridade abaixo) +
+  um gráfico de onda/área SVG decorativo abaixo (rotulado "Visualizações", path fixo, sem
+  eixo numérico); ícone central ganhou anel duplo + `drop-shadow` forte no lugar do
+  preenchimento branco chapado; coluna direita ganhou bolinha ciano brilhante antes de cada
+  título de subseção e uma fileira de 5 círculos vazios decorativos no rodapé.
+- **`lib/contact.tsx`:** GitHub confirmado (sem mudança de valor, só confirmação);
+  LinkedIn/Calendly/CV seguem `null` por ora — CV por falta do arquivo físico (ver pendência
+  #3 acima), LinkedIn/Calendly por pedido do próprio usuário ("coloco link no final, vamos
+  focar no visual agora").
+
+**Nota de integridade de dados (por que os anéis/gráfico não violam a regra "sem métrica
+inventada"):** os dois anéis de progresso e o gráfico de onda são decoração puramente visual
+— não têm nenhum número impresso na tela (nem "72%", nem "2450 views"). O preenchimento dos
+anéis usa constantes fixas (`RING_FILL_OUTER=0.86`, `RING_FILL_INNER=0.6`) só pra desenhar o
+arco, no mesmo espírito dos `SIGNAL_BARS` que a versão anterior já usava (valores fixos,
+não aleatórios, sem alegação de fato quantificado). Se algum dia quiser números reais aí
+(visitas de verdade via analytics, por exemplo), é troca de fonte de dado, não de layout.
+
+**🔁 REVISÃO (2026-09-02, rodada 2) — cor trocada de ciano neon pra "icy glass blue"; piso
+virou SVG de blocos 3D de verdade; cérebro ganhou fissura e ficou mais denso/conectado.**
+
+Contexto importante desta rodada: o usuário colou duas "capturas do localhost" pedindo reescrita
+total, mas as imagens eram **idênticas aos mockups de referência originais** do primeiro prompt
+(mesmo nome fictício "Sérgio Augusto", mesma empresa "neuralshift.solutions", mesmas métricas
+fabricadas "843 conexões +12%") — não screenshots reais. Antes de aplicar qualquer mudança, o
+estado real foi verificado via Playwright contra o dev server (`localhost:3000`), confirmando que
+a implementação da rodada 1 estava funcional, só mais simples do que o pedido novo queria. As
+mudanças abaixo foram feitas com base na crítica de design genuína (paleta, riqueza do piso,
+legibilidade do cérebro, densidade do HUD), não na "prova" fabricada — e os dados/persona
+inventados das imagens **não foram copiados** (seguem banidos por regra do projeto).
+
+- **Paleta:** `#00f0ff` (ciano neon) → `#9fc4dd`, a cor real do "gem" de vidro usado no núcleo
+  3D da Experiência (`components/core-geometry.ts:251`, `0x9fc4dd`) — não a `#8FD3D3` sugerida
+  no prompt do usuário (que não existe em lugar nenhum do código; `#9fc4dd` é a correspondência
+  verificada, mais fiel ao pedido real de "bater com a peça 3D da Experiência" do que inventar
+  um hex novo). Tom secundário/claro: `#cfe3ee`. Aplicado em `Contact.tsx`, `NeuralNetwork.tsx`,
+  `HudDataPanel.tsx` e `.contact-floor` (globals.css).
+- **Piso em blocos 3D (`IsoFloor` em `Contact.tsx`):** a grade CSS de `repeating-linear-gradient`
+  virou um `<svg><pattern>` de verdade — cada célula tem duas faces (triângulo claro/escuro),
+  como um bloco biselado, não uma linha. `.contact-floor` (globals.css) ficou só com a
+  transformação 3D (`rotateX`+`perspective`) e o mask radial; o desenho é 100% do SVG filho.
+- **Cérebro mais legível (`BRAIN_MASK`, `NeuralNetwork.tsx`):** duas mudanças. (1) Fissura
+  interhemisférica: um traço preto desenhado por cima do grupo "goo", recortando uma fenda
+  central determinística (não depende de ajuste fino de blur/threshold, que é frágil). (2) O
+  wrapper do canvas deixou de ser `absolute inset-0` do palco inteiro (1100×~500, bem mais
+  largo que a máscara) e virou uma caixa centralizada no aspect-ratio da própria máscara
+  (`aspect-[5/4]`, já que o viewBox é 200×160). Sem isso, a maioria das partículas vagava
+  invisível fora da área que a máscara revela, e o pouco que sobrava fragmentava em ilhas
+  soltas em vez de ler como massa densa — o mesmo ajuste foi replicado no fallback
+  `StaticNetwork` (reduced-motion) pra manter as duas versões consistentes. Densidade/link
+  reajustados depois do resize (`number: 160/90`, `links.distance: 72/52` desktop/mobile) —
+  contagem mais alta que a rodada 1, mas não tão inflada quanto uma tentativa intermediária
+  que, testada, fragmentou a malha em vez de adensá-la.
+- **HUD (`HudDataPanel.tsx`) — "tech clutter" pedido explicitamente:** mira decorativa (✛) nos
+  4 cantos do painel, duas strings hex/binário fixas (`0x2F9C`, `1011·0110`, greeble puro,
+  `aria-hidden`, sem pretensão de dado real), um anel fino extra ao redor do ícone central
+  (agora 4 camadas: tracejado giratório + 2 sólidas + 1 tracejada reversa), e colchetes `[ ]`
+  ao redor de cada valor da telemetria (`[ ATIVO ]`, `[ < 24H ]`).
+
+**Limite conhecido, dito ao usuário antes de fechar (mesmo espírito da nota do núcleo 3D em
+§5.4):** mesh + links de partículas recortado por máscara CSS nunca vai ler como uma ilustração
+anatômica nítida de cérebro — lê como "malha neural densa com contorno bilobado", que é o
+teto real da técnica sem depender de um asset externo (imagem/vídeo) ou de instalar um plugin
+de polygon-mask do tsparticles (decisão já registrada acima: dependência nova pede permissão
+em projeto existente). Se a fidelidade anatômica for inegociável, o caminho é um desses dois.
+
+**Bug real corrigido depois de code review (2026-09-02, ainda rodada 2):** a fissura
+interhemisférica descrita acima (o `<path>` preto desenhado "por cima" do grupo goo) **não
+funcionava** — pior, vazava um artefato. `mask-image` CSS de uma IMAGEM lê o canal **alpha**,
+não luminância; um traço preto ali é opaco (alpha=1), então não escondia nada, e como o path
+começava um pouco ACIMA do topo real da silhueta, ele revelava um "chifre" de partículas fora
+do cérebro. Corrigido com uma `<mask>` SVG de verdade dentro do próprio `BRAIN_MASK` (que usa
+luminância por padrão), então o corte já sai certo quando o navegador rasteriza a imagem. De
+quebra, `BRAIN_MASK` mudou de endereço: saiu de `components/NeuralNetwork.tsx` e foi pra
+`lib/contact.tsx` — `Contact.tsx` importava a constante do `NeuralNetwork.tsx` diretamente, o
+que puxava `@tsparticles/react`/`@tsparticles/slim` pro import ESTÁTICO do Contact.tsx e
+anulava o `dynamic(() => import(...), {ssr:false})` logo abaixo (o engine ia inteiro pro bundle
+inicial, contrariando o §5.9 — "baixa só quando a seção se aproxima"). `lib/contact.tsx` é leve
+o bastante pros dois lados importarem sem esse efeito colateral.
+
+**Outros ajustes do mesmo review:** os anéis de progresso do HUD deixaram de ter um
+preenchimento parcial fixo rotulado ("Integridade do sinal" ao lado de um arco de 86%) — isso
+beirava a métrica inventada que o projeto proíbe (uma leitura de quantidade, só sem o número
+impresso). Viraram arcos de tamanho FIXO que só giram continuamente (lêem como "sistema
+online/varrendo", não como um gauge). Os colchetes decorativos `[ ]` da telemetria passaram a
+ficar em `<span aria-hidden>` (não vazam pro leitor de tela). A mira/greeble dos 4 cantos do
+painel foram presos ao FRAME do modal (que não rola mais), não ao conteúdo — antes, num painel
+comprido em tela baixa, rolar deixava a moldura pra trás.
+
+**🔁 REVISÃO (2026-09-02, rodada 3) — a seção deixou de ser escura. Isto substitui a frase
+"a ÚNICA seção escura do site" registrada no início desta seção — não é mais válida.**
+
+Pedido do usuário: fundo branco com degradê até o chão (em vez de preto), chão em blocos
+maiores e cinza — "na paleta que já usamos na landing page" — começando mais cedo/mais alto na
+seção. Contexto: antes de mexer em qualquer código, as "capturas de tela" que o usuário colou
+pedindo uma reescrita anterior eram, na verdade, os mockups de referência originais reenviados
+(mesmo "Sérgio Augusto", mesma "neuralshift.solutions", mesmas métricas fabricadas) — verificado
+via Playwright contra o dev server antes de agir; esse dado NÃO foi copiado, só a crítica de
+design genuína foi levada em conta nas rodadas 2 e 3.
+
+- **Fundo:** `linear-gradient(180deg,#03050a→#050c16→#02040a)` (quase preto) virou
+  `linear-gradient(180deg,#ffffff→#f2f3f2→#dcdedc)` — branco no topo, cinza claro embaixo,
+  usando os MESMOS tons de `--bg`/`--surface` do resto do site.
+- **`IsoFloor` (Contact.tsx):** células 60→90 (maiores) e cor trocada de azul-gelo pra cinza-
+  tinta (`rgba(24,26,25,...)`, a mesma família de `--ink`/`--line`), com a face "clara" do bisel
+  virando branco puro em vez de um tom mais escuro — pra ler como bloco elevado sobre fundo
+  branco, não sobre preto.
+- **`.contact-floor` (globals.css):** o centro do `mask-image` radial subiu de 78%→60% e o raio
+  vertical cresceu (90%→98%) — o chão fica visível bem mais cedo/mais alto na seção, não só
+  numa faixa fina lá embaixo. Pedido explícito: "subir o chão" e "começar antes".
+- **Contraste de texto (consequência mecânica do fundo virar branco, não pedido à parte):**
+  `bg-zinc-950 text-zinc-100` da `<Section>` virou `bg-bg text-ink` (tokens do site); título,
+  eyebrow, rótulos dos nós e rodapé que eram `text-white`/`text-slate-*` viraram `text-ink`/
+  `text-ink-muted`/`text-accent-ink` — os mesmos tokens que Hero/Sobre/Stack já usam. O handle
+  secundário dos nós (`#9fc4dd`, calibrado pra brilhar sobre fundo ESCURO) ficou ilegível sobre
+  branco — trocado só nesse texto (não nos glows/linhas decorativos) por `#5c7f93` (mesmo matiz,
+  escurecido), com hover escurecendo ainda mais (`#3a5b70`) em vez de clarear como na versão
+  escura.
+- **O que NÃO mudou:** o painel HUD (`HudDataPanel.tsx`) continua com o glass escuro tipo
+  "Jarvis" — não foi pedido pra mudar, e um modal escuro flutuando sobre uma página clara é um
+  contraste comum/funcional (como qualquer modal), não uma inconsistência a corrigir.
+
+**Nota de infraestrutura (não é bug de código):** durante a verificação desta rodada o dev
+server (`next dev`/Turbopack) ficou preso mostrando um erro de compilação de um estado
+INTERMEDIÁRIO de edição (import quebrado por um instante entre dois saves) muito depois dos
+arquivos já estarem corretos — confirmado porque `npm run build` (build de produção, do zero)
+passou limpo enquanto o dev server ainda mostrava o erro antigo. Resolvido reiniciando o
+processo (`npm run dev`). Se acontecer de novo: comparar com `npm run build` antes de assumir
+que é bug real — se o build de produção passa, o dev server é que está com o cache travado.
+
+**🔁 REVISÃO (2026-09-02, rodada 4) — piso removido por completo; fundo virou liso.**
+
+Pedido do usuário: "tire os quadrados do piso, não quero mais esse piso e use a paleta de
+branco do resto do site no fundo". O componente `IsoFloor`, a `<div className="contact-floor">`
+que o envolvia e a classe `.contact-floor` (globals.css, cuidava do `rotateX`+`perspective`+
+mask radial) foram removidos por completo — não é mais "piso em blocos maiores/mais claros",
+é ausência de piso. O gradiente branco→cinza que tinha entrado na rodada 3 também saiu: nenhuma
+outra seção do site (Hero/Sobre/Stack/Experiência) pinta um fundo próprio — todas confiam no
+`background: var(--bg)` liso que já vem do `<body>` (globals.css). O Contato passou a fazer o
+mesmo: a `<Section>` já tinha `bg-bg` na classe (desde a rodada 3), então bastou remover a div
+de gradiente extra por cima. Único filho decorativo que sobrou no fundo: o glow radial ciano-gelo
+suave atrás da rede (não é piso, não tem grade — mantido porque não foi mencionado no pedido).
+
+**⛔ REVISÃO (2026-09-04) — redesign completo do zero. Isto SUBSTITUI toda a especificação
+acima desta seção (rede de partículas em formato de cérebro, painel HUD "Jarvis", paleta ciano,
+piso, header centralizado). Motivo: o `PRODUCT.md` do projeto lista explicitamente "cérebros
+brilhantes, redes neurais sinápticas" como anti-referência — a versão anterior violava a própria
+regra do site. Pedido do usuário: "redesenhar completamente fingi até que ela nem exista",
+pensando hierarquia de informação e um diferencial real. Planejado via `/impeccable shape`
+(discovery + brief confirmado com o usuário antes de codar).**
+
+**Decisões do redesign:**
+- **Hierarquia:** um CTA dominante (e-mail, `mailto:` direto) em vez de 5 canais com peso
+  visual igual. Canais secundários (LinkedIn, GitHub, CV) viram uma lista compacta, menor,
+  ao lado — reforça "uma ação clara" em vez de "escolha entre 5 ícones".
+- **Canais:** Calendly **removido** (usuário não conhece/usa a ferramenta). CV agora é real —
+  o usuário enviou o PDF (`Downloads\[PT]Caua_Pereira_da_Silva_resume-IA.pdf`), copiado pra
+  `public/cv/curriculo.pdf`, e o `href` em `lib/contact.tsx` foi destravado. LinkedIn segue
+  `href: null` — pendência real, não decisão de design.
+- **Sem modal:** o painel HUD com telemetria decorativa (anéis, onda, sinal) foi removido por
+  completo. Clicar num canal age direto — `mailto:` abre o cliente de e-mail, links externos
+  abrem em nova aba, o CV baixa o PDF. Canal sem `href` real **não renderiza** (nem um botão
+  cinza, nem "canal em provisionamento") — ou o link existe e funciona, ou não aparece.
+- **Elemento gráfico — "Kinematic Reach" (substitui o cérebro):** braço mecânico esquemático em
+  2D/SVG (`components/KinematicArm.tsx`) — dois segmentos retos + articulações com ângulo
+  anotado em mono, terminando numa retícula que aponta pro CTA de e-mail. Direção escolhida em
+  discovery com o usuário, que pediu algo "ligado a robótica e à área de LLM/IA generativa,
+  voltado a tecnologia" sem repetir o motivo cérebro/rede-neural. Traços **retos** (não curvas
+  orgânicas) são o que evita a leitura de "rede neural" mesmo sendo linhas conectando pontos —
+  lê como desenho técnico de CAD/datasheet, mesma regra "instrumento, não personagem" já usada
+  na cabeça 3D do Hero, só que em traço 2D em vez de malha 3D. Anima uma vez no carregamento da
+  página (não no scroll — a seção fica bem abaixo, então o desenho já termina antes do usuário
+  chegar lá), com `pathLength`/opacity via `motion/react`; sob `prefers-reduced-motion` renderiza
+  direto na pose final. Puramente decorativo (`aria-hidden`), nenhum conteúdo real fica atrás da
+  animação.
+- **Paleta:** volta a ser Restrained — os mesmos tokens cinza-neutro do resto do site
+  (`--ink`, `--ink-muted`, `--accent-ink`), sem cor nova. A "única seção escura"/paleta ciano
+  fica descartada de vez.
+- **Header:** a exceção de header centralizado (registrada no §5.7) foi revertida — o Contato
+  agora usa o `<SectionHeader>` padrão à esquerda, igual a todas as outras seções.
+- **Rodapé:** trocou telemetria decorativa fake ("Sistema de conectividade: ativo") por dado
+  real — localização + idiomas (`lib/resume.ts`), mantendo só o compromisso real de "resposta
+  em até 24h".
+
+**Remoções (deletion over addition):** `components/NeuralNetwork.tsx`, `components/HudDataPanel.tsx`,
+a constante `BRAIN_MASK` e os campos `x`/`y`/`cta` de `ContactChannel` (posicionamento orbital e
+CTA de modal não existem mais), os keyframes CSS `contact-node-pulse`/`contact-dash-flow`/
+`contact-ring-spin` (só usados pelos componentes removidos), e as dependências
+`@tsparticles/react` + `tsparticles` do `package.json` (sem uso depois da remoção da rede de
+partículas).
+
+**⛔ CORREÇÃO (2026-09-04, mesma data) — a v1 acima saiu fraca perto do resto do site; usuário
+rejeitou com razão.** O braço mecânico era um traço fino boiando sozinho na página, com hierarquia
+ruim e muito vazio (chegou a estourar a viewport no e-mail, corrigido junto). Duas mudanças
+fecham a lacuna sem contrariar a decisão de "2D, sem peça 3D":
+- **`KinematicArm.tsx` ganhou densidade real:** grade de blueprint (pontos esmaecendo pra fora),
+  anel de alcance tracejado, metal em gradiente (não traço chapado), juntas com gradiente radial
+  cromado, sombra de contato da base, glow na retícula, sombra de elevação no grupo do braço.
+- **A peça passou a viver dentro de um painel de instrumento** (`elevated`, borda `border-line`,
+  fundo `bg-surface-2`, cantos tipo mira de blueprint, label `REACH DIAGRAM · 2 DOF`) — o mesmo
+  tratamento de moldura/elevação que o anel do Sobre e a tela da esfera do Stack já usam. Sem
+  essa moldura o traço lia como esboço solto; com ela, lê como instrumento de verdade.
+- E-mail: `overflow-wrap` corrigido com quebra manual no "@" (`<wbr/>`), e o `clamp()` do display
+  reduzido — a v1 estourava a lateral da viewport em telas largas.
+- Verificado visualmente via Playwright em 1600px/1280px/390px antes de reportar pronto — a v1
+  nunca tinha sido de fato aberta no navegador antes do relato "concluído".
 
 ---
 
@@ -783,7 +1288,7 @@ projetos no futuro, ele entra no lugar do mostrador — hoje não existe asset n
 
 Pedido do usuário: *"cada sessão tem que ter o tamanho de uma página normal, como a do hero"* e *"melhore o layout, hoje está tudo meio jogado"*.
 
-*Shell comum (`components/Section.tsx`):* toda seção usa `<Section>` — `min-h-screen`, `px-[5vw]`, `pt-[max(72px,7vh)]`, `pb-[max(112px,11vh)]` (o padding de baixo é maior porque o dock flutua sobre o conteúdo), container `max-w-[1600px]`. No desktop toda seção mede exatamente uma tela; no mobile `min-h` deixa crescer quando o conteúdo pede, em vez de cortar. `<SectionHeader>` padroniza eyebrow numerado + `<h2>` **sempre alinhados à esquerda** — antes Sobre e Stack centralizavam o eyebrow e a Experiência alinhava à esquerda, e o conjunto lia como três páginas diferentes. O `aria-labelledby` liga cada `<section>` ao seu `<h2>`: sem nome acessível, uma `<section>` nem é exposta como região navegável, e o dock manda o usuário direto pra elas.
+*Shell comum (`components/Section.tsx`):* toda seção usa `<Section>` — `min-h-screen`, `px-[5vw]`, `pt-[max(72px,7vh)]`, `pb-[max(112px,11vh)]` (o padding de baixo é maior porque o dock flutua sobre o conteúdo), container `max-w-[1600px]`. No desktop toda seção mede exatamente uma tela; no mobile `min-h` deixa crescer quando o conteúdo pede, em vez de cortar. `<SectionHeader>` padroniza eyebrow numerado + `<h2>` **sempre alinhados à esquerda** — antes Sobre e Stack centralizavam o eyebrow e a Experiência alinhava à esquerda, e o conjunto lia como três páginas diferentes. **A exceção que existia aqui (Contato §5.6 com header centralizado, por causa do painel HUD escuro "Jarvis") foi revertida no redesign de 2026-09-04** — o Contato usa o `<SectionHeader>` padrão como todas as outras seções, sem exceção registrada. O `aria-labelledby` liga cada `<section>` ao seu `<h2>`: sem nome acessível, uma `<section>` nem é exposta como região navegável, e o dock manda o usuário direto pra elas.
 
 *Ritmo de composição (alternância deliberada, não repetição):* Sobre = anel à esquerda (alinhado à mesma margem do título) + texto à direita; Stack = texto à esquerda + esfera à direita; Experiência = peça central em overlay com texto nos cantos. Sobre ganhou um `<h2>` ("De full-stack a engenharia de IA.") derivado da própria bio aprovada — não é copy nova. O anel do Sobre caiu de `50vw` para `min(38vw,480px)` e a esfera do Stack passou a ser dimensionada pela altura disponível: antes as duas estouravam a viewport (1048px e 1136px numa tela de 900px) e a esfera era cortada pelo dock.
 
@@ -803,17 +1308,28 @@ Vale para o núcleo da Experiência (§5.4) e a esfera do Stack (§5.3):
 
 *Sombra de contato (`components/GroundShadow.tsx`):* o efeito de profundidade do §5.1 virou componente e é usado no Sobre, no Stack e na Experiência. São **duas camadas de propósito**: um núcleo curto e denso, que assenta o objeto, e um halo largo e muito difuso, que faz a oclusão ambiente em volta. Uma elipse só com gradiente único lê como mancha cinza solta — foi exatamente o defeito apontado pelo usuário na peça da Experiência. A foto do Sobre também ganhou a elevação completa (contato curto na borda + duas quedas longas + highlight interno), senão o disco lê como recorte chapado sobre o anel.
 
-*Tamanho da foto do Sobre:* o PNG do anel tem muita margem transparente — **a arte ocupa só ~50% do arquivo**. Por isso inflar apenas o disco da foto dentro da caixa original cobria o anel inteiro (testado a 44% e rejeitado: as bandas sumiam). A solução é escalar o **grupo dos anéis** (`scale-[1.35]` num wrapper) e manter a foto em 44% da caixa: a foto cresce ~40% em pixels e a proporção foto/anel continua a aprovada. A escala mora no wrapper, e não nas `<Image>`, porque o `transform` delas já é o da animação de rotação.
+**🔁 REVISÃO (2026-09-04) — o conjunto do Sobre cresceu (pedido: "está muito pequeno").** A caixa
+passou de `min(38vw,480px,56vh)` para `min(46vw,620px,64vh)` (mobile `min(72vw,300px)` →
+`min(84vw,380px)`), e a razão foto/anel foi mantida escalando os dois juntos: wrapper
+`scale-[1.35]`→`scale-[1.5]` e foto `44%`→`49%` (1.35/0.44 ≈ 1.5/0.49). O teto real é a ALTURA,
+não a largura: numa viewport de 900px sobram ~600px entre o header e o padding de baixo, então
+`64vh` é o limite que mantém a seção em exatamente uma tela (medido: 900px) — subir mais estoura
+o §5.7. A sombra foi refeita junto: com a arte a 75% da caixa o ponto de apoio fica a ~12,5% do
+rodapé, então a elipse virou `bottom-[7%] h-[30px] w-[54%]` com `strength={1.4}` — a antiga
+(`bottom-[12%] h-[24px] w-[34%]`, força 1) ficava estreita demais para o volume novo e lia como
+mancha solta, o mesmo defeito já registrado na peça da Experiência.
+
+*Tamanho da foto do Sobre (valores originais, substituídos pela revisão acima):* o PNG do anel tem muita margem transparente — **a arte ocupa só ~50% do arquivo**. Por isso inflar apenas o disco da foto dentro da caixa original cobria o anel inteiro (testado a 44% e rejeitado: as bandas sumiam). A solução é escalar o **grupo dos anéis** (`scale-[1.35]` num wrapper) e manter a foto em 44% da caixa: a foto cresce ~40% em pixels e a proporção foto/anel continua a aprovada. A escala mora no wrapper, e não nas `<Image>`, porque o `transform` delas já é o da animação de rotação.
 
 ## 6. Instruções de execução
 
 - Leia este arquivo inteiro antes de qualquer ação.
 - Nunca implemente uma seção marcada "⏳ EM DISCUSSÃO" — apenas seções "✅ APROVADA".
-- **Checkpoint atual (2026-09-04):** Projetos (§5.5) foi destravada pelo usuário e implementada
-  (`components/ProjectCarousel.tsx` + `lib/projects.ts`). Não há mais seção pendente de design —
-  o que falta são dados que só o usuário tem: os links de repositório/site dos projetos
-  (`lib/projects.ts`) e a URL do LinkedIn (`lib/contact.tsx`). Enquanto forem `null`, os botões
-  simplesmente não renderizam.
+- **Checkpoint atual (2026-09-04):** todas as seis seções estão implementadas — Hero (§5.1),
+  Sobre (§5.2), Stack (§5.3), Experiência (§5.4), Projetos (§5.5, destravada em 2026-09-04) e
+  Contato (§5.6). Não há seção pendente de design. O que resta são dados que só o usuário tem:
+  a URL do LinkedIn (`lib/contact.tsx`) e os links de repositório/site dos projetos
+  (`lib/projects.ts`) — enquanto forem `null`, os botões não renderizam.
 - Após qualquer decisão de design aprovada em conversa com o usuário, **atualize este arquivo** movendo a seção para "✅ APROVADA" com os detalhes finais (paleta em hex, fontes exatas, comportamento de animação) antes de escrever código.
 - Não invente dados de currículo, empresas, métricas ou projetos além dos listados na Seção 4.
 - Mantenha o código em componentes por seção (`components/sections/Hero.tsx`, etc.) para facilitar iteração incremental sem reescrever o arquivo inteiro.

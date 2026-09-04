@@ -16,6 +16,8 @@
   --shadow-sm: 0 1px 1px rgba(15, 17, 17, 0.05), 0 2px 6px rgba(15, 17, 17, 0.06);
   --shadow-lg: 0 10px 20px rgba(15, 17, 17, 0.11), 0 40px 80px rgba(15, 17, 17, 0.16);
   --inset-hi: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  /* cinza-chumbo da navbar (2026-09-04) */
+  --nav: #3a3e3d;
   color-scheme: light;
 }
 
@@ -36,6 +38,13 @@
 
 html {
   scroll-behavior: smooth;
+  /* scroll-padding-top: 0 de propósito. A navbar é fixa, mas cada seção já tem
+     88px de padding-top — reservar mais empurrava o alvo pra baixo e a âncora
+     parava com uma faixa da seção anterior ainda na tela. */
+  /* reserva o espaço da scrollbar sempre: evita que um futuro overlay/modal
+     com scroll-lock (`overflow:hidden` no <html>) faça a página saltar
+     horizontalmente ao abrir */
+  scrollbar-gutter: stable;
 }
 
 body {
@@ -44,6 +53,35 @@ body {
   font-family: var(--font-plex-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+}
+
+/* Navbar: a sombra é do CONJUNTO (pill + pontas), então é drop-shadow no
+   elemento pai — box-shadow em cada peça desenhava a emenda entre elas. */
+.nav-bar {
+  filter: drop-shadow(0 6px 14px rgba(15, 17, 17, 0.13));
+}
+
+/* "Pontas": quadrado da cor da barra com um quarto de círculo recortado pela
+   máscara, virando um filete côncavo que liga a barra à borda de cima da
+   página. 1px a mais de largura entra por baixo da pill — sem essa sobreposição
+   sobra um fio claro na emenda por arredondamento de subpixel. */
+.nav-wing {
+  position: absolute;
+  top: 0;
+  width: 21px;
+  height: 20px;
+  background: var(--nav);
+  pointer-events: none;
+}
+/* a rampa de ~1px na máscara é o antisserrilhamento: com corte seco
+   (transparent 20px, #000 20px) a curva sai escadinha */
+.nav-wing-left {
+  left: -20px;
+  mask-image: radial-gradient(circle 20px at 0 100%, transparent 19.4px, #000 20.4px);
+}
+.nav-wing-right {
+  right: -20px;
+  mask-image: radial-gradient(circle 20px at 100% 100%, transparent 19.4px, #000 20.4px);
 }
 
 /* Sistema de elevação (§5.1): nada chapado — sombra dupla + highlight interno. */

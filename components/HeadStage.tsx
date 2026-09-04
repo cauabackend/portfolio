@@ -1,22 +1,24 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useProgress } from "@react-three/drei";
+import { useInViewport } from "@/lib/useInViewport";
 
 // Three.js precisa de WebGL: nada de SSR (CONTEXTO.md §5.1, item 4 do checklist).
-const HeadScene = dynamic(() => import("./HeadScene"), { ssr: false });
+//
+// A figura do Hero é o vídeo com chroma key. O caminho em modelo 3D
+// (HeadScene/RobotHead + public/models/head_final.glb) foi APAGADO em
+// 2026-09-04 a pedido do usuário — nada no app o carregava. Para reabrir,
+// regerar o componente com `npx gltfjsx` a partir do .glb.
+const HeadScene = dynamic(() => import("./HeadVideoScene"), { ssr: false });
 
 export function HeadStage() {
-  const { active } = useProgress();
+  // O Hero abre a página, então não há o que adiar no download — só a
+  // decodificação, que deve parar quando a seção sai de cena.
+  const { setNode, inView } = useInViewport({ rootMargin: "100px" });
 
   return (
-    <div className="absolute inset-0">
-      {active && (
-        <p className="absolute inset-0 flex items-center justify-center font-mono text-[11px] tracking-[0.14em] text-[var(--ink-faint)]">
-          BOOTING SYSTEM…
-        </p>
-      )}
-      <HeadScene />
+    <div ref={setNode} className="absolute inset-0">
+      <HeadScene active={inView} />
     </div>
   );
 }

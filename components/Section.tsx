@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 // Shell comum a todas as seções (padronização pedida em 2026-09-01): cada seção
 // ocupa uma tela como o Hero, com a mesma coluna, o mesmo respiro e o mesmo
-// cabeçalho. O padding de baixo é maior porque o dock flutua sobre o conteúdo.
+// cabeçalho. O padding de cima é maior porque a navbar flutua sobre o conteúdo.
 export function Section({
   id,
   index,
@@ -26,7 +26,10 @@ export function Section({
       aria-labelledby={`sec-${index}-title`}
       // dvh, não vh: no mobile 100vh é a viewport SEM a barra de endereço, então
       // com ela visível a seção fica mais alta que a tela e o respiro do dock some
-      className={`relative flex min-h-dvh flex-col px-[5vw] pt-[max(72px,7vh)] pb-[max(112px,11vh)] ${className}`}
+      // O respiro é clamp por ALTURA, não max(): numa tela baixa (720px de
+      // viewport é o caso real do usuário, com zoom de navegador) 88+72px de
+      // padding fixo comem 22% da tela e empurram o fim da seção pra fora.
+      className={`relative flex min-h-dvh flex-col px-[5vw] pt-[clamp(52px,8vh,88px)] pb-[clamp(40px,6vh,72px)] ${className}`}
     >
       <div className={`mx-auto flex w-full max-w-[1600px] flex-1 flex-col ${innerClassName}`}>
         {children}
@@ -59,7 +62,9 @@ export function SectionHeader({
       </p>
       <h2
         id={`sec-${index}-title`}
-        className="m-0 mt-4 max-w-[18ch] font-display text-[clamp(28px,3.4vw,50px)] leading-[1.05] font-bold tracking-[-0.02em] text-balance"
+        // o teto em vh entra no min() porque o título quebra em 2 linhas: numa
+        // tela baixa ele sozinho comia ~90px do que a seção tinha pra distribuir
+        className="m-0 mt-4 max-w-[18ch] font-display text-[clamp(26px,min(3.4vw,5.4vh),50px)] leading-[1.05] font-bold tracking-[-0.02em] text-balance"
       >
         {title}
       </h2>

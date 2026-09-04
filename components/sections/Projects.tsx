@@ -1,14 +1,13 @@
 import { Section, SectionHeader } from "@/components/Section";
 import { ProjectCarousel } from "@/components/ProjectCarousel";
-import { projects } from "@/lib/projects";
 
 // Projetos (CONTEXTO.md §5.5): carrossel 3D arrastável, e o clique abre o card
-// dedicado do projeto. Mesmo ritmo de grade do Contato — cabeçalho, conteúdo
-// que preenche a altura, rodapé — pra seção medir uma tela como as outras.
+// dedicado do projeto. Cabeçalho + conteúdo que preenche a altura, pra seção
+// medir uma tela como as outras.
 export function Projects() {
   return (
     <Section id="projetos" index="05">
-      <div className="grid flex-1 grid-rows-[auto_minmax(0,1fr)_auto] gap-8">
+      <div className="grid flex-1 grid-rows-[auto_minmax(0,1fr)] gap-[clamp(16px,4vh,32px)]">
         <SectionHeader index="05" label="Projetos" title="Projetos de destaque.">
           {/* sem "arraste para girar": §5.8 tirou essa legenda de todas as
               peças interativas — o cursor-grab é a affordance */}
@@ -23,18 +22,9 @@ export function Projects() {
             que Stack e Contato usam — numa viewport baixa a linha 1fr encolhe
             mais que a placa, que tem piso de 150px, e o cartão vazaria por
             cima do cabeçalho. */}
-        <div className="h-[min(52vh,440px)] min-h-0 min-[861px]:h-full min-[861px]:min-h-95">
+        <div className="h-[min(52vh,440px)] min-h-0 min-[861px]:h-full min-[861px]:min-h-[min(380px,46vh)]">
           <ProjectCarousel />
         </div>
-
-        <p className="m-0 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-line pt-6 font-mono text-[10px] tracking-[0.16em] text-ink-muted uppercase">
-          <span>
-            {String(projects.length).padStart(2, "0")}{" "}
-            {projects.length === 1 ? "projeto" : "projetos"}
-          </span>
-          <span aria-hidden className="h-3 w-px bg-line" />
-          <span>IA aplicada · governança · dados</span>
-        </p>
       </div>
     </Section>
   );

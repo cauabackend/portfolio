@@ -16,7 +16,7 @@ export default function Page() {
         Pular para o conteúdo
       </a>
       <Nav />
-      {/* cada seção já reserva o respiro do dock no próprio padding-bottom */}
+      {/* cada seção já reserva o respiro da navbar no próprio padding-top */}
       <main id="conteudo">
         <Hero />
         <Sobre />

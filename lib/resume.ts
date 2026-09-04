@@ -129,7 +129,8 @@ export const stack = [
 export const sections = [
   { id: "hero", label: "Início" },
   { id: "sobre", label: "Sobre" },
-  { id: "expertise", label: "Expertise" },
+  // rótulo da navegação; o id continua "expertise" pra não quebrar a âncora
+  { id: "expertise", label: "Skills" },
   { id: "experiencia", label: "Experiência" },
   { id: "projetos", label: "Projetos" },
   { id: "contato", label: "Contato" },

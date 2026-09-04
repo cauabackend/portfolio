@@ -2,19 +2,22 @@ import { profile } from "@/lib/resume";
 import { HeadStage } from "@/components/HeadStage";
 
 // Hero aprovado — CONTEXTO.md §5.1 (mockup design/hero-v1.html).
-// Composição minimalista: tipografia gigante + cabeça 3D + dock (em Nav).
+// Composição minimalista: tipografia gigante + cabeça 3D + navbar (em Nav).
 export function Hero() {
   return (
     <section
       id="hero"
-      className="relative isolate flex min-h-dvh flex-col justify-between overflow-x-clip bg-[var(--bg)] pt-[26px] pb-[34px] max-[860px]:pb-[96px]"
+      className="relative isolate flex min-h-dvh flex-col overflow-x-clip bg-[var(--bg)] pt-[64px] pb-[34px]"
     >
       <div className="relative flex flex-1 items-center pr-[5vw] pl-[2vw] max-[860px]:flex-col max-[860px]:justify-center max-[860px]:gap-6 max-[860px]:px-[6vw]">
-        <div className="relative z-[2] aspect-square w-[min(46vw,980px)] flex-none max-[860px]:w-[min(78vw,420px)]">
-          <span
-            aria-hidden
-            className="absolute bottom-[8%] left-1/2 h-[26px] w-[46%] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(ellipse,rgba(15,17,17,.24),transparent_72%)] blur-[4px]"
-          />
+        {/* `self-end`: o vídeo é um busto cortado na borda de baixo do quadro,
+            então o corte precisa cair na linha de base do Hero — ancorado no
+            meio da coluna, ele lia como figura cortada no ar. A sombra de
+            contato saiu junto: o corte não é um ponto de apoio, e a elipse
+            aparecia por trás do canvas transparente como uma mancha solta. */}
+        {/* a caixa é quadrada, então a largura vira altura: sem o teto em vh a
+            figura sozinha passava da tela numa viewport baixa */}
+        <div className="relative z-[2] aspect-square w-[min(46vw,980px,76vh)] flex-none self-end max-[860px]:w-[min(78vw,420px,54vh)] max-[860px]:self-center">
           <HeadStage />
         </div>
 
@@ -34,16 +37,9 @@ export function Hero() {
       {/* mesma coluna das demais seções (px-[5vw] + cap de 1600px): antes esta
           linha usava px-11 e não tinha cap, então a margem esquerda do Hero não
           batia com a espinha do resto da página */}
-      <div className="mx-auto flex w-full max-w-[1600px] items-end justify-between px-[5vw] font-mono max-[720px]:flex-col max-[720px]:items-start max-[720px]:gap-[14px]">
+      <div className="mx-auto w-full max-w-[1600px] px-[5vw] font-mono">
         <p className="m-0 text-[11.5px] tracking-[0.1em] text-[var(--ink-muted)] uppercase">
           {profile.name} — {profile.location}
-        </p>
-        <p className="m-0 flex items-center gap-[10px] text-[11px] tracking-[0.08em] text-[var(--ink-faint)]">
-          <span
-            aria-hidden
-            className="h-7 w-px bg-[linear-gradient(var(--ink-faint),transparent)]"
-          />
-          SCROLL
         </p>
       </div>
     </section>
