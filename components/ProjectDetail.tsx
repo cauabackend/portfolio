@@ -182,8 +182,7 @@ export function ProjectDetail({
 
             {/* o documento do projeto fica AQUI, e não na fileira de links do
                 rodapé: é a prova mais forte que a ficha tem, e no rodapé (mono
-                de 12px, terceira coluna) ele passa despercebido. O chip reusa o
-                mesmo tratamento do CTA do Contato — elevação + borda hairline. */}
+                de 12px, terceira coluna) ele passa despercebido. */}
             {project.paper && (
               <motion.a
                 href={project.paper.href}
