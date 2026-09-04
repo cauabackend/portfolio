@@ -61,6 +61,20 @@ body {
   filter: drop-shadow(0 6px 14px rgba(15, 17, 17, 0.13));
 }
 
+/* Material: degradê vertical curto + um fio de luz de 1px no topo (o mesmo
+   `--inset-hi` do resto do site, invertido pro escuro) — é o que separa "peça
+   usinada" de "retângulo chapado".
+   `background-size: 100% 42px` (a altura da pill) e `no-repeat` são o truque
+   que mantém o degradê CONTÍNUO nas pontas: elas têm 20px, então pintam
+   exatamente o mesmo trecho de cima do gradiente, sem emenda visível. */
+.nav-bar,
+.nav-wing {
+  background-image: linear-gradient(180deg, #464b49 0%, #3a3e3d 54%, #313534 100%);
+  background-size: 100% 42px;
+  background-repeat: no-repeat;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09);
+}
+
 /* "Pontas": quadrado da cor da barra com um quarto de círculo recortado pela
    máscara, virando um filete côncavo que liga a barra à borda de cima da
    página. 1px a mais de largura entra por baixo da pill — sem essa sobreposição
@@ -70,7 +84,10 @@ body {
   top: 0;
   width: 21px;
   height: 20px;
-  background: var(--nav);
+  /* background-COLOR, não o atalho `background`: o atalho vem depois da regra
+     do degradê e zeraria o background-image, deixando a ponta chapada e a pill
+     com degradê — foi exatamente a diferença de cor que apareceu na emenda */
+  background-color: var(--nav);
   pointer-events: none;
 }
 /* a rampa de ~1px na máscara é o antisserrilhamento: com corte seco
