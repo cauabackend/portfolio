@@ -129,11 +129,19 @@ Engenharia. Lógica/Algoritmos e Estruturas de Dados não foram duplicados — j
 de EDUCAÇÃO. Soft skill ("sociável") ficou de fora: o currículo não tem seção de soft skills
 e criar uma mudaria a estrutura, que o usuário pediu para preservar.
 
-**⚠️ Divergência conhecida, NÃO corrigida por falta de pedido:** o PDF traz "BRAVEND — ESTÁGIO
-EM ENGENHARIA DE IA & ML", mas `lib/resume.ts` já usa "Estágio em Engenharia de Software" (a
-correção registrada logo abaixo, na Seção 4). Não foi aplicada ao PDF porque muda conteúdo além
-do pedido e o título mais longo pode quebrar em duas linhas na coluna de 50% — decidir com o
-usuário antes de mexer.
+**Alinhamento de 2026-09-04 (site e PDF agora batem), decidido pelo usuário:**
+- **Cargo na Bravend: "Software Engineer"** — sem a palavra "estágio", em inglês, como o
+  `profile.role` do Hero. O PDF trazia "ESTÁGIO EM ENGENHARIA DE IA & ML" e `lib/resume.ts`
+  trazia "Estágio em Engenharia de Software"; os dois viraram "Software Engineer". O título
+  cabe na coluna de 50% da linha de cargo sem quebrar (medido depois de gerar).
+- **LinkedIn: `https://www.linkedin.com/in/devcaua`** — resolve a pendência de §5.6 que estava
+  aberta desde 2026-09-02. Aplicado no PDF e em `lib/contact.tsx` (o botão de LinkedIn passa a
+  renderizar, porque `href` deixou de ser `null`). O PDF apontava para um perfil que não existe
+  (`/in/cauapereira`).
+- **GitHub: `https://github.com/cauabackend`** nos dois. O PDF apontava para `/cauapereira`.
+
+O cargo vive em DOIS lugares que precisam mudar juntos: `role` em `lib/resume.ts` e a linha
+`BRAVEND — …` em `design/cv/curriculo.html`.
 
 ### Experiências & Projetos
 

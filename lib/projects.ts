@@ -45,8 +45,8 @@ export const projects: ReadonlyArray<Project> = [
     id: "bravend-core",
     name: "Core de IA",
     // "Engenharia de IA & ML" saiu daqui em 2026-09-04: o cargo dele na Bravend
-    // é Estágio em Engenharia de Software (ver correção na Seção 4). O núcleo de
-    // IA é onde o projeto vive, e é isso que esta linha diz.
+    // é Software Engineer (ver correção na Seção 4). O núcleo de IA é onde o
+    // projeto vive, e é isso que esta linha diz.
     org: "Bravend · Núcleo de IA",
     tagline: "Agentes LLM, pipelines RAG e assistentes analíticos",
     period: "jun/2026 – presente",

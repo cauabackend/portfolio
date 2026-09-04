@@ -35,11 +35,13 @@ export const experiences: Experience[] = [
   {
     id: "bravend",
     org: "Bravend",
-    // CORREÇÃO 2026-09-04 (dita pelo usuário): o estágio é de Engenharia de
-    // SOFTWARE. Constava "Engenharia de IA & ML", que era o trabalho, não o
-    // cargo. Ele escreve o software do produto e, além disso, atua no núcleo de
-    // IA — é o que o primeiro bullet passou a dizer.
-    role: "Estágio em Engenharia de Software",
+    // CORREÇÃO 2026-09-04 (dita pelo usuário), em dois passos: primeiro saiu
+    // "Engenharia de IA & ML", que era o trabalho e não o cargo; depois o
+    // usuário pediu o título sem a palavra estágio, só "Software Engineer".
+    // Ele escreve o software do produto e, além disso, atua no núcleo de IA —
+    // é o que o primeiro bullet passou a dizer. Mesmo título no PDF do
+    // currículo (design/cv/curriculo.html); mudar um exige mudar o outro.
+    role: "Software Engineer",
     period: "jun/2026 – presente",
     current: true,
     // Reescrito em 2026-09-04 para a voz do site, sem tirar nem acrescentar

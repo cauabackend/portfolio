@@ -82,7 +82,7 @@ export const contactChannels: ReadonlyArray<ContactChannel> = [
     id: "linkedin",
     label: "LinkedIn",
     handle: "perfil profissional",
-    href: null,
+    href: "https://www.linkedin.com/in/devcaua",
     protocol: "HTTPS",
     icon: LinkedinMark,
     external: true,
