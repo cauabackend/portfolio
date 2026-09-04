@@ -3,19 +3,20 @@
 import { useEffect, useRef } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { ArrowUpRight, X } from "lucide-react";
-import { ProjectSchematic, SCHEMATIC_CAPTION } from "@/components/ProjectSchematic";
-import type { Project } from "@/lib/projects";
+import { ProjectSchematic } from "@/components/ProjectSchematic";
+import { projects, type Project } from "@/lib/projects";
 
-// Card dedicado do projeto (CONTEXTO.md §5.5): abre no clique da placa central
-// do carrossel. Diálogo de verdade — Esc, trap de Tab, scroll-lock e foco
-// devolvido ao palco pelo `onExitComplete` de quem monta.
+// Ficha do projeto (CONTEXTO.md §5.5) — abre no clique da placa do carrossel.
 //
-// Redesign 2026-09-04: a placa escura genérica saiu daqui. O card virou uma
-// FICHA DE INSTRUMENTO — janela de esquema à esquerda, com a moldura de cantos
-// e o rótulo em mono que o Contato já usa, e datasheet à direita. O esquema é
-// próprio de cada projeto (ProjectSchematic), na mesma linguagem de blueprint
-// do KinematicArm. A lombada escura é o que costura o card à placa do
-// carrossel de onde ele abriu.
+// ⛔ NÃO é mais um card/modal centralizado com fundo desfocado (rejeitado pelo
+// usuário em 2026-09-04: "extremamente genérico... quero mudar por completo").
+// A ficha TOMA A TELA INTEIRA e usa a composição do Hero (§5.1): figura grande
+// à esquerda, nome em tipografia display gigante à direita, dados soltos nos
+// cantos em mono. Sem moldura, sem caixa, sem sombra de modal — a página vira
+// o projeto. Continua sendo um diálogo de verdade: Esc, trap de Tab,
+// scroll-lock e foco devolvido pelo `onExitComplete` de quem monta.
+const EASE = [0.16, 1, 0.3, 1] as const;
+
 export function ProjectDetail({
   project,
   index,
@@ -25,11 +26,11 @@ export function ProjectDetail({
   index: number;
   onClose: () => void;
 }) {
-  const panel = useRef<HTMLDivElement>(null);
+  const sheet = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion() ?? false;
 
   useEffect(() => {
-    const el = panel.current;
+    const el = sheet.current;
     if (!el) return;
     const root = document.documentElement;
     const prevOverflow = root.style.overflow;
@@ -37,14 +38,16 @@ export function ProjectDetail({
 
     const focusables = () =>
       Array.from(el.querySelectorAll<HTMLElement>("a[href], button:not([disabled])"));
-    focusables()[0]?.focus();
+    // o foco vai para a própria ficha, não para o X: focar o botão desenha o
+    // anel de foco em volta dele toda vez que a ficha abre
+    el.focus();
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         onClose();
         return;
       }
-      // sem trap, o Tab vaza pra página atrás do painel
+      // sem trap, o Tab vaza pra página atrás da ficha
       if (e.key !== "Tab") return;
       const items = focusables();
       if (items.length === 0) return;
@@ -52,8 +55,8 @@ export function ProjectDetail({
       const last = items[items.length - 1];
       const current = document.activeElement;
       // as duas pontas precisam do `!contains`: clicar num trecho não focável
-      // do painel deixa o foco no <body>, e sem essa guarda o Tab seguinte cai
-      // na página atrás do diálogo
+      // deixa o foco no <body>, e sem essa guarda o Tab seguinte cai na página
+      // atrás do diálogo
       if (e.shiftKey && (current === first || !el.contains(current))) {
         e.preventDefault();
         last.focus();
@@ -76,109 +79,149 @@ export function ProjectDetail({
   ].filter(Boolean) as { href: string; label: string }[];
 
   const serial = `P.${String(index + 1).padStart(2, "0")}`;
-  const fields = [
-    { k: "Escopo", v: project.org },
-    { k: "Período", v: project.period || "—" },
-  ];
+  // o nome vira duas linhas escalonadas quando tem por onde quebrar — o mesmo
+  // stagger do Hero. Nome de uma palavra só fica em linha única, sem picotar.
+  const words = project.name.split(" ");
+  const lines = words.length > 1 ? [words[0], words.slice(1).join(" ")] : words;
+
+  const rise = (delay: number) => ({
+    initial: reduced ? { opacity: 0 } : { y: "110%" },
+    animate: reduced ? { opacity: 1 } : { y: "0%" },
+    transition: reduced ? { duration: 0.2 } : { duration: 0.8, delay, ease: EASE },
+  });
+  const fade = (delay: number) => ({
+    initial: reduced ? { opacity: 0 } : { opacity: 0, y: 10 },
+    animate: { opacity: 1, y: 0 },
+    transition: reduced ? { duration: 0.2 } : { duration: 0.55, delay, ease: EASE },
+  });
 
   return (
     <motion.div
-      className="fixed inset-0 z-60 grid place-items-center overflow-y-auto p-[max(16px,4vw)]"
-      // pointerdown com alvo == backdrop, e não click: com click, começar uma
-      // seleção de texto dentro do painel e soltar fora fecha o card
-      onPointerDown={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
+      className="fixed inset-0 z-60 overflow-y-auto bg-bg"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.2 }}
-      style={{ background: "rgba(231,232,231,0.78)", backdropFilter: "blur(6px)" }}
+      transition={{ duration: reduced ? 0.15 : 0.28, ease: EASE }}
     >
       <motion.div
-        ref={panel}
+        ref={sheet}
         role="dialog"
         aria-modal="true"
         aria-labelledby="project-detail-title"
-        initial={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.94, y: 14 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 8 }}
-        transition={reduced ? { duration: 0.15 } : { type: "spring", stiffness: 240, damping: 26 }}
-        className="elevated relative grid w-full max-w-255 grid-cols-1 overflow-hidden rounded-[28px] border border-line bg-surface-2 min-[861px]:grid-cols-[44px_minmax(0,1.02fr)_minmax(0,1fr)]"
+        tabIndex={-1}
+        initial={reduced ? undefined : { scale: 0.985 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.5, ease: EASE }}
+        className="relative flex min-h-full flex-col px-[5vw] pt-[clamp(18px,3.5vh,36px)] pb-[clamp(20px,4vh,44px)]"
       >
-        {/* lombada: o escuro da placa do carrossel reduzido a um filete de
-            arquivo. Decorativa — número e nome estão no título ao lado. */}
-        <div
-          aria-hidden
-          className="relative flex items-center justify-between gap-3 bg-[#0a0b0b] px-5 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] min-[861px]:justify-center min-[861px]:px-0 min-[861px]:py-8"
-        >
-          <span className="font-mono text-[10px] tracking-[0.22em] text-white/50 uppercase min-[861px]:rotate-180 min-[861px]:[writing-mode:vertical-rl]">
-            {serial} — {project.name}
-          </span>
-          <span className="h-1 w-1 rounded-full bg-white/35 min-[861px]:absolute min-[861px]:top-5" />
-        </div>
-
-        {/* janela de esquema: a mesma moldura de instrumento do Contato (cantos
-            + rótulo em mono), sobre --surface para ler como recesso na placa */}
-        <div className="relative flex items-center justify-center border-b border-line bg-surface px-6 pt-12 pb-8 min-[861px]:border-r min-[861px]:border-b-0">
-          {[
-            "top-4 left-4 border-t border-l",
-            "top-4 right-4 border-t border-r",
-            "bottom-4 left-4 border-b border-l",
-            "bottom-4 right-4 border-b border-r",
-          ].map((pos) => (
-            <span key={pos} aria-hidden className={`absolute h-3 w-3 border-ink-faint ${pos}`} />
-          ))}
-          <span
-            aria-hidden
-            className="absolute top-6 left-7 font-mono text-[10px] tracking-[0.14em] text-ink-muted uppercase"
+        {/* trilho superior: identificação à esquerda, saída à direita */}
+        <div className="flex items-start justify-between gap-6">
+          <motion.p
+            className="m-0 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[11px] tracking-[0.18em] text-ink-muted uppercase"
+            {...fade(0.1)}
           >
-            {SCHEMATIC_CAPTION[project.id] ?? "Esquema"}
-          </span>
-          <ProjectSchematic id={project.id} className="w-full max-w-110" />
-        </div>
+            <span className="text-ink">{serial}</span>
+            <span aria-hidden className="h-3 w-px bg-line" />
+            <span>{project.org}</span>
+            {project.period && (
+              <>
+                <span aria-hidden className="h-3 w-px bg-line" />
+                <span>{project.period}</span>
+              </>
+            )}
+          </motion.p>
 
-        <div className="p-[clamp(24px,3vw,40px)]">
-          <button
+          {/* só o X, sem pílula: o botão não é conteúdo, é saída */}
+          <motion.button
             type="button"
             onClick={onClose}
             aria-label="Fechar"
-            className="absolute top-4 right-4 z-1 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-line bg-surface-2 text-ink-muted transition-colors duration-200 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-ink"
+            className="-m-2 flex flex-none cursor-pointer p-2 text-ink-muted transition-colors duration-200 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-accent-ink"
+            {...fade(0.1)}
           >
-            <X size={16} strokeWidth={1.6} />
-          </button>
+            <X size={22} strokeWidth={1.5} />
+          </motion.button>
+        </div>
 
-          <p className="m-0 font-mono text-[10px] tracking-[0.2em] text-ink-muted uppercase">
-            Projeto {serial}
-          </p>
-          <h3
-            id="project-detail-title"
-            className="m-0 mt-2 font-display text-[clamp(26px,3vw,40px)] leading-[1.03] font-bold tracking-[-0.03em] text-balance"
-          >
-            {project.name}
-          </h3>
+        {/* corpo: figura + tipografia, na composição do Hero */}
+        <div className="grid flex-1 items-center gap-[clamp(20px,3vw,56px)] py-[clamp(16px,3vh,40px)] min-[861px]:grid-cols-[minmax(0,1fr)_minmax(0,1.06fr)]">
+          {/* sem legenda externa: o esquema já rotula cada nó e traz as siglas
+              técnicas dentro do próprio desenho */}
+          <motion.div className="flex justify-center" {...fade(0.22)}>
+            <ProjectSchematic
+              id={project.id}
+              className="w-full max-w-[min(48vw,640px)] max-h-[42vh] min-[861px]:max-h-[54vh]"
+            />
+          </motion.div>
 
-          {/* faixa de campos: filete em cima e embaixo, como linha de ficha */}
-          <dl className="m-0 mt-5 grid grid-cols-2 gap-x-6 border-y border-line py-3">
-            {fields.map((f) => (
-              <div key={f.k}>
-                <dt className="font-mono text-[9.5px] tracking-[0.18em] text-ink-muted uppercase">
-                  {f.k}
-                </dt>
-                <dd className="m-0 mt-1 text-[13px] leading-[1.35] text-ink">{f.v}</dd>
-              </div>
-            ))}
-          </dl>
+          <div>
+            <h2
+              id="project-detail-title"
+              className="m-0 font-display leading-[0.92] font-bold tracking-[-0.035em] text-[clamp(40px,8.4vw,124px)]"
+            >
+              {lines.map((line, i) => (
+                // a máscara é o que faz a linha SUBIR de dentro do papel em vez
+                // de aparecer por cima dele
+                <span key={line} className="block overflow-hidden pb-[0.06em]">
+                  <motion.span
+                    className={`block ${i === 1 ? "pl-[8%]" : ""}`}
+                    {...rise(0.16 + i * 0.09)}
+                  >
+                    {line}
+                  </motion.span>
+                </span>
+              ))}
+            </h2>
 
-          <p className="m-0 mt-5 max-w-[62ch] text-[15px] leading-[1.6] text-pretty text-ink-muted">
+            <motion.p
+              className="m-0 mt-[clamp(12px,2vh,22px)] max-w-[34ch] font-mono text-[clamp(12px,1.1vw,14px)] leading-[1.5] tracking-[0.02em] text-accent-ink"
+              {...fade(0.42)}
+            >
+              {project.tagline}
+            </motion.p>
+
+            {/* o documento do projeto fica AQUI, e não na fileira de links do
+                rodapé: é a prova mais forte que a ficha tem, e no rodapé (mono
+                de 12px, terceira coluna) ele passa despercebido. O chip reusa o
+                mesmo tratamento do CTA do Contato — elevação + borda hairline. */}
+            {project.paper && (
+              <motion.a
+                href={project.paper.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group mt-[clamp(16px,2.6vh,28px)] inline-flex flex-col items-start font-mono text-[12px] tracking-[0.14em] text-ink uppercase transition-colors duration-200 hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-ink"
+                {...fade(0.5)}
+              >
+                <span>
+                  {project.paper.label}
+                  <span className="ml-2.5 text-ink-faint">PDF</span>
+                </span>
+                {/* o mesmo filete que cresce do CTA do Contato: é a forma que o
+                    site já usa pra marcar link, sem pílula e sem ícone */}
+                <span
+                  aria-hidden
+                  className="mt-2 block h-px w-full bg-ink-faint transition-colors duration-200 group-hover:bg-accent-ink"
+                />
+                <span className="sr-only">(abre em nova aba)</span>
+              </motion.a>
+            )}
+          </div>
+        </div>
+
+        {/* rodapé de dados: as três leituras lado a lado, sem caixa nenhuma */}
+        <motion.div
+          className="grid gap-[clamp(18px,3vw,48px)] border-t border-line pt-[clamp(16px,2.4vh,28px)] min-[861px]:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_minmax(0,auto)]"
+          {...fade(0.5)}
+        >
+          <p className="m-0 max-w-[52ch] text-[clamp(13.5px,1.05vw,15px)] leading-[1.55] text-pretty text-ink-muted">
             {project.summary}
           </p>
 
-          <ul className="m-0 mt-5 list-none p-0">
+          <ul className="m-0 list-none p-0">
             {project.highlights.map((h) => (
               <li
                 key={h}
-                className="flex gap-3 border-t border-line py-2.5 text-[13.5px] leading-[1.45] text-ink first:border-t-0 first:pt-0"
+                className="flex gap-3 py-1.5 text-[clamp(12.5px,0.95vw,13.5px)] leading-[1.45] text-ink"
               >
                 <span aria-hidden className="mt-2 h-px w-3 flex-none bg-ink-faint" />
                 {h}
@@ -186,37 +229,41 @@ export function ProjectDetail({
             ))}
           </ul>
 
-          {/* stack como carimbos: a mesma leitura de peça marcada que os
-              rótulos em mono do resto do site */}
-          <ul className="m-0 mt-6 flex list-none flex-wrap gap-1.5 p-0">
-            {project.tags.map((t) => (
-              <li
-                key={t}
-                className="rounded-[5px] border border-line bg-surface px-2 py-1 font-mono text-[10px] tracking-widest text-ink-muted uppercase"
-              >
-                {t}
-              </li>
-            ))}
-          </ul>
-
-          {links.length > 0 && (
-            <div className="mt-6 flex flex-wrap gap-3">
-              {links.map((l) => (
-                <a
-                  key={l.href}
-                  href={l.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="elevated inline-flex items-center gap-2 rounded-full border border-line bg-surface-2 px-4 py-2 font-mono text-[12px] tracking-[0.06em] text-ink transition-colors duration-200 hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-accent-ink"
-                >
-                  {l.label}
-                  <ArrowUpRight size={14} strokeWidth={1.6} />
-                  <span className="sr-only"> (abre em nova aba)</span>
-                </a>
+          <div className="flex flex-col gap-4">
+            <ul className="m-0 flex list-none flex-wrap gap-x-3 gap-y-1.5 p-0 font-mono text-[10px] tracking-[0.16em] text-ink-faint uppercase">
+              {project.tags.map((t) => (
+                <li key={t}>{t}</li>
               ))}
-            </div>
-          )}
-        </div>
+            </ul>
+
+            {links.length > 0 && (
+              <div className="flex flex-wrap gap-3">
+                {links.map((l) => (
+                  <a
+                    key={l.href}
+                    href={l.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group inline-flex items-center gap-2 font-mono text-[12px] tracking-[0.06em] text-ink transition-colors duration-200 hover:text-accent-ink focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-accent-ink"
+                  >
+                    {l.label}
+                    <span
+                      aria-hidden
+                      className="elevated flex h-7 w-7 items-center justify-center rounded-full border border-line bg-surface-2"
+                    >
+                      <ArrowUpRight size={13} strokeWidth={1.8} />
+                    </span>
+                    <span className="sr-only"> (abre em nova aba)</span>
+                  </a>
+                ))}
+              </div>
+            )}
+
+            <p className="m-0 font-mono text-[10px] tracking-[0.18em] text-ink-faint uppercase">
+              {String(index + 1).padStart(2, "0")} / {String(projects.length).padStart(2, "0")}
+            </p>
+          </div>
+        </motion.div>
       </motion.div>
     </motion.div>
   );

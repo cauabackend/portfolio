@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import { GroundShadow } from "./GroundShadow";
+import { SceneBoundary } from "./SceneBoundary";
 import { useInViewport } from "@/lib/useInViewport";
 
 // WebGL só existe no cliente (CONTEXTO.md §5.3: componente client-only).
@@ -27,7 +28,12 @@ export function StackSphere() {
         {/* Sombra de contato em CSS, atrás do canvas transparente. A ContactShadows
             do three desenhava um plano quadrado cujo corte reto aparecia no fundo. */}
         <GroundShadow className="bottom-[7%] h-[26px] w-[30%]" />
-        <StackSphereScene onHover={setHovered} active={inView} />
+        {/* 23 texturas carregando: se uma falhar, o useLoader lança e sem
+            boundary o erro sobe até a raiz e derruba a página. A seção degrada
+            de graça, porque a legenda abaixo já traz os nomes em texto. */}
+        <SceneBoundary>
+          <StackSphereScene onHover={setHovered} active={inView} />
+        </SceneBoundary>
       </div>
 
       {/* A altura fica reservada mesmo vazia pra o nome da ferramenta não empurrar

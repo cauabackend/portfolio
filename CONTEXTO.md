@@ -72,15 +72,73 @@ Para cada seção: propor 2–3 direções visuais concretas (paleta, tipografia
 **Educação:** Bacharelado em Engenharia de Software — FIAP (2025 – jun/2029), cursando o 3º semestre
 **Idiomas:** Português (nativo), Inglês (B2), Espanhol (B1)
 
+### Competências (do PDF `public/cv/curriculo.pdf` + "Main skills" do LinkedIn, fornecidas em 2026-09-04)
+
+Fonte de verdade da seção Skills (§5.3). Não acrescentar item que não esteja aqui.
+
+- **IA generativa & LLMs:** OpenAI API, Claude, Codex, LLaMA, RAG, Prompt Engineering,
+  Fine-tuning, LLMOps, LangChain, Hugging Face, Vector Databases, Multi-agent Systems.
+- **ML, estatística & confiabilidade:** Python (avançado), PyTorch, TensorFlow, scikit-learn,
+  XGBoost, SHAP, Pandas, NumPy, testes de hipótese (Wilcoxon pareado, bootstrap por
+  agrupamento), atestação criptográfica (Sigstore, in-toto), governança e auditoria de IA.
+- **Engenharia & ferramentas:** FastAPI, Streamlit, SQL (PostgreSQL, MySQL), Docker, AWS,
+  Vercel, Git, GitHub, GitHub Actions, CI/CD, REST APIs, MLOps, arquitetura de software.
+- **Fundamentos:** lógica de programação, algoritmos, estruturas de dados.
+
+### O PDF do currículo tem FONTE (2026-09-04) — não remendar o binário
+
+`public/cv/curriculo.pdf` passou a ser **gerado** a partir de `design/cv/curriculo.html`
+(`design/cv/build.ps1` imprime com o Chrome headless). Para mudar o currículo, edite o HTML
+e rode o build; **não** edite o PDF.
+
+Como se chegou nisso: o arquivo que o usuário enviou foi feito pelo **WeasyPrint 62.3** em
+**Liberation Sans**, e o texto é glifo de fonte subsetada — trocar "2025" por "2026" deu para
+fazer no content stream (só um glifo, mesma largura), mas **acrescentar palavras não dá**: as
+linhas são justificadas e posicionadas em coordenada absoluta, então qualquer inserção exige
+re-quebrar o parágrafo, re-justificar e deslocar todas as coordenadas abaixo. O HTML foi
+reconstruído medindo o próprio PDF (linha de base de cada linha, cada régua, cada recuo).
+
+Decisões que o HTML documenta e que não são óbvias:
+- **Arial no lugar de Liberation Sans.** São metricamente compatíveis — a Liberation é
+  justamente o substituto que o Linux usa para Arial. Verificado linha a linha: as quebras
+  caem nos mesmos pontos. WeasyPrint não foi usado porque no Windows depende de Pango/GTK.
+- **A linha de título é de duas colunas de 50%**, não um `space-between` elástico. É o que
+  explica o título do RESONANCE quebrar em duas linhas mesmo sobrando espaço à direita: ele
+  mede 371px e a coluna tem 351,5px. Com `space-between` ele cabia numa linha só e o layout
+  mudava.
+- **`letter-spacing: 0.5px` no `h1` e nos `h2`** e em mais nada. Nos títulos o PDF traz avanço
+  extra entre CADA glifo; nos parágrafos, só em volta do espaço (isso é justificação).
+- **`header p { text-align: center }` precisa vir depois de `p { text-align: justify }`**,
+  senão o subtítulo e a linha de contato encostam na margem esquerda.
+- **Marcador de lista desenhado com `li::before` a `left: -7.536px`** (a largura de "• " a
+  12px). O `::marker` do Chrome sai maior e mais afastado que o do original.
+- **`--user-data-dir` no build**: sem isso o Chrome de impressão briga pelo perfil do
+  navegador aberto e sai sem escrever o arquivo.
+
+Fidelidade medida contra o original: quebras de linha idênticas em todos os parágrafos que não
+mudaram, deriva vertical máxima de 1,2pt na página inteira, marcador a 0,27px do lugar. Duas
+diferenças conhecidas e aceitas: (1) as margens saem em 45px/38px em vez de 45,354px/37,795px
+porque o Chrome arredonda margem de impressão; (2) a última linha do bullet do Resonance quebra
+uma palavra depois — o texto fica a 0,7px do limite da caixa e os dois motores de texto discordam
+nessa casa. O arquivo passou de 21,6 KB para 84 KB (o Chrome embute subconjunto de fonte maior).
+
 ### Experiências & Projetos
 
-**Bravend — Estágio em Engenharia de IA & ML** (jun/2026 – presente)
+**Bravend — Estágio em Engenharia de Software** (jun/2026 – presente)
+_Correção de 2026-09-04: constava "Estágio em Engenharia de IA & ML". O cargo é de
+**Engenharia de Software**; o trabalho com IA acontece dentro dele ("além de construir
+softwares eu mexo com essa área de IA", palavras do usuário). Aplicada em `lib/resume.ts`
+(`role` + primeiro highlight) e em `lib/projects.ts`. Não confundir com o cargo pretendido
+(AI & Machine Learning Engineer), que é o do Hero e permanece._
 - Atuação central no core de IA da empresa
 - Automação inteligente com ganho de eficiência de ~50%
 - Fine-tuning de múltiplos agentes LLM (Claude, OpenAI, Codex), reduzindo custos operacionais em 15%
 - Pipelines RAG e assistentes analíticos
 
-**Aletheia — Co-Founder & AI Engineer** (2025 – presente)
+**Aletheia — Co-Founder & AI Engineer** (2026 – presente)
+_Correção de 2026-09-04: constava 2025 por engano; a startup foi fundada em 2026. Aplicada em
+`lib/resume.ts`, `lib/projects.ts` e no PDF `public/cv/curriculo.pdf`. **Não confundir com o 2025
+da FIAP**, que é a data correta do início da graduação e permanece._
 - Governança de IA
 - Atestação criptográfica integrada ao Sigstore e in-toto via GitHub Actions
 - Rigor estatístico: testes pareados de Wilcoxon e bootstrap por agrupamento para medir desvios em modelos estocásticos
@@ -660,6 +718,51 @@ enviou uma foto pessoal (retrato em Paris, Torre Eiffel ao fundo); recortada via
 via `next/image` com `object-cover` dentro do disco (o `<span>` de texto placeholder foi
 removido, mantendo a borda/highlight sobrepostos). O TODO de asset pendente está resolvido.
 
+**🔁 REVISÃO (2026-09-04) — copy reescrita e a LISTA DE DADOS foi removida. Substitui a
+"lista de dados (NOME/LOCAL/FORMAÇÃO/IDIOMAS/FOCO)" descrita na coluna de conteúdo acima e
+o texto do mockup `sobre-v1.html`.**
+
+O usuário pediu um texto que "encha os olhos do recrutador" e apontou dois defeitos reais na
+versão anterior: ela **não falava dele**, só repetia a trajetória que a seção Experiência já
+conta, e a lista de dados ocupava a metade de baixo da coluna dizendo pouco.
+
+- **A `<dl>` saiu inteira** (e `about.fields` com ela). O espaço liberado (~194px) virou texto.
+  Formação, cidade e idiomas voltaram como uma linha só de conferência em mono no pé da coluna
+  (`about.credentials`), com filete acima; nome e foco já vivem no rodapé do Hero, então não
+  foram reintroduzidos. A linha usa `--accent-ink` e não `--ink-faint`, que a 12px dava 2,2:1.
+- **Os três parágrafos têm o MESMO corpo.** Uma versão com o primeiro maior, deslocado para o
+  lado do título como "tese", foi implementada e **rejeitada pelo usuário**: o degrau de tamanho
+  lia como dois textos diferentes na mesma seção. Não reintroduzir.
+- **O parágrafo sobre o Resonance foi escrito e removido a pedido do usuário** (2026-09-04). O
+  projeto tem card próprio em §5.5; aqui só alongava a seção.
+- **A copy passou a ter uma tese no centro**, e não uma lista de tecnologias: *software
+  determinístico quebra e você vê, modelo estocástico degrada calado*. É o que explica por que
+  o trabalho dele termina em atestação (Sigstore/in-toto) e em teste estatístico (Wilcoxon
+  pareado, bootstrap), em vez de deixar os dois como jargão solto.
+- **Fonte da copy:** o usuário forneceu em conversa o "sobre" do LinkedIn dele, que traz o que
+  a Seção 4 não tinha. Daí vieram o arco de atuação do primeiro parágrafo (ajuste fino →
+  deploy → governança em produção, ou seja MLOps), a palavra *auditável* e o destino dos
+  pipelines RAG (assistentes analíticos). Nada foi inventado além dessa fonte.
+- **⚠️ A ALETHEIA AINDA ESTÁ EM CONSTRUÇÃO**, dito pelo usuário em 2026-09-04, e isso vale
+  contra o próprio LinkedIn dele, que descreve a esteira no presente ("utilizo atestação..."). A
+  frase do site é de propósito e não de sistema em operação ("estou construindo a Aletheia,
+  que co-fundei, para deixar esse caminho auditável"). Só passar para o presente quando ele
+  disser que a esteira roda. **O mesmo cuidado NÃO foi aplicado a `lib/projects.ts`**, cujo
+  `summary` da Aletheia ainda afirma no presente que cada artefato recebe atestação — pendente
+  de correção junto com o usuário.
+- **Ordem seguindo as referências consultadas** (DEV, 40 portfólios revisados; Codecademy e
+  KDnuggets sobre portfólio de ML): especialidade nas primeiras palavras, depois o *como se
+  pensa*, depois a prova com número, e o background curto por último.
+- **Regras de escrita aplicadas ao texto, a pedido do usuário:** sem travessão, sem
+  dois-pontos, sem ponto e vírgula, sem enumeração de três itens em paralelo e sem adjetivo
+  vago no lugar de fato. O negrito (`strong`) cai só na tese e nos números (15%, ~50%), que é
+  o que se varre em 30 segundos.
+- **Teto de altura, medido e não estimado:** a coluna de texto não pode passar de ~484px numa
+  viewport de 720px, senão a seção deixa de caber em uma tela (§5.7). São ~14 linhas de
+  parágrafo. Cada rodada foi medida no browser (`overflow` da `<section>` contra `innerHeight`
+  em 1500×720, a viewport real do usuário); a primeira versão estourava 22px e a segunda 7px.
+  Ao mexer nessa copy, medir de novo.
+
 ### 5.3 Core Expertise / Stack — ✅ APROVADA
 
 **⚠️ Nota de precedência:** esta seção passou por 4 direções descartadas antes da aprovada — registradas aqui só como histórico de racional, não como opções válidas: (1) carrossel de duas esteiras horizontais infinitas com tiles de logo; (2) índice categorizado de "pills" (ferramenta com ícone + label, agrupadas por domínio), inspirado no layout de "Skills & Expertise" do portfólio-referência do usuário (aaabadcode.com, feito com o produto Fastfolio); (3) chat simulado no cliente (bolhas de pergunta/resposta, chips de categoria, digitação com efeito typewriter, sem IA/API real) — também inspirado na mesma referência, mas na parte de simular uma conversa; descartado a pedido do usuário em favor da direção 4. Leia a especificação final abaixo; as anteriores não devem ser reimplementadas.
@@ -698,7 +801,8 @@ dial, displaying one crisp full-color technology logo at its center...
 
 *Biblioteca de ícones:* mesma abordagem documentada no histórico de exploração — `devicon` (CDN ou pacote npm) para ferramentas/linguagens com logo multi-tom oficial; `simple-icons` (SVG usado como CSS mask colorido na cor de marca) para marcas que o devicon não cobre (ex.: OpenAI, Anthropic). Para produção, preferir servir os SVGs definitivos estático de `public/icons/stack/` (baixados uma vez) em vez de depender de CDN em runtime.
 
-**⚠️ Pendência não resolvida:** XGBoost, SHAP, Sigstore, in-toto e as Soft Skills não têm logo de marca disponível — ficaram de fora da esfera. Falta decidir onde essas entram (índice complementar abaixo da esfera? outra seção?) — **não implementar essa parte até essa decisão ser tomada com o usuário.**
+**✅ RESOLVIDO (2026-09-04) — a pendência "onde entram XGBoost, SHAP, Sigstore e in-toto"
+virou a lista de competências ao lado do globo. Ver a revisão no fim desta seção.**
 
 *Paleta/tipografia:* reaproveita integralmente os tokens do Hero/Sobre (tema claro cinza-neutro, Instrument Sans/IBM Plex Sans/IBM Plex Mono, sem cor introduzida nos elementos metálicos — só tons neutros de cinza, consistente com a decisão do Hero de acento estritamente neutro).
 
@@ -731,6 +835,42 @@ acabado e com animações mais fluidas") a seção foi refeita em R3F — `compo
 
 *Nota de implementação:* o mockup é vanilla JS puro; a implementação React final deve portar a lógica de projeção/rotação para dentro de um componente `StackSphere.tsx` (client-only, sem SSR, já que depende de `window.scrollY`/`requestAnimationFrame`), possivelmente com `framer-motion` só para transições de entrada/hover, mantendo o loop de animação principal em JS puro por performance.
 
+**🔁 REVISÃO (2026-09-04) — o conteúdo da seção passou a ser o currículo inteiro, não uma
+amostra. Substitui a lista de 12 ferramentas e a pendência de XGBoost/SHAP/Sigstore.**
+
+Pedido do usuário: *"coloque todas as skills que fazem sentido, use meu currículo para se
+basear, pq as skills presentes na roda não representam o que tem no currículo"*, mais um
+texto explicando o que não caberia no globo, pensando na hierarquia para o recrutador.
+Fonte: o PDF `public/cv/curriculo.pdf` (bloco COMPETÊNCIAS) e as "Main skills" que ele colou
+do LinkedIn na mesma conversa. Ambos estão agora na Seção 4 deste arquivo.
+
+*Hierarquia decidida (dois níveis, um por canal):*
+1. **Globo = marca.** 23 nós, só o que tem logotipo oficial: Python, Claude, OpenAI, Hugging
+   Face, LangChain, PyTorch, TensorFlow, scikit-learn, Pandas, NumPy, FastAPI, Streamlit,
+   PostgreSQL, MySQL, Docker, AWS, Vercel, Git, GitHub, GitHub Actions, TypeScript, React,
+   Next.js. **Saíram** JavaScript (redundante com TypeScript), Node.js e Tailwind CSS: não
+   constam do currículo e diluíam o posicionamento de IA. Os SVGs ficam em
+   `public/icons/stack/`, baixados uma vez (devicon para os coloridos, simple-icons para
+   LangChain, logo oficial da Hugging Face). **Sigstore, in-toto e XGBoost continuam fora
+   do globo por não existir ícone de marca em nenhum dos dois conjuntos.**
+2. **Índice em texto = tudo.** `competencies` em `lib/resume.ts`, quatro grupos na mesma
+   divisão do PDF. Começou como "só o que não cabe no globo" e o usuário mandou o contrário
+   na mesma sessão (*"cadê AWS, Docker e outras skills no texto?? lá você pode colocar
+   tudo"*): a repetição de AWS/Docker/Python entre globo e índice é **de propósito**, porque
+   o índice é o que o recrutador lê e o que uma busca por palavra encontra. **Vercel foi
+   removido do índice** a pedido dele, e segue como nó do globo.
+
+*Legenda da figura (pedido: "tem skill no globo que não tem legenda"):* o nome de cada nó
+dependia de passar o mouse por cima, e sumia de vez em leitor de tela ou sem WebGL. A lista
+`sr-only` que existia virou `<figcaption>` visível sob a esfera, com os 23 nomes na ordem do
+`stack`. O `<figure>`/`<figcaption>` são o que amarra texto e figura.
+
+*Consequências de layout:* a coluna de texto foi de `minmax(0,420px)` para `minmax(0,620px)`
+e o gap de `5vw` para `4vw` — em 460px o índice quebrava em linhas demais e estourava a
+altura. O teto da esfera caiu para `min(58vh,520px)` / `min-h-380px`, porque a legenda passou
+a consumir parte da coluna. **Medido em 1500×720 (a viewport real do usuário, §5.7): seção em
+720px, zero de overflow.** Ao mexer aqui, medir de novo nessa altura.
+
 ### 5.4 Experiência / Timeline — ✅ APROVADA
 
 **Aprovação (2026-09-01):** o usuário forneceu em conversa a spec completa + imagem de referência (layout zigue-zague ao redor de um núcleo 3D central) e pediu implementação explícita, destravando o checkpoint. O mockup de "fio 3D" anterior segue rejeitado e não tem relação com esta direção.
@@ -739,7 +879,51 @@ acabado e com animações mais fluidas") a seção foi refeita em R3F — `compo
 
 *Composição (desktop):* seção full-height, grid de 3 colunas. Coluna esquerda, de cima pra baixo: header (eyebrow "04 EXPERIÊNCIA" mono + linha fina; título "Jornada Profissional" em Instrument Sans bold) → bloco ALETHEIA → bloco VISÃO GERAL DE CARREIRA (`justify-between` dá o escalonamento vertical). Coluna direita: bloco BRAVEND no topo (com `pt-[8vh]`). Coluna central: núcleo 3D girando sobre uma linha vertical de 1px (`--line`) que atravessa a seção, com sombra de contato elíptica (mesmo tratamento do Hero §5.1). Mobile (≤980px): empilha header → núcleo → BRAVEND → ALETHEIA → VISÃO GERAL.
 
-*Blocos de texto:* título da organização em caps (Instrument Sans bold, `clamp(22px,2.1vw,32px)`), subtítulo semibold, período em IBM Plex Mono caps, bullets com marcador de traço fino (`h-px w-3`). **Dados 100% de `lib/resume.ts`** (Seção 4): a spec original do prompt trazia datas/cargos incorretos ("2023", "Sênior", "Cofundador 2022", "Satomak") que foram substituídos pelos reais — Bravend jun/2026–presente (Estágio em Engenharia de IA & ML), Aletheia 2025–presente (Co-Founder & AI Engineer). `highlights[0]` de cada experiência entra no subtítulo; o restante vira os bullets, verbatim.
+*Blocos de texto:* título da organização em caps (Instrument Sans bold, `clamp(22px,2.1vw,32px)`), subtítulo semibold, período em IBM Plex Mono caps, bullets com marcador de traço fino (`h-px w-3`). **Dados 100% de `lib/resume.ts`** (Seção 4): a spec original do prompt trazia datas/cargos incorretos ("2023", "Sênior", "Cofundador 2022", "Satomak") que foram substituídos pelos reais — Bravend jun/2026–presente (Estágio em Engenharia de IA & ML), Aletheia 2026–presente (Co-Founder & AI Engineer). `highlights[0]` de cada experiência entra no subtítulo; o restante vira os bullets, verbatim.
+
+**🔁 REVISÃO (2026-09-04) — hierarquia, espaçamento e copy dos blocos. Substitui o parágrafo
+acima no que diz respeito a montagem do subtítulo e à composição da coluna esquerda.**
+
+Pedido do usuário, em duas mensagens: *"melhore a hierarquia visual dos textos tbm, tem textos
+com muito espaçamento outro com pouco"* e, sobre a linha de rodapé da coluna esquerda,
+*"isso que eu mandei na print nao está legal… está tudo mt vago nessa pagina"*.
+
+- **O espaçamento torto tinha uma causa medível, não era ajuste fino.** A Bravend estava presa
+  à linha 1 do grid, então **era ela** quem media a linha (238px, contra 130px do cabeçalho), e
+  os 108px de sobra viravam vão morto debaixo do título. Medido antes: **148px** de respiro
+  acima da Aletheia contra **40px** abaixo. A correção é uma classe: a Bravend passa a
+  atravessar as três linhas (`row-end-4 self-start`), sem sair do canto onde já estava. A linha
+  1 volta a medir o cabeçalho, toda a folga cai na linha do meio e o `self-center` da Aletheia a
+  divide em dois. Medido depois: **76px e 76px**.
+- **Nenhum highlight é mais desviado para o subtítulo.** O subtítulo é o cargo, e ponto. A
+  montagem antiga (`Núcleo de IA da Bravend — ${role}`) repetia o nome da empresa a 6px do
+  `<h3>` que já diz BRAVEND, trazia travessão (proibido pela regra de escrita) e tirava da lista
+  justamente a linha mais concreta do bloco.
+- **Ritmo interno em vez de respiro uniforme.** Nome e data colados (6px, são o mesmo dado), o
+  cargo com um degrau, os bullets com o dobro. Antes os quatro pedaços tinham o mesmo respiro e
+  o bloco lia como quatro linhas soltas. O período também subiu para debaixo do nome da empresa:
+  a ordem de varredura é ONDE, QUANDO, o QUÊ, e antes a data ficava depois do cargo, que é a
+  informação mais longa das três.
+- **Bullets em `--accent-ink`, não `--ink-muted`.** A 12px o muted dá 4,2:1 sobre o `--bg`,
+  abaixo do mínimo de 4,5:1 — e é ali que está a substância do currículo. O peso secundário
+  passa a vir do tamanho, não do contraste baixo.
+- **O `<h3>` "VISÃO GERAL DE CARREIRA" e a linha `careerSummary` saíram, e no lugar entrou a
+  FORMAÇÃO (FIAP).** O rótulo, em caixa alta e no mesmo corpo de BRAVEND e ALETHEIA, fazia a
+  coluna parecer ter três empregos. E a copy era vaga: "Desenvolvimento de soluções baseadas em
+  dados | AI & Machine Learning Engineer" não diz o que foi feito, e o pipe é resquício de
+  headline de LinkedIn. Uma primeira tentativa de reescrita ("soluções baseadas em dados, do
+  ajuste do modelo ao deploy em produção") foi rejeitada pelo usuário com razão: **ela violava a
+  própria regra de escrita do texto** (substantivo vago + "de X a Y" sem escala). FIAP é a
+  terceira entrada real da jornada, tem data, fecha a cronologia e usa a mesma peça `Entry`
+  (`bullets` virou opcional). `careerSummary` **continua exportado em `lib/resume.ts`, sem uso**,
+  caso a linha de posicionamento volte.
+- **Copy dos bullets reescrita** sob as regras que o usuário passou (sem travessão, sem
+  dois-pontos, sem gerúndio de fecho, sem adjetivo vago): "Automação inteligente com ganho de
+  eficiência de ~50%" virou "A automação que construí subiu a eficiência da operação em cerca de
+  50%"; "…(Claude, OpenAI, Codex), reduzindo custos operacionais em 15%" virou duas frases com o
+  número no fim; "Rigor estatístico: testes pareados de Wilcoxon…" perdeu o rótulo e os
+  dois-pontos. Nenhum fato entrou ou saiu. O bullet da Aletheia é **frase nominal de propósito**,
+  não presente do indicativo, porque a esteira ainda está em construção.
 
 *Peça 3D:* `public/models/core.glb` (40 MB, cópia SEM otimização — decisão explícita do usuário: "deixe o arquivo com sua qualidade alta"). `components/CoreScene.tsx` + `CoreStage.tsx` espelham o padrão HeadScene/HeadStage: dynamic import sem SSR, fallback "LOADING CORE…" via `useProgress`, `StudioEnvironment` + NeutralToneMapping + anisotropia máxima. Hardening pós-review: error boundary no `CoreStage` (WebGL decorativo falha → seção degrada pra texto), montagem adiada por IntersectionObserver (o glb de 40 MB só baixa quando a seção se aproxima da viewport, sem competir com o Hero), `useProgress` filtrado por item (o manager é global), DOM em ordem de leitura com posicionamento explícito no grid (WCAG 1.3.2), copy da "Visão Geral" em `lib/resume.ts` (`careerSummary`).
 
@@ -1041,14 +1225,63 @@ real de cada projeto.
   O fade a cada troca vem do `motion`: o projeto não tem `animate-in`, que é do
   `tailwindcss-animate` e não está instalado.
 
-**Card dedicado — redesenho (2026-09-04):** a placa escura genérica saiu do diálogo e ele virou
-uma **ficha de instrumento**: lombada escura à esquerda (o preto da placa do carrossel reduzido a
-um filete, o que costura o card à peça de onde ele abriu), janela de esquema com a moldura de
-cantos + rótulo em mono que o Contato já usa, e datasheet à direita. O esquema é próprio de cada
-projeto (`components/ProjectSchematic.tsx`), na mesma linguagem de blueprint do `KinematicArm`.
-Vale aqui o mesmo limite de dados do resto do site: os pontos e barras são **desenho**, nunca
-carregam eixo, escala ou valor impresso, e o texto só cita fato do currículo (114k faixas,
-Sigstore/in-toto, RAG).
+**⛔ Card dedicado — o MODELO de card/modal foi DESCARTADO (2026-09-04).** Duas tentativas foram
+rejeitadas pelo usuário nesta ordem, e nenhuma delas deve voltar:
+1. Placa preta chapada + coluna de texto — *"muito genérico, nem parece que eu tive esforço"*. O
+   retângulo de cor no lugar de um print que não existe é o que denuncia o vazio.
+2. A mesma caixa com a placa trocada por um esquema desenhado — *"continua extremamente genérico,
+   talvez seja o modelo que estamos usando"*. **A leitura de template não estava no conteúdo da
+   caixa, e sim na CAIXA**: retângulo arredondado flutuando sobre fundo desfocado, figura à
+   esquerda e texto à direita é a forma de modal que qualquer template tem.
+
+**✅ Vigente — FICHA EM TELA CHEIA (`components/ProjectDetail.tsx`).** O projeto ocupa a tela
+inteira, sem moldura, sem sombra de modal e sem backdrop desfocado — fundo `--bg` opaco, a página
+inteira vira o projeto. A composição é a do **Hero (§5.1)**, que é o que costura a ficha ao resto
+do site: figura grande à esquerda, nome em display gigante à direita
+(`clamp(40px,8.4vw,124px)`, quebrado em duas linhas escalonadas quando o nome tem mais de uma
+palavra), identificação em mono no trilho de cima e os dados soltos num rodapé de três colunas
+(resumo · registros · stack), separado só por um filete. Saída: **um X limpo**, sem pílula nem
+botão-cartão (pedido explícito) — o foco de abertura vai para a própria ficha (`tabIndex={-1}`),
+e não para o X, senão o anel de foco desenha exatamente a caixinha que saiu.
+
+*Esquema por projeto (`components/ProjectSchematic.tsx`):* cada projeto tem um desenho próprio na
+linguagem de blueprint do `KinematicArm` (grade de pontos esmaecendo, traço de CAD com gradiente
+de metal, juntas cromadas, legendas em mono) — cadeia de atestação (Aletheia), pipeline
+recuperação→agentes (Core de IA) e classificação com atribuição (Resonance). Vale o mesmo limite
+de dados do resto do site: pontos e barras são **desenho**, nunca carregam eixo, escala ou valor
+impresso, e o texto só cita fato do currículo (114k faixas, Sigstore/in-toto, RAG).
+
+Duas armadilhas que custaram uma rodada cada:
+- **`viewBox` recortado no conteúdo de cada desenho** (`VIEWBOX` por id). Com uma caixa única, a
+  folga vazia do SVG virava um vão morto entre a figura e o que vinha abaixo dela.
+- **Tracejado não pode entrar com `pathLength`.** O `motion` anima traço escrevendo na própria
+  `stroke-dasharray`, então animar o desenho de uma linha tracejada apaga o tracejado — ela vira
+  uma linha sólida. Tudo que é tracejado entra por opacidade.
+
+**🔁 REVISÃO (2026-09-04) — documento público do projeto na ficha (`paper`).**
+
+Pedido do usuário: poder LER, a partir da ficha da Aletheia, o artigo público da startup
+(versão pública da proposta, trilha Startup One da FIAP). O PDF real foi fornecido por ele e
+está em `public/papers/aletheia.pdf` (247 KB).
+
+- **É o PDF servido direto, aberto em nova aba** — não uma página HTML transcrevendo o texto.
+  O artigo é de duas colunas com figuras e tabelas: reproduzir isso em HTML custaria umas 400
+  linhas e ainda perderia a leitura de artigo, que é justamente o que impressiona. O visualizador
+  de PDF do navegador é feature nativa, zero código, e o arquivo ainda fica baixável. **Limite
+  conhecido:** duas colunas em celular exige pinça. Se isso incomodar, o caminho é uma página
+  `/artigo/aletheia` com o texto remontado nos tokens do site, mantendo o PDF como download.
+- **Campo `paper: { href, label } | null` em `lib/projects.ts`**, mesma regra de `repo`/`site`:
+  `null` não renderiza nada. Preencher em outro projeto faz o link aparecer sozinho.
+- **Onde o link mora:** na coluna do NOME, logo abaixo do tagline — e não na fileira de links do
+  rodapé. No rodapé (mono 12px, terceira coluna) ele passava despercebido, e nos projetos que têm
+  um documento ele é a prova mais forte da ficha.
+- **⛔ O chip em pílula foi REJEITADO** ("muito genérico e com cara de IA"): pílula branca
+  arredondada + bolinha cromada com ícone é a forma que qualquer template usa. Vigente: mono
+  caixa-alta + marcador `PDF` em `--ink-faint` + filete de 1px que muda de cor no hover — o mesmo
+  vocabulário de link que o CTA do Contato já usa. Não reintroduzir pílula nem ícone aqui.
+- **Legenda do carrossel:** para projeto com `paper`, a linha "Repositório" vira
+  "Documento · Artigo público" (`ProjectsGallery.tsx`). Pedido explícito: o código da Aletheia
+  nunca vai abrir, então prometer repositório ali é promessa que não se cumpre.
 
 ### 5.6 Contato / Footer — ✅ APROVADA
 

@@ -45,10 +45,20 @@ function useGeodesic() {
     }
     geo.dispose();
 
-    // nós que ganham badge: espalhados uniformemente pela lista
+    // Nós que ganham badge: espalhados uniformemente pela lista. O índice fica
+    // guardado no próprio badge, em vez de redescoberto com indexOf.
+    //
+    // TETO: `stack` não pode passar de nodes.length (42 com detail 1). Acima
+    // disso o passo fica < 1, dois badges caem no MESMO nó (dois logos
+    // coplanares brigando no z-buffer) e uma junta cromada aparece dentro do
+    // mostrador. Nada quebra, só fica errado na tela. Para crescer mais, subir
+    // o detail do IcosahedronGeometry.
     const step = nodes.length / stack.length;
-    const badges = stack.map((tool, i) => ({ tool, node: nodes[Math.floor(i * step)] }));
-    const badgeNodes = new Set(badges.map((b) => nodes.indexOf(b.node)));
+    const badges = stack.map((tool, i) => {
+      const index = Math.floor(i * step);
+      return { tool, index, node: nodes[index] };
+    });
+    const badgeNodes = new Set(badges.map((b) => b.index));
 
     return { nodes, edges, badges, badgeNodes };
   }, []);

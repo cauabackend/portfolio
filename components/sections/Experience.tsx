@@ -1,4 +1,4 @@
-import { careerSummary, experiences } from "@/lib/resume";
+import { education, experiences } from "@/lib/resume";
 import { CoreStage } from "@/components/CoreStage";
 import { GroundShadow } from "@/components/GroundShadow";
 import { Section, SectionHeader } from "@/components/Section";
@@ -9,10 +9,12 @@ import { Section, SectionHeader } from "@/components/Section";
 // Bravend em cima à direita, Aletheia no meio e a visão de carreira embaixo.
 // A ordem do DOM é a ordem de leitura; o desktop só reposiciona no grid.
 //
-// Curadoria dos dados (fonte: lib/resume.ts, Seção 4 do CONTEXTO.md — nada inventado):
-// bravend.highlights[0] ("Atuação central no core de IA…") vira o subtítulo
-// "Núcleo de IA da Bravend"; aletheia.highlights[0] ("Governança de IA") entra no
-// subtítulo. Os bullets são o restante, verbatim.
+// Fonte dos dados: lib/resume.ts (Seção 4 do CONTEXTO.md), nada inventado. Desde
+// 2026-09-04 nenhum highlight é desviado para o subtítulo: o subtítulo é o cargo
+// e os highlights são todos bullets. A montagem antiga tirava o highlights[0] da
+// lista para virar aposto do cargo, e o resultado era um subtítulo comprido com
+// travessão enquanto a linha mais concreta do bloco sumia do lugar onde o olho
+// procura fato.
 const bravend = experiences.find((e) => e.id === "bravend")!;
 const aletheia = experiences.find((e) => e.id === "aletheia")!;
 
@@ -20,33 +22,49 @@ type EntryProps = {
   title: string;
   subtitle: string;
   period: string;
-  bullets: readonly string[];
+  // opcional: a entrada de formação não tem bullet, e um <ul> vazio deixaria
+  // a margem de cima sem conteúdo embaixo
+  bullets?: readonly string[];
   className?: string;
 };
 
+// Ordem de varredura de um recrutador: ONDE, QUANDO, o QUÊ. O período subiu para
+// logo abaixo do nome da empresa — antes ficava depois do cargo, que é a
+// informação mais longa das três, e a data se perdia no meio do bloco.
+//
+// O espaçamento interno também deixou de ser uniforme. Antes os quatro pedaços
+// tinham o mesmo respiro entre si e o bloco lia como quatro linhas soltas. Agora
+// é ritmo: nome e data colados (são o mesmo dado), cargo com um degrau, bullets
+// com o dobro. Proximidade é o que agrupa, não caixa nem régua.
 function Entry({ title, subtitle, period, bullets, className = "" }: EntryProps) {
   return (
     <article className={className}>
       <h3 className="m-0 font-display text-[clamp(18px,min(1.9vw,3.4vh),30px)] leading-[1.05] font-bold tracking-[-0.01em] uppercase">
         {title}
       </h3>
-      <p className="m-0 mt-[clamp(4px,1.2vh,8px)] max-w-[38ch] text-[clamp(13px,2.1vh,14px)] leading-[1.45] font-semibold">
-        {subtitle}
-      </p>
-      <p className="m-0 mt-[clamp(4px,1.2vh,8px)] font-mono text-[11px] tracking-[0.12em] text-[var(--ink-muted)] uppercase">
+      <p className="m-0 mt-[6px] font-mono text-[11px] tracking-[0.12em] text-ink-muted uppercase">
         {period}
       </p>
-      <ul className="m-0 mt-[clamp(8px,1.5vh,16px)] flex max-w-[42ch] list-none flex-col gap-[clamp(4px,1.2vh,8px)] p-0">
-        {bullets.map((b) => (
-          <li
-            key={b}
-            className="flex gap-[10px] text-[clamp(12px,1.95vh,13px)] leading-[1.5] text-[var(--ink-muted)]"
-          >
-            <span aria-hidden className="mt-[9px] h-px w-3 flex-none bg-[var(--ink-faint)]" />
-            {b}
-          </li>
-        ))}
-      </ul>
+      <p className="m-0 mt-[clamp(9px,1.7vh,14px)] max-w-[38ch] text-[clamp(13px,2.1vh,14px)] leading-[1.45] font-semibold">
+        {subtitle}
+      </p>
+      {/* accent-ink, não ink-muted: a 12px o muted dá 4,2:1 sobre o --bg e fica
+          abaixo do mínimo de 4,5:1 — e é justamente aqui que está a substância
+          do currículo. O peso continua secundário pelo tamanho, não pelo
+          contraste baixo. */}
+      {bullets && bullets.length > 0 && (
+        <ul className="m-0 mt-[clamp(14px,2.4vh,22px)] flex max-w-[42ch] list-none flex-col gap-[clamp(6px,1.3vh,10px)] p-0">
+          {bullets.map((b) => (
+            <li
+              key={b}
+              className="flex gap-[10px] text-[clamp(12px,1.95vh,13px)] leading-[1.5] text-accent-ink"
+            >
+              <span aria-hidden className="mt-[9px] h-px w-3 flex-none bg-[var(--ink-faint)]" />
+              {b}
+            </li>
+          ))}
+        </ul>
+      )}
     </article>
   );
 }
@@ -83,31 +101,48 @@ export function Experience() {
           <CoreStage />
         </div>
 
+        {/* row-end-4 + self-start é o conserto do espaçamento torto da coluna da
+            esquerda, e não uma mudança de posição: a Bravend continua no mesmo
+            canto. Estando presa à linha 1, ERA ELA quem media a linha (238px
+            contra os 130px do cabeçalho), e os 108px de sobra viravam vão morto
+            debaixo do título. Medido: 148px de respiro acima da Aletheia contra
+            40px abaixo. Atravessando as três linhas, a linha 1 volta a medir o
+            cabeçalho, toda a folga cai na linha do meio e o self-center da
+            Aletheia a divide em dois respiros iguais. */}
         <Entry
-          className="min-[981px]:col-start-3 min-[981px]:row-start-1"
+          className="min-[981px]:col-start-3 min-[981px]:row-start-1 min-[981px]:row-end-4 min-[981px]:self-start"
           title="Bravend"
-          subtitle={`Núcleo de IA da Bravend — ${bravend.role}`}
+          // O cargo, e só o cargo. A linha antiga ("Núcleo de IA da Bravend —
+          // …") repetia o nome da empresa a 6px do <h3> que já diz BRAVEND, e
+          // trazia um travessão, que a regra de escrita do texto proíbe. O que
+          // ele faz além do cargo é fato, então virou o primeiro bullet em vez
+          // de aposto no subtítulo.
+          subtitle={bravend.role}
           period={bravend.period}
-          bullets={bravend.highlights.slice(1)}
+          bullets={bravend.highlights}
         />
 
         <Entry
           className="min-[981px]:col-start-1 min-[981px]:row-start-2 min-[981px]:self-center"
           title="Aletheia"
-          subtitle={`${aletheia.role} — ${aletheia.highlights[0]}`}
+          subtitle={aletheia.role}
           period={aletheia.period}
-          bullets={aletheia.highlights.slice(1)}
+          bullets={aletheia.highlights}
         />
 
-        {/* resumo da própria seção, não conteúdo independente — div, não article */}
-        <div className="min-[981px]:col-start-1 min-[981px]:row-start-3 min-[981px]:self-end">
-          <h3 className="m-0 font-display text-[clamp(18px,min(1.9vw,3.4vh),30px)] leading-[1.05] font-bold tracking-[-0.01em] uppercase">
-            Visão Geral de Carreira
-          </h3>
-          <p className="m-0 mt-[clamp(4px,1.2vh,8px)] max-w-[38ch] text-[clamp(13px,2.1vh,14px)] leading-[1.45] font-semibold">
-            {careerSummary}
-          </p>
-        </div>
+        {/* A formação ocupa o lugar de duas coisas que saíram daqui em
+            2026-09-04, ambas rejeitadas pelo usuário: o <h3> "VISÃO GERAL DE
+            CARREIRA", que em caixa alta e no mesmo corpo de BRAVEND e ALETHEIA
+            fazia a coluna parecer ter três empregos, e a linha de posicionamento
+            que ele mandou no print ("soluções baseadas em dados…"), vaga demais.
+            FIAP é a terceira entrada real da jornada, tem data e fecha a
+            cronologia — e usa a mesma peça, então lê como parte da mesma lista. */}
+        <Entry
+          className="min-[981px]:col-start-1 min-[981px]:row-start-3 min-[981px]:self-end"
+          title={education.school}
+          subtitle={`${education.degree}, ${education.status}`}
+          period={`${education.start} – ${education.end}`}
+        />
       </div>
     </Section>
   );

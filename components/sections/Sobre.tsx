@@ -13,6 +13,25 @@ const RINGS = [
   // acabamento do anel. O PNG segue em public/images/sobre caso volte.
 ];
 
+// Um trecho da bio. `strong` cai no acento (é o que o recrutador varre) e
+// `muted` no comentário lateral.
+function Marked({ parts }: { parts: readonly { t: string; strong?: boolean; muted?: boolean }[] }) {
+  return (
+    <>
+      {parts.map((p, i) => (
+        <span
+          key={i}
+          className={
+            p.strong ? "font-semibold text-accent-ink" : p.muted ? "text-ink-muted" : undefined
+          }
+        >
+          {p.t}
+        </span>
+      ))}
+    </>
+  );
+}
+
 export function Sobre() {
   return (
     <Section id="sobre" index="02">
@@ -84,43 +103,27 @@ export function Sobre() {
         </div>
 
         <div className="min-w-0 max-w-[520px]">
+          {/* Todos os parágrafos no mesmo corpo, a pedido do usuário. Uma versão
+              com o primeiro maior, ao lado do título, foi implementada e
+              rejeitada: o degrau de tamanho lia como dois textos diferentes. */}
           {about.paragraphs.map((parts, i) => (
             <p
               key={i}
-              className="m-0 font-display text-[clamp(16px,1.4vw,18.5px)] leading-[1.62] font-medium tracking-[-0.005em] not-first:mt-[14px]"
+              className="m-0 font-display text-[clamp(15.5px,1.4vw,18px)] leading-[1.6] font-medium tracking-[-0.005em] text-pretty not-first:mt-[clamp(12px,1.6vh,16px)]"
             >
-              {parts.map((p, j) => (
-                <span
-                  key={j}
-                  className={
-                    "strong" in p && p.strong
-                      ? "font-semibold text-[var(--accent-ink)]"
-                      : "muted" in p && p.muted
-                        ? "text-[var(--ink-muted)]"
-                        : undefined
-                  }
-                >
-                  {p.t}
-                </span>
-              ))}
+              <Marked parts={parts} />
             </p>
           ))}
 
-          <dl className="mt-7 flex flex-col gap-[11px] border-t border-[var(--line)] pt-[22px]">
-            {about.fields.map((f) => (
-              <div key={f.k} className="flex items-baseline gap-[14px]">
-                <dt className="w-[84px] flex-none font-mono text-[10.5px] tracking-[0.1em] text-[var(--ink-faint)] uppercase">
-                  {f.k}
-                </dt>
-                <dd className="m-0 font-mono text-[13px] leading-[1.5] tracking-[-0.005em]">
-                  {f.v}
-                  {"sub" in f && f.sub && (
-                    <span className="ml-1 text-[11px] text-[var(--ink-muted)]">{f.sub}</span>
-                  )}
-                </dd>
-              </div>
+          {/* Linha de conferência: mono, corpo pequeno e um filete acima. Fica
+              quieta pelo tamanho e pela posição, não por contraste baixo —
+              --ink-faint aqui dava 2,2:1 sobre o fundo, ilegível a 12px.
+              --accent-ink dá 6,7:1. */}
+          <ul className="m-0 mt-[clamp(18px,3vh,28px)] flex list-none flex-wrap gap-x-7 gap-y-2 border-t border-line p-0 pt-[clamp(12px,1.8vh,18px)] font-mono text-[12px] tracking-[0.01em] text-accent-ink">
+            {about.credentials.map((c) => (
+              <li key={c}>{c}</li>
             ))}
-          </dl>
+          </ul>
         </div>
       </div>
     </Section>

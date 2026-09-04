@@ -19,6 +19,8 @@ export type Project = {
   tags: string[];
   repo: string | null;
   site: string | null;
+  /** documento público do projeto (PDF em public/papers) — mesma regra: null não renderiza */
+  paper: { href: string; label: string } | null;
 };
 
 export const projects: ReadonlyArray<Project> = [
@@ -27,7 +29,7 @@ export const projects: ReadonlyArray<Project> = [
     name: "Aletheia",
     org: "Co-Founder & AI Engineer",
     tagline: "Governança de IA com atestação criptográfica",
-    period: "2025 – presente",
+    period: "2026 – presente",
     summary:
       "Governança de IA: cada artefato produzido na esteira recebe atestação criptográfica via Sigstore e in-toto, e o desvio entre execuções de modelos estocásticos é medido com estatística — não com achismo.",
     highlights: [
@@ -37,11 +39,15 @@ export const projects: ReadonlyArray<Project> = [
     tags: ["Sigstore", "in-toto", "GitHub Actions", "Wilcoxon", "Bootstrap"],
     repo: null,
     site: null,
+    paper: { href: "/papers/aletheia.pdf", label: "Ler o artigo" },
   },
   {
     id: "bravend-core",
     name: "Core de IA",
-    org: "Bravend · Engenharia de IA & ML",
+    // "Engenharia de IA & ML" saiu daqui em 2026-09-04: o cargo dele na Bravend
+    // é Estágio em Engenharia de Software (ver correção na Seção 4). O núcleo de
+    // IA é onde o projeto vive, e é isso que esta linha diz.
+    org: "Bravend · Núcleo de IA",
     tagline: "Agentes LLM, pipelines RAG e assistentes analíticos",
     period: "jun/2026 – presente",
     summary:
@@ -54,6 +60,7 @@ export const projects: ReadonlyArray<Project> = [
     tags: ["Claude", "OpenAI", "Codex", "RAG", "Fine-tuning"],
     repo: null,
     site: null,
+    paper: null,
   },
   {
     id: "resonance",
@@ -73,5 +80,6 @@ export const projects: ReadonlyArray<Project> = [
     tags: ["Python", "XGBoost", "SHAP"],
     repo: null,
     site: null,
+    paper: null,
   },
 ];

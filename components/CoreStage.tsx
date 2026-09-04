@@ -1,8 +1,8 @@
 "use client";
 
-import { Component, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import { useInViewport } from "@/lib/useInViewport";
+import { SceneBoundary } from "./SceneBoundary";
 
 // Three.js precisa de WebGL: nada de SSR — mesmo padrão do HeadStage.
 //
@@ -10,18 +10,6 @@ import { useInViewport } from "@/lib/useInViewport";
 // procedural continua em ./CoreScene, intacta: reverter é trocar o caminho
 // desta linha.
 const CoreScene = dynamic(() => import("./CoreVideoScene"), { ssr: false });
-
-// WebGL decorativo nunca pode derrubar a rota: sem contexto WebGL a seção
-// degrada pra texto puro — o significado mora nos blocos de texto.
-class SceneBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
-  state = { failed: false };
-  static getDerivedStateFromError() {
-    return { failed: true };
-  }
-  render() {
-    return this.state.failed ? null : this.props.children;
-  }
-}
 
 export function CoreStage() {
   // Duas margens, dois propósitos: a larga adianta o download do vídeo antes de

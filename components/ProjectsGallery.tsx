@@ -145,7 +145,11 @@ export function ProjectsGallery() {
             ? [
                 { k: "Período", v: current.period || "—" },
                 { k: "Stack", v: current.tags.slice(0, 2).join(" · ") },
-                { k: "Repositório", v: current.repo ? "Público" : "—" },
+                // projeto com documento público troca a linha de repositório
+                // pela do artigo: o código da Aletheia não vai abrir, o artigo sim
+                current.paper
+                  ? { k: "Documento", v: "Artigo público" }
+                  : { k: "Repositório", v: current.repo ? "Público" : "—" },
               ]
             : [
                 { k: "Período", v: "—" },

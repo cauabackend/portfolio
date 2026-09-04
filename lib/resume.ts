@@ -35,26 +35,39 @@ export const experiences: Experience[] = [
   {
     id: "bravend",
     org: "Bravend",
-    role: "Estágio em Engenharia de IA & ML",
+    // CORREÇÃO 2026-09-04 (dita pelo usuário): o estágio é de Engenharia de
+    // SOFTWARE. Constava "Engenharia de IA & ML", que era o trabalho, não o
+    // cargo. Ele escreve o software do produto e, além disso, atua no núcleo de
+    // IA — é o que o primeiro bullet passou a dizer.
+    role: "Estágio em Engenharia de Software",
     period: "jun/2026 – presente",
     current: true,
+    // Reescrito em 2026-09-04 para a voz do site, sem tirar nem acrescentar
+    // fato. O bullet de currículo vinha em fragmento nominal com gerúndio de
+    // fecho ("...reduzindo custos operacionais em 15%") e com adjetivo vago
+    // ("automação inteligente"). Vira frase direta, com o número no fim, que é
+    // onde o olho para. highlights[0] não é bullet, alimenta o subtítulo.
     highlights: [
-      "Atuação central no core de IA da empresa",
-      "Automação inteligente com ganho de eficiência de ~50%",
-      "Fine-tuning de múltiplos agentes LLM (Claude, OpenAI, Codex), reduzindo custos operacionais em 15%",
-      "Pipelines RAG e assistentes analíticos",
+      "Escrevo o software do produto e trabalho no núcleo de IA da empresa.",
+      "Fiz fine-tuning dos agentes LLM sobre Claude, OpenAI e Codex. O ajuste tirou 15% do custo operacional.",
+      "A automação que construí subiu a eficiência da operação em cerca de 50%.",
+      "Construo os pipelines de RAG por trás dos assistentes analíticos.",
     ],
   },
   {
     id: "aletheia",
     org: "Aletheia",
     role: "Co-Founder & AI Engineer",
-    period: "2025 – presente",
+    period: "2026 – presente",
     current: true,
+    // Frase nominal de propósito, e não no presente do indicativo: a Aletheia
+    // AINDA ESTÁ EM CONSTRUÇÃO (dito pelo usuário em 2026-09-04). "A esteira
+    // assina" seria sistema em operação. Os dois-pontos de "Rigor estatístico:"
+    // saíram, o rótulo só anunciava o que a própria frase já diz.
     highlights: [
-      "Governança de IA",
-      "Atestação criptográfica integrada ao Sigstore e in-toto via GitHub Actions",
-      "Rigor estatístico: testes pareados de Wilcoxon e bootstrap por agrupamento para medir desvios em modelos estocásticos",
+      "Plataforma de governança para modelos de IA, em construção.",
+      "Atestação criptográfica de cada artefato com Sigstore e in-toto, pelo GitHub Actions.",
+      "Desvio entre duas versões de um modelo medido com Wilcoxon pareado e bootstrap por agrupamento.",
     ],
   },
   {
@@ -73,56 +86,163 @@ export const experiences: Experience[] = [
 
 // Linha de posicionamento da seção Experiência (§5.4) — copy fornecida pelo
 // usuário em 2026-09-01, com o título alinhado ao profile.role do site.
+// NÃO RENDERIZADO desde 2026-09-04. Era a linha do rodapé da coluna esquerda da
+// Experiência e o usuário a rejeitou por vaga, com razão: "soluções baseadas em
+// dados" não diz o que foi feito, e o pipe é resquício de headline de LinkedIn.
+// O lugar dela passou a ser ocupado pela formação (FIAP), que é fato com data.
+// Mantida aqui, e não apagada, caso ele queira a linha de posicionamento de volta.
 export const careerSummary =
   "Desenvolvimento de soluções baseadas em dados | AI & Machine Learning Engineer";
 
-// Copy da seção Sobre — texto aprovado no mockup sobre-v1.html (CONTEXTO.md §5.2).
-// Marcações inline viram <b>/<span class="muted"> no componente.
+// Copy da seção Sobre (CONTEXTO.md §5.2). Marcações inline viram
+// <b>/<span class="muted"> no componente.
+//
+// Reescrita em 2026-09-04. A versão do mockup só repetia a trajetória que a
+// seção Experiência já conta, e abria repetindo o próprio <h2>. Esta abre com a
+// especialidade, põe no centro a tese que explica POR QUE ele trabalha assim
+// (modelo estocástico não avisa quando piora) e só então usa o currículo como
+// prova. A lista de dados (nome/local/formação/idiomas) foi removida da seção a
+// pedido do usuário: formação, cidade e idiomas voltaram para o último
+// parágrafo, e nome/foco já estão no Hero.
+// Regras de escrita do texto: sem travessão, sem dois-pontos, sem ponto e
+// vírgula e sem enumeração de três itens em paralelo. São os padrões que fazem
+// um texto ler como gerado por máquina.
 export const about = {
   paragraphs: [
     [
-      { t: "Comecei como desenvolvedor " },
-      { t: "full-stack", muted: true },
-      { t: " — hoje o foco é " },
-      { t: "engenharia de IA", strong: true },
-      { t: ": fine-tuning de agentes LLM, pipelines RAG e governança de sistemas estocásticos." },
+      { t: "Faço IA de ponta a ponta, do ajuste fino do modelo ao deploy e à governança em produção. Software determinístico quebra e você vê na hora. " },
+      { t: "Modelo estocástico degrada calado", strong: true },
+      { t: ", e responde com a mesma confiança de antes." },
     ],
     [
-      { t: "Atuo no core de IA da " },
-      { t: "Bravend", strong: true },
-      { t: " e co-fundo a " },
+      // A Aletheia AINDA ESTÁ EM CONSTRUÇÃO (dito pelo usuário em 2026-09-04),
+      // apesar de o "sobre" do LinkedIn dele descrever a esteira no presente.
+      // Por isso a frase é de propósito, não de sistema em operação: "estou
+      // construindo... para". Só trocar para o presente quando ele disser que
+      // a esteira roda.
+      { t: "Estou construindo a " },
       { t: "Aletheia", strong: true },
       {
-        t: ", onde uso rigor estatístico — testes de Wilcoxon, bootstrap por agrupamento — pra medir desvio real em modelos de IA, não achismo. ",
+        t: ", que co-fundei, para deixar esse caminho auditável. Cada etapa do pipeline assinada com Sigstore e in-toto, e nenhuma versão de modelo virando afirmação sem Wilcoxon pareado e bootstrap.",
       },
-      { t: "Engenharia de Software na FIAP, em andamento.", muted: true },
     ],
+    [
+      { t: "Na " },
+      { t: "Bravend", strong: true },
+      { t: " ajusto os agentes LLM sobre Claude, OpenAI e Codex e construo os pipelines RAG dos assistentes analíticos. O ajuste tirou " },
+      { t: "15% do custo operacional", strong: true },
+      { t: " e a automação subiu a eficiência em " },
+      { t: "cerca de 50%", strong: true },
+      { t: "." },
+    ],
+    // O parágrafo sobre o Resonance (XGBoost, 114k faixas, SHAP) foi escrito e
+    // REMOVIDO a pedido do usuário em 2026-09-04. O projeto já tem card próprio
+    // na seção Projetos; aqui ele alongava a seção sem acrescentar argumento.
   ],
-  fields: [
-    { k: "Nome", v: profile.name },
-    { k: "Local", v: profile.location },
-    { k: "Formação", v: "Eng. de Software — FIAP", sub: "· 2025–2029" },
-    { k: "Idiomas", v: "PT nativo · EN B2 · ES B1" },
-    { k: "Foco", v: "Full-Stack → AI & ML Engineer" },
-  ],
+  // Formação, cidade e idioma são conferência, não argumento. Viram uma linha de
+  // dados em mono no pé da coluna em vez de um parágrafo com o mesmo peso visual
+  // dos que carregam a prova.
+  credentials: ["Eng. de Software, FIAP · 3º semestre", "São Paulo, SP", "Inglês B2 · Espanhol B1"],
 } as const;
 
-// Nós da esfera geodésica (CONTEXTO.md §5.3). Só as ferramentas que têm logo de
-// marca real — SVGs baixados uma vez para public/icons/stack/ (sem CDN em runtime).
-// XGBoost/SHAP/Sigstore/in-toto e soft skills seguem pendentes de decisão.
+// Nós da esfera geodésica (CONTEXTO.md §5.3). Só as ferramentas do currículo que
+// têm logo de marca real — SVGs baixados uma vez para public/icons/stack/ (sem CDN
+// em runtime). O que não tem logotipo vive em `competencies`, logo abaixo.
 export const stack = [
   { label: "Python", icon: "python" },
   { label: "Claude", icon: "anthropic" },
   { label: "OpenAI", icon: "openai" },
-  { label: "Next.js", icon: "nextjs" },
-  { label: "React", icon: "react" },
-  { label: "TypeScript", icon: "typescript" },
-  { label: "JavaScript", icon: "javascript" },
-  { label: "Node.js", icon: "nodejs" },
-  { label: "Tailwind CSS", icon: "tailwindcss" },
+  { label: "Hugging Face", icon: "huggingface" },
+  { label: "LangChain", icon: "langchain" },
+  { label: "PyTorch", icon: "pytorch" },
+  { label: "TensorFlow", icon: "tensorflow" },
+  { label: "scikit-learn", icon: "scikitlearn" },
+  { label: "Pandas", icon: "pandas" },
+  { label: "NumPy", icon: "numpy" },
+  { label: "FastAPI", icon: "fastapi" },
+  { label: "Streamlit", icon: "streamlit" },
+  { label: "PostgreSQL", icon: "postgresql" },
+  { label: "MySQL", icon: "mysql" },
+  { label: "Docker", icon: "docker" },
+  { label: "AWS", icon: "aws" },
+  { label: "Vercel", icon: "vercel" },
   { label: "Git", icon: "git" },
   { label: "GitHub", icon: "github" },
   { label: "GitHub Actions", icon: "githubactions" },
+  { label: "TypeScript", icon: "typescript" },
+  { label: "React", icon: "react" },
+  { label: "Next.js", icon: "nextjs" },
+] as const;
+
+// Índice COMPLETO de competências (currículo + "Main skills" do LinkedIn). Inclui
+// de propósito as ferramentas que já estão no globo: o usuário pediu a lista
+// inteira aqui, porque o globo mostra logotipo e este texto é o que o recrutador
+// lê e busca por palavra. O que só existe aqui é o que não tem logo de marca
+// (método, técnica, estatística).
+export const competencies = [
+  {
+    group: "IA generativa & LLMs",
+    items: [
+      "OpenAI",
+      "Claude",
+      "Codex",
+      "LLaMA",
+      "Hugging Face",
+      "LangChain",
+      "RAG",
+      "Fine-tuning",
+      "Prompt engineering",
+      "LLMOps",
+      "Sistemas multiagente",
+      "Vector databases",
+    ],
+  },
+  {
+    group: "ML, estatística & governança",
+    items: [
+      "Python",
+      "PyTorch",
+      "TensorFlow",
+      "scikit-learn",
+      "XGBoost",
+      "Pandas",
+      "NumPy",
+      "SHAP",
+      "Testes de hipótese",
+      "Wilcoxon pareado",
+      "Bootstrap por agrupamento",
+      "Sigstore",
+      "in-toto",
+      "Auditoria de modelos",
+    ],
+  },
+  {
+    group: "Engenharia, dados & infra",
+    items: [
+      "FastAPI",
+      "REST APIs",
+      "PostgreSQL",
+      "MySQL",
+      "Docker",
+      "AWS",
+      // Vercel saiu do índice a pedido do usuário (2026-09-04). Continua como nó
+      // do globo; para tirar de vez, remover também de `stack`.
+      "Streamlit",
+      "Git",
+      "GitHub",
+      "GitHub Actions",
+      "CI/CD",
+      "MLOps",
+      "Arquitetura de software",
+      "TypeScript",
+      "React",
+      "Next.js",
+    ],
+  },
+  {
+    group: "Fundamentos",
+    items: ["Lógica de programação", "Algoritmos", "Estruturas de dados"],
+  },
 ] as const;
 
 // Âncoras da navegação single-page. A ordem define a ordem das seções na página.

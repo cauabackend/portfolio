@@ -15,12 +15,6 @@ import { motion, useReducedMotion } from "motion/react";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-export const SCHEMATIC_CAPTION: Record<string, string> = {
-  aletheia: "Cadeia de atestação · Sigstore + in-toto",
-  "bravend-core": "Pipeline · recuperação → agentes",
-  resonance: "Classificação · 114k faixas",
-};
-
 /** ruído determinístico: LCG semeado — `Math.random` divergiria entre renders */
 function scatter(seed: number, count: number) {
   let s = seed;
@@ -45,6 +39,14 @@ const SIGNATURE_BLOCK = [9, 16, 6, 22, 11, 7, 18, 13, 24, 8, 15, 10].map((w, i, 
   x: 18 + all.slice(0, i).reduce((sum, prev) => sum + prev + 4, 0),
 }));
 
+// A caixa é recortada no conteúdo de cada desenho: com um viewBox único, a
+// folga vazia do SVG virava um vão entre a figura e a legenda abaixo dela.
+const VIEWBOX: Record<string, string> = {
+  aletheia: "0 26 320 186",
+  "bravend-core": "0 46 320 174",
+  resonance: "0 26 320 202",
+};
+
 export function ProjectSchematic({ id, className = "" }: { id: string; className?: string }) {
   const reduced = useReducedMotion() ?? false;
 
@@ -60,7 +62,7 @@ export function ProjectSchematic({ id, className = "" }: { id: string; className
   });
 
   return (
-    <svg aria-hidden viewBox="0 0 320 240" className={className}>
+    <svg aria-hidden viewBox={VIEWBOX[id] ?? "0 0 320 240"} className={className}>
       <defs>
         <pattern id="ps-dots" width="16" height="16" patternUnits="userSpaceOnUse">
           <circle cx="1" cy="1" r="1" fill="var(--ink-faint)" />
@@ -132,7 +134,7 @@ function Caption({
 }
 
 // ── Aletheia: build → artefato → atestação assinada ─────────────────────────
-function Attestation({ draw, fade }: Anim) {
+function Attestation({ fade }: Anim) {
   // a esteira ocupa a faixa esquerda e o selo a direita: as legendas são largas
   // em mono, e um passo a mais empurraria "ASSINADO" para fora do viewBox
   const plates = [
@@ -179,10 +181,20 @@ function Attestation({ draw, fade }: Anim) {
       ))}
 
       {/* elos da esteira */}
+      {/* tracejados entram por opacidade: `draw` usa pathLength, que sobrescreve
+          a stroke-dasharray e apaga o tracejado */}
       {[68, 144].map((x, i) => (
-        <motion.g key={x} {...draw(0.32 + i * 0.18)}>
-          <line x1={x} y1="111" x2={x + 20} y2="111" stroke="var(--ink-muted)" strokeWidth="1.2" strokeDasharray="3 3" />
-        </motion.g>
+        <motion.line
+          key={x}
+          x1={x}
+          y1="111"
+          x2={x + 20}
+          y2="111"
+          stroke="var(--ink-muted)"
+          strokeWidth="1.2"
+          strokeDasharray="3 3"
+          {...fade(0.32 + i * 0.18)}
+        />
       ))}
       {[86, 162].map((x, i) => (
         <motion.path
@@ -198,9 +210,16 @@ function Attestation({ draw, fade }: Anim) {
       ))}
 
       {/* selo: hexágono usinado com anel de alcance e glow */}
-      <motion.g {...draw(0.72)}>
-        <line x1="220" y1="111" x2="240" y2="111" stroke="var(--ink-muted)" strokeWidth="1.2" strokeDasharray="3 3" />
-      </motion.g>
+      <motion.line
+        x1="220"
+        y1="111"
+        x2="240"
+        y2="111"
+        stroke="var(--ink-muted)"
+        strokeWidth="1.2"
+        strokeDasharray="3 3"
+        {...fade(0.72)}
+      />
       <motion.g {...fade(0.9)}>
         <circle cx="272" cy="111" r="26" fill="none" stroke="var(--ink-faint)" strokeWidth="1" strokeDasharray="2 6" />
         <ellipse cx="272" cy="136" rx="15" ry="4" fill="rgba(15,17,17,0.16)" filter="url(#ps-blur)" />
@@ -240,7 +259,9 @@ function Attestation({ draw, fade }: Anim) {
 // ── Bravend: corpus → recuperação → agentes → resposta ──────────────────────
 function Pipeline({ draw, fade }: Anim) {
   const corpus = [56, 79, 102, 125, 148];
-  const agents = [66, 112, 158];
+  // a pilha para acima de 160: as legendas correm em y=176 e o último agente
+  // encostava nelas
+  const agents = [62, 100, 138];
 
   return (
     <>
@@ -304,7 +325,7 @@ function Pipeline({ draw, fade }: Anim) {
           stroke="var(--ink-muted)"
           strokeWidth="1.2"
           strokeDasharray="3 3"
-          {...draw(0.66 + i * 0.08)}
+          {...fade(0.66 + i * 0.08)}
         />
       ))}
 
@@ -355,7 +376,7 @@ function Pipeline({ draw, fade }: Anim) {
 }
 
 // ── Resonance: 114k faixas classificadas + atribuição SHAP ──────────────────
-function Classifier({ draw, fade }: Anim) {
+function Classifier({ fade }: Anim) {
   // caixa do gráfico em coordenadas do viewBox
   const box = { x: 24, y: 34, w: 196, h: 140 };
   const px = (u: number) => box.x + u * box.w;
@@ -398,13 +419,15 @@ function Classifier({ draw, fade }: Anim) {
       </motion.g>
 
       {/* fronteira de decisão */}
+      {/* fade, não `draw`: o pathLength do motion escreve na própria
+          stroke-dasharray, e animar o traço apagava o tracejado */}
       <motion.path
         d={`M${px(0.06)} ${py(0.92)} C ${px(0.4)} ${py(0.78)}, ${px(0.5)} ${py(0.34)}, ${px(0.94)} ${py(0.14)}`}
         fill="none"
         stroke="var(--accent-ink)"
         strokeWidth="1.4"
         strokeDasharray="5 4"
-        {...draw(0.55)}
+        {...fade(0.55)}
       />
 
       {/* ponto em análise + retícula com chamada */}
