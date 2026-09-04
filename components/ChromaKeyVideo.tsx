@@ -21,7 +21,10 @@ const FRAGMENT = /* glsl */ `
   uniform float similarity;
   uniform float smoothness;
   uniform float spill;
+  uniform float fadeBottom;
   varying vec2 vUv;
+
+  const vec3 LUMA = vec3(0.299, 0.587, 0.114);
 
   vec2 chroma(vec3 c) {
     return vec2(
@@ -50,15 +53,26 @@ const FRAGMENT = /* glsl */ `
     float dist = distance(chroma(texel.rgb), chroma(sampleKey()));
     float alpha = smoothstep(similarity, similarity + smoothness, dist);
 
-    // Despill: a borda de um objeto sobre fundo verde recebe verde refletido, e
-    // o key sozinho não tira isso — sem despill sobra um contorno esverdeado.
-    // Onde o verde supera os outros canais, puxa o pixel para o cinza de mesma
-    // luminância.
-    float excess = texel.g - max(texel.r, texel.b);
-    if (excess > 0.0) {
-      float luma = dot(texel.rgb, vec3(0.299, 0.587, 0.114));
-      texel.rgb = mix(texel.rgb, vec3(luma), clamp(excess * spill, 0.0, 1.0));
+    // Despill/unspill: a borda de um objeto sobre fundo verde recebe verde
+    // refletido — e uma superfície cromada REFLETE o fundo inteiro, então o
+    // resíduo aparece também em rastros dentro da figura, longe de qualquer
+    // borda. A versão anterior misturava o pixel com o cinza da própria
+    // luminância, o que lava a peça sem matar o verde.
+    //
+    // Aqui o verde é limitado ao teto que uma superfície acromática (metal,
+    // cristal) admite — a média de R e B. Acima disso é reflexo do fundo, por
+    // construção. A luminância perdida no corte é devolvida na escala, senão a
+    // área tratada escurece e vira uma mancha; o teto de 1.12 evita estourar.
+    float cap = (texel.r + texel.b) * 0.5;
+    if (texel.g > cap) {
+      float before = dot(texel.rgb, LUMA);
+      texel.g = mix(texel.g, cap, spill);
+      texel.rgb *= clamp(before / max(dot(texel.rgb, LUMA), 1e-4), 1.0, 1.12);
     }
+
+    // Degradê na borda inferior: o quadro corta a figura numa linha reta, e sem
+    // isso a peça termina em corte seco contra o fundo da página.
+    alpha *= smoothstep(0.0, max(fadeBottom, 1e-4), vUv.y);
 
     if (alpha < 0.004) discard; // pixel totalmente vazado não escreve nada
     gl_FragColor = vec4(texel.rgb, alpha);
@@ -78,7 +92,7 @@ export type ChromaKeyOptions = {
   similarity: number;
   /** largura da transição — 0 dá borda serrilhada */
   smoothness: number;
-  /** força da remoção do verde refletido na borda */
+  /** 0–1: quanto do verde acima do teto acromático é removido (1 = tudo) */
   spill: number;
 };
 
@@ -92,6 +106,7 @@ export function ChromaKeyVideo({
   options,
   fit,
   playing = true,
+  fadeBottom = 0,
 }: {
   src: string;
   options: ChromaKeyOptions;
@@ -99,6 +114,9 @@ export function ChromaKeyVideo({
   fit: number;
   /** false pausa a decodificação — vídeo 2K rodando fora da tela pesa na rolagem */
   playing?: boolean;
+  /** 0–1: fração da altura do quadro que dissolve na borda de baixo, para a
+   *  figura não terminar em corte reto contra o fundo da página */
+  fadeBottom?: number;
 }) {
   const [aspect, setAspect] = useState(1);
   const maxAnisotropy = useThree((s) => s.gl.capabilities.getMaxAnisotropy());
@@ -161,6 +179,7 @@ export function ChromaKeyVideo({
       similarity: { value: options.similarity },
       smoothness: { value: options.smoothness },
       spill: { value: options.spill },
+      fadeBottom: { value: fadeBottom },
     }),
     // de propósito só `texture`: os parâmetros entram pelo efeito abaixo, senão
     // cada ajuste recompilaria o shader
@@ -175,7 +194,8 @@ export function ChromaKeyVideo({
     uniforms.similarity.value = options.similarity;
     uniforms.smoothness.value = options.smoothness;
     uniforms.spill.value = options.spill;
-  }, [options, uniforms]);
+    uniforms.fadeBottom.value = fadeBottom;
+  }, [options, fadeBottom, uniforms]);
   /* eslint-enable react-hooks/immutability */
 
   useEffect(() => {

@@ -13,7 +13,10 @@ import { ChromaKeyVideo, type ChromaKeyOptions } from "./ChromaKeyVideo";
 const KEY: ChromaKeyOptions = {
   similarity: 0.072,
   smoothness: 0.07,
-  spill: 2.4,
+  // 1 = verde puxado até o teto acromático. O 2.4 daqui era da fórmula antiga
+  // de despill; com a atual o `mix` extrapola, o canal verde cai abaixo dos
+  // outros dois e o cristal ganha mancha magenta.
+  spill: 1,
 };
 
 // A peça 3D era enquadrada por `0.94 * min(largura, altura)` do viewport. O
